@@ -1,21 +1,19 @@
 module.exports = function headerTemplate() {
-    return `
-      <div class="header">
-        <table>
-          <tr>
-            <td align="left">
+    return `  <div class="header">
+  <table>
+      <tr>
+          <td align="left">
               <img
-                src="../../../public/assets/images/mv_logo.png"
-                alt="MAYAVRIKSH Logo"
-                style="max-height: 50px; display: block;"
+                  src="https://res.cloudinary.com/dwdu18hzs/image/upload/v1756148350/751fd396-66c6-481f-8016-e9003210be97-photoaidcom-cropped_1_zksjmb.png"
+                  alt="MAYAVRIKSH Logo"
               />
-            </td>
-            <td align="right">
-              <h1 style="margin:0; font-size:22px; color:#ffffff; font-weight:bold;">MAYAVRIKSH</h1>
-              <p style="margin:2px 0 0; font-size:13px; color:#d4e8d4; letter-spacing:0.5px;">From Soil to Soul</p>
-            </td>
-          </tr>
-        </table>
-      </div>
-    `;
+          </td>
+          <td align="right">
+              <h1>MAYAVRIKSH</h1>
+              <p>From Soil to Soul</p>
+          </td>
+      </tr>
+  </table>
+</div>
+  `;
 };

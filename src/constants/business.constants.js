@@ -13,5 +13,6 @@ module.exports = {
         LANDMARK: "Near Shyambazar Metro",
         LATITUDE: "22.5995",
         LONGITUDE: "88.3697"
-    }
+    },
+    LOGO:"https://res.cloudinary.com/dwdu18hzs/image/upload/v1756148350/751fd396-66c6-481f-8016-e9003210be97-photoaidcom-cropped_1_zksjmb.png"
 };

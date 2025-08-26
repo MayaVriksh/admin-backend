@@ -26,7 +26,7 @@
         "seed:pot_materials": "node src/seeder/scripts/potMaterials.seeder.js",
         "seed:pots": "node src/seeder/scripts/pots.seeder.js",
         "seed:purchase_order": "node src/seeder/scripts/purchaseOrder.seeder.js",
-        "postinstall": "prisma generate"
+        "postinstall": "prisma generate --no-engine"
     },
     "prisma": {
         "schema": "src/prisma/schema.prisma"

@@ -1,5 +1,11 @@
 const nodemailer = require("nodemailer");
-const { COMPANY_NAME, SUPPORT_EMAIL } = require("../constants/business.constants"); // adjust path as needed
+const {
+    COMPANY_NAME,
+    SUPPORT_EMAIL
+} = require("../constants/business.constants");
+const { AUTH } = require("../constants/emailSubjects.constants");
+const welcomeTemplate = require("../email-templates/users/welcome.template");
+require("dotenv").config();
 
 // =============================
 // Transporter Configuration
@@ -15,6 +21,9 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS // Your email password from .env
     }
 });
+
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "****" : "MISSING");
 
 // =============================
 // Generic Send Email Function
@@ -51,5 +60,12 @@ const sendEmail = async ({ to, subject, html, from }) => {
 
 module.exports = sendEmail;
 
+(async () => {
+    const result = await sendEmail({
+        to: "j6362254@gmail.com",
+        subject: AUTH.ACCOUNT_VERIFIED,
+        html: welcomeTemplate({ name: "SAKET" })
+    });
 
-
+    console.log(result);
+})();
