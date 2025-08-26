@@ -26,10 +26,7 @@
         "seed:pot_materials": "node src/seeder/scripts/potMaterials.seeder.js",
         "seed:pots": "node src/seeder/scripts/pots.seeder.js",
         "seed:purchase_order": "node src/seeder/scripts/purchaseOrder.seeder.js",
-        "seed:variant_images": "node src/seeder/scripts/variantImages.seeder.js",
-        "seed:plant_inventory": "node src/seeder/scripts/plantWarehouseInventory.seeder.js",
-        "seed:pot_inventory": "node src/seeder/scripts/potWarehouseInventory.seeder.js",
-        "postinstall": "prisma generate"
+        "postinstall": "prisma generate --no-engine"
     },
     "prisma": {
         "schema": "src/prisma/schema.prisma"
@@ -40,6 +37,7 @@
         "@hapi/vision": "^7.0.3",
         "@prisma/client": "^6.14.0",
         "@prisma/extension-accelerate": "^2.0.2",
+        "@sendgrid/mail": "^8.1.5",
         "axios": "^1.11.0",
         "bcrypt": "^6.0.0",
         "cloudinary": "^2.7.0",
