@@ -8,17 +8,15 @@ const welcomeTemplate = require("../email-templates/users/welcome.template");
 require("dotenv").config();
 
 // =============================
-// Transporter Configuration
+// Gmail Transporter Configuration
 // =============================
-// NOTE: For production, configure with a real email provider like SendGrid, AWS SES, Gmail, or any SMTP service.
-// For local/dev testing, you can still use Ethereal.
 const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || "smtp.ethereal.email",
-    port: parseInt(process.env.EMAIL_PORT, 10) || 587,
-    secure: process.env.EMAIL_SECURE === "true", // true for 465, false for others
+    host: process.env.EMAIL_HOST || "smtp.gmail.com",
+    port: parseInt(process.env.EMAIL_PORT, 10) || 465,
+    secure: process.env.EMAIL_SECURE === "true", // SSL for 465
     auth: {
-        user: process.env.EMAIL_USER, // Your email username from .env
-        pass: process.env.EMAIL_PASS // Your email password from .env
+        user: process.env.EMAIL_USER, // Gmail address
+        pass: process.env.EMAIL_PASS // Gmail App Password
     }
 });
 
@@ -26,46 +24,62 @@ console.log("EMAIL_USER:", process.env.EMAIL_USER);
 console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "****" : "MISSING");
 
 // =============================
-// Generic Send Email Function
+// Generic Send Email Function with Retry
 // =============================
-/**
- * Sends an email using nodemailer transporter.
- * @param {object} options
- * @param {string} options.to - Recipient email address.
- * @param {string} options.subject - Email subject line.
- * @param {string} options.html - HTML body content.
- * @param {string} [options.from] - Optional custom sender email.
- */
-const sendEmail = async ({ to, subject, html, from }) => {
-    try {
-        const info = await transporter.sendMail({
-            from: from || `"${COMPANY_NAME}" <${SUPPORT_EMAIL}>`, // Default from constants
-            to,
-            subject,
-            html
-        });
+const sendEmail = async ({ to, subject, html, retries = 3 }) => {
+    let attempt = 0;
 
-        // If using Ethereal (dev mode), log preview link
-        if (nodemailer.getTestMessageUrl(info)) {
-            console.log("📧 Preview URL:", nodemailer.getTestMessageUrl(info));
+    while (attempt <= retries) {
+        try {
+            const info = await transporter.sendMail({
+                from: `"${COMPANY_NAME}" <${SUPPORT_EMAIL}>`,
+                to,
+                subject,
+                html
+            });
+
+            // Gmail does not provide preview links like Ethereal
+            console.log(
+                `✅ Email sent to ${to} | Subject: ${subject} | MessageID: ${info.messageId}`
+            );
+            return { success: true, messageId: info.messageId };
+        } catch (error) {
+            console.error(
+                `❌ Attempt ${attempt + 1} failed to send email:`,
+                error
+            );
+
+            // Gmail sometimes blocks temporarily; wait before retrying
+            if (attempt === retries) return { success: false, error };
+            attempt++;
+            await new Promise((res) => setTimeout(res, 2000 * attempt)); // exponential backoff
         }
-
-        console.log(`✅ Email sent to ${to} | Subject: ${subject}`);
-        return { success: true, messageId: info.messageId };
-    } catch (error) {
-        console.error("❌ Error sending email:", error);
-        return { success: false, error };
     }
 };
 
-module.exports = sendEmail;
+// =============================
+// Optional Queue for Batch Emails
+// =============================
+const emailQueue = [];
+const queueEmail = (emailOptions) => emailQueue.push(emailOptions);
 
+const processQueue = async () => {
+    while (emailQueue.length > 0) {
+        const email = emailQueue.shift();
+        await sendEmail(email);
+    }
+};
+
+module.exports = { sendEmail, queueEmail, processQueue };
+
+// =============================
+// Example: Send a test email
+// =============================
 (async () => {
     const result = await sendEmail({
-        to: "j6362254@gmail.com",
+        to: "testingmine87@gmail.com",
         subject: AUTH.ACCOUNT_VERIFIED,
         html: welcomeTemplate({ name: "SAKET" })
     });
-
     console.log(result);
 })();

@@ -5,13 +5,15 @@ const {
 } = require("../constants/business.constants"); // adjust path as needed
 const { AUTH } = require("../constants/emailSubjects.constants");
 const welcomeTemplate = require("../email-templates/users/welcome.template");
+require("dotenv").config();
 
 // =============================
 // SendGrid Configuration
 // =============================
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-// console.log(process.env.SENDGRID_API_KEY);
+
+console.log(process.env.SENDGRID_API_KEY);
 
 // =============================
 // Generic Send Email Function
@@ -41,6 +43,7 @@ const sendEmail = async ({ to, subject, html, from }) => {
         return { success: true, status: response.statusCode };
     } catch (error) {
         console.error("❌ Error sending email:", error);
+        console.error("❌ Error sending:", error.response.body);
         return { success: false, error };
     }
 };
@@ -54,6 +57,6 @@ module.exports = sendEmail;
     await sendEmail({
         to: "j6362254@gmail.com",
         subject: AUTH.ACCOUNT_VERIFIED,
-        html: welcomeTemplate("SAKET")
+        html: welcomeTemplate({ name: "SAKET" })
     });
 })();
