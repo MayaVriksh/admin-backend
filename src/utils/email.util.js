@@ -20,13 +20,13 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "****" : "MISSING");
+// console.log("EMAIL_USER:", process.env.EMAIL_USER);
+// console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "****" : "MISSING");
 
 // =============================
 // Generic Send Email Function with Retry
 // =============================
-const sendEmail = async ({ to, subject, html, retries = 3 }) => {
+const sendEmail = async (to, subject, html, retries = 2) => {
     let attempt = 0;
 
     while (attempt <= retries) {
@@ -75,11 +75,11 @@ module.exports = { sendEmail, queueEmail, processQueue };
 // =============================
 // Example: Send a test email
 // =============================
-(async () => {
-    const result = await sendEmail({
-        to: "testingmine87@gmail.com",
-        subject: AUTH.ACCOUNT_VERIFIED,
-        html: welcomeTemplate({ name: "SAKET" })
-    });
-    console.log(result);
-})();
+// (async () => {
+//     const result = await sendEmail(
+//         "testingmine87@gmail.com",
+//         AUTH.ACCOUNT_VERIFIED,
+//         welcomeTemplate({ name: "SAKET" })
+//     );
+//     console.log(result);
+// })();

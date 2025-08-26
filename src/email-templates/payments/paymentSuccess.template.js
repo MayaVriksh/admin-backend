@@ -7,7 +7,7 @@ module.exports = function paymentSuccessTemplate({ recipientName, amount, transa
   <!doctype html>
   <html>
     <head>
-      <title>Payment Successful - MAYAVRIKSH</title>
+      <title>Payment Successful - MayaVriksh</title>
       ${styles()}
     </head>
     <body>
@@ -24,7 +24,7 @@ module.exports = function paymentSuccessTemplate({ recipientName, amount, transa
               <p><strong>Date & Time:</strong> ${dateTime}</p>
             </div>
             <p>If you have any questions, reach us at <a href="mailto:support@mayavriksh.com">support@mayavriksh.com</a>.</p>
-            <p class="closing">Thank you for choosing us!<br /><strong>Team MAYAVRIKSH</strong></p>
+            <p class="closing">Thank you for choosing us!<br /><strong>Team MayaVriksh</strong></p>
           </div>
           ${footer()}
         </div>

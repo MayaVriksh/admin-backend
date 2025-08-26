@@ -6,6 +6,56 @@ const {
 } = require("../../../constants/responseCodes.constant.js");
 const ERROR_MESSAGES = require("../../../constants/errorMessages.constant.js");
 
+// Generate Email OTP
+const generateEmailOtp = async (req, h) => {
+    try {
+        const { email } = req.payload;
+
+        await AuthService.generateEmailOtp(email);
+
+        return h
+            .response({
+                success: RESPONSE_FLAGS.SUCCESS,
+                message: SUCCESS_MESSAGES.OTP.SENT
+            })
+            .code(RESPONSE_CODES.SUCCESS);
+    } catch (error) {
+        console.error("Generate Email OTP Error:", error);
+
+        return h
+            .response({
+                success: error.success || RESPONSE_FLAGS.FAILURE,
+                message: error.message || ERROR_MESSAGES.OTP.ERROR
+            })
+            .code(error.code || RESPONSE_CODES.INTERNAL_SERVER_ERROR);
+    }
+};
+
+// Verify Email OTP
+const verifyEmailOtp = async (req, h) => {
+    try {
+        const { email, otp } = req.payload;
+
+        await AuthService.verifyEmailOtp(email, otp);
+
+        return h
+            .response({
+                success: RESPONSE_FLAGS.SUCCESS,
+                message: SUCCESS_MESSAGES.OTP.VERIFIED
+            })
+            .code(RESPONSE_CODES.SUCCESS);
+    } catch (error) {
+        console.error("Verify Email OTP Error:", error);
+
+        return h
+            .response({
+                success: error.success || RESPONSE_FLAGS.FAILURE,
+                message: error.message || ERROR_MESSAGES.OTP.ERROR
+            })
+            .code(error.code || RESPONSE_CODES.INTERNAL_SERVER_ERROR);
+    }
+};
+
 const signup = async (req, h) => {
     try {
         const data = req.payload;
@@ -20,42 +70,23 @@ const signup = async (req, h) => {
     } catch (error) {
         console.error("Signup Error:", error);
 
-        const isDuplicateEmail =
-            error.message.includes("already exists") ||
-            error.message.toLowerCase().includes("duplicate");
-
-        const isMissingWarehouse = error.message
-            .toLowerCase()
-            .includes("warehouse");
-
-        const isUnsupportedRole = error.message
-            .toLowerCase()
-            .includes("unsupported");
-
         return h
             .response({
-                success: RESPONSE_FLAGS.FAILURE,
-                message: isDuplicateEmail
-                    ? ERROR_MESSAGES.AUTH.EMAIL_ALREADY_REGISTERED
-                    : isMissingWarehouse
-                      ? "📦 Warehouse ID is required for supplier registration."
-                      : isUnsupportedRole
-                        ? "🚫 This role is not currently supported for signup."
-                        : ERROR_MESSAGES.AUTH.REGISTRATION_FAILED
+                success: error.success || RESPONSE_FLAGS.FAILURE,
+                message:
+                    error.message || ERROR_MESSAGES.AUTH.REGISTRATION_FAILED
             })
-            .code(
-                isDuplicateEmail
-                    ? RESPONSE_CODES.CONFLICT
-                    : RESPONSE_CODES.BAD_REQUEST
-            );
+            .code(error.code || RESPONSE_CODES.INTERNAL_SERVER_ERROR);
     }
 };
 
 const signin = async (req, h) => {
     try {
         const { email, password } = req.payload;
-        const {accessToken, refreshToken } =
-            await AuthService.login(email, password);
+        const { accessToken, refreshToken } = await AuthService.login(
+            email,
+            password
+        );
         // The secure Refresh Token is set in the HttpOnly cookie
         // The short-lived Access Token is sent in the response body for the client to use
         return h
@@ -86,14 +117,14 @@ const issueNewAccessToken = async (req, h) => {
         console.log("Incoming Refresh Token: ", incomingRefreshToken);
 
         // This service function will verify the refresh token and issue a new access token
-        const {  newAccessToken } =
+        const { newAccessToken } =
             await AuthService.refreshUserToken(incomingRefreshToken);
 
         return h
             .response({
                 success: RESPONSE_FLAGS.SUCCESS,
-                message: "Token refreshed successfully.", // Added a message for consistency
-                        })
+                message: "Token refreshed successfully." // Added a message for consistency
+            })
             .state("mv_access_token", newAccessToken)
             .code(RESPONSE_CODES.SUCCESS);
     } catch (error) {
@@ -112,20 +143,18 @@ const issueNewAccessToken = async (req, h) => {
 
 const logout = async (_, h) => {
     try {
-        return (
-            h
-                .response({
-                    success: true,
-                    message: SUCCESS_MESSAGES.AUTH.LOGOUT_SUCCESS
-                })
-                .unstate("mv_refresh_token", {
-                    path: "/"
-                })
-                .unstate("mv_access_token", {
-                    path: "/"
-                })
-                .code(RESPONSE_CODES.SUCCESS)
-        );
+        return h
+            .response({
+                success: true,
+                message: SUCCESS_MESSAGES.AUTH.LOGOUT_SUCCESS
+            })
+            .unstate("mv_refresh_token", {
+                path: "/"
+            })
+            .unstate("mv_access_token", {
+                path: "/"
+            })
+            .code(RESPONSE_CODES.SUCCESS);
     } catch (error) {
         console.error("Logout error:", error);
         return h
@@ -225,6 +254,8 @@ const changePassword = async (req, h) => {
 };
 
 module.exports = {
+    generateEmailOtp,
+    verifyEmailOtp,
     signup,
     signin,
     issueNewAccessToken,

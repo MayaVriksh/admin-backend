@@ -1,5 +1,6 @@
 const { prisma } = require("../../../config/prisma.config");
 const bcrypt = require("bcrypt");
+const { v4: uuidv4 } = require("uuid");
 const {
     generateAccessToken,
     generateRefreshToken,
@@ -17,22 +18,142 @@ const {
     FIRST_NAME,
     LAST_NAME
 } = require("../../../constants/general.constant.js");
+const generateOtpCode = require("../../../utils/generateOtp.utils.js");
+const { sendEmail } = require("../../../utils/email.util.js");
+const {
+    AUTH,
+    CUSTOMER
+} = require("../../../constants/emailSubjects.constants.js");
+const verifyEmailTemplate = require("../../../email-templates/auth/verifyEmail.template.js");
+const welcomeTemplate = require("../../../email-templates/users/welcome.template.js");
+
+const generateEmailOtp = async (email, userId = null) => {
+    console.log("In AuthService: Generating Email OTP");
+
+    const otp = generateOtpCode(6);
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+    await saveOtp(email, otp, expiresAt, userId);
+
+    await sendEmail(
+        email,
+        AUTH.VERIFY_EMAIL,
+        verifyEmailTemplate({
+            name: "Green Friend",
+            email,
+            otp,
+            requestedAt: new Date().toLocaleString()
+        })
+    );
+
+    await sendEmail(
+        email,
+        CUSTOMER.WELCOME,
+        welcomeTemplate({
+            name: "Green Friend"
+        })
+    );
+
+    console.log(
+        `📩 OTP generated for ${email}: ${otp}, expires at ${expiresAt}`
+    );
+};
+
+const saveOtp = async (email, otp, expiresAt, userId) => {
+    console.log(`➕ Creating new OTP record for ${email}`);
+    return prisma.emailVerification.create({
+        data: {
+            id: uuidv4(),
+            email,
+            userId,
+            token: otp,
+            expiresAt
+        }
+    });
+};
+
+const getLatestEmailVerificationRecord = async (email) => {
+    console.log(`📂 Fetching latest OTP record for ${email}`);
+    return prisma.emailVerification.findFirst({
+        where: { email },
+        orderBy: { createdAt: "desc" }
+    });
+};
+
+const verifyEmailOtp = async (email, otp) => {
+    console.log("In AuthService: Verifying Email OTP");
+
+    const record = await getLatestEmailVerificationRecord(email);
+
+    validateOtpRecord(record, otp);
+
+    await markOtpVerified(record.id);
+
+    console.log(`✅ Email verified: ${email}`);
+};
+
+const validateOtpRecord = (record, otp) => {
+    if (!record) {
+        console.log("❌ No OTP record found");
+        throw {
+            success: RESPONSE_FLAGS.FAILURE,
+            code: RESPONSE_CODES.NOT_FOUND,
+            message: ERROR_MESSAGES.OTP.ERROR
+        };
+    }
+
+    if (record.verified) {
+        console.log("⚠️ OTP already used");
+        throw {
+            success: RESPONSE_FLAGS.FAILURE,
+            code: RESPONSE_CODES.CONFLICT,
+            message: ERROR_MESSAGES.OTP.ALREADY_USED
+        };
+    }
+
+    if (record.token !== otp) {
+        console.log("❌ Invalid OTP entered");
+        throw {
+            success: RESPONSE_FLAGS.FAILURE,
+            code: RESPONSE_CODES.BAD_REQUEST,
+            message: ERROR_MESSAGES.OTP.INVALID
+        };
+    }
+
+    if (new Date() > record.expiresAt) {
+        console.log("⏰ OTP expired");
+        throw {
+            success: RESPONSE_FLAGS.FAILURE,
+            code: RESPONSE_CODES.GONE,
+            message: ERROR_MESSAGES.OTP.EXPIRED
+        };
+    }
+};
+
+const markOtpVerified = async (id) => {
+    console.log(`🔒 Marking OTP record as verified: ${id}`);
+    return prisma.emailVerification.update({
+        where: { id },
+        data: {
+            verified: true,
+            verifiedAt: new Date(),
+            updatedAt: new Date()
+        }
+    });
+};
 
 const register = async (data) => {
-    const { firstName, lastName, email, phoneNumber, password, role } = data;
+    const {
+        firstName,
+        lastName,
+        email,
+        emailVerified,
+        phoneNumber,
+        password,
+        role
+    } = data;
 
     return await prisma.$transaction(async (tx) => {
-        const existingUserByEmail = await tx.user.findUnique({
-            where: { email }
-        });
-        if (existingUserByEmail) {
-            throw {
-                success: RESPONSE_FLAGS.FAILURE,
-                code: RESPONSE_CODES.BAD_REQUEST,
-                message: ERROR_MESSAGES.AUTH.EMAIL_ALREADY_REGISTERED
-            };
-        }
-
         const existingUserByPhone = await tx.user.findUnique({
             where: { phoneNumber }
         });
@@ -41,6 +162,17 @@ const register = async (data) => {
                 success: RESPONSE_FLAGS.FAILURE,
                 code: RESPONSE_CODES.BAD_REQUEST,
                 message: ERROR_MESSAGES.AUTH.PHONE_ALREADY_EXISTS
+            };
+        }
+
+        const existingUserByEmail = await tx.user.findUnique({
+            where: { email }
+        });
+        if (existingUserByEmail) {
+            throw {
+                success: RESPONSE_FLAGS.FAILURE,
+                code: RESPONSE_CODES.BAD_REQUEST,
+                message: ERROR_MESSAGES.AUTH.EMAIL_ALREADY_REGISTERED
             };
         }
 
@@ -87,6 +219,7 @@ const register = async (data) => {
                 userId,
                 roleId: roleRecord.roleId,
                 email,
+                emailVerified,
                 phoneNumber,
                 password: hashedPassword,
                 fullName: {
@@ -440,6 +573,8 @@ const changePassword = async (userId, oldPassword, newPassword) => {
 };
 
 module.exports = {
+    generateEmailOtp,
+    verifyEmailOtp,
     login,
     register,
     refreshUserToken,

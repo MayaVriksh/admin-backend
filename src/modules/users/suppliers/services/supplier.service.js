@@ -1,3 +1,4 @@
+const GeneralConstants = require("../../../../constants/general.constant.js");
 const util = require("util");
 const { v4: uuidv4 } = require("uuid");
 const { prisma } = require("../../../../config/prisma.config.js");
@@ -109,6 +110,15 @@ const completeSupplierProfile = async (
             }
             // --- MODIFIED: Update the User's address JSON blob ---
             // We are only updating the address here, not other User fields. Here
+            const address = {
+                [GeneralConstants.ADDRESS_FIELDS.STREET_ADDRESS]: streetAddress,
+                [GeneralConstants.ADDRESS_FIELDS.LANDMARK]: landmark,
+                [GeneralConstants.ADDRESS_FIELDS.CITY]: city,
+                [GeneralConstants.ADDRESS_FIELDS.STATE]: state,
+                [GeneralConstants.ADDRESS_FIELDS.COUNTRY]: country,
+                [GeneralConstants.ADDRESS_FIELDS.PIN_CODE]: pinCode
+            };
+
             await tx.user.update({
                 where: {
                     userId,
@@ -116,14 +126,7 @@ const completeSupplierProfile = async (
                     deletedAt: null
                 },
                 data: {
-                    address: {
-                        streetAddress,
-                        landmark,
-                        city,
-                        state,
-                        country,
-                        pinCode
-                    },
+                    address,
                     ...(profileImageData && {
                         profileImageUrl: profileImageData.mediaUrl,
                         publicId: profileImageData.publicId

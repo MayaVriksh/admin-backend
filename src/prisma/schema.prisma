@@ -42,6 +42,16 @@ enum DamageType {
   WAREHOUSE_IN_HOUSE // Damage occurring inside the warehouse
 }
 
+enum NotificationCategory {
+  GENERAL
+  ORDER
+  PROMOTION
+  ALERT
+  REMINDER
+  SYSTEM
+  SECURITY
+}
+
 // ---------------------- User & Role Management ----------------------
 
 model User {
@@ -87,6 +97,7 @@ model User {
   EmailVerification               EmailVerification[]       @relation(name: "UserEmailVerifications")
   PhoneVerification               PhoneVerification[]       @relation(name: "UserPhoneVerifications")
   WarehouseEmployee               WarehouseEmployee[]       @relation(name: "WarehouseEmployeeAssignedBy")
+  Notification                    Notification[]            @relation(name: "UserNotification")
 
   @@index([phoneNumber, email])
   @@index([userId])
@@ -2001,8 +2012,8 @@ model PotSupplierInventory {
 }
 
 model EmailVerification {
-  id     String @id
-  userId String
+  id     String  @id
+  userId String?
 
   email     String
   token     String
@@ -2010,14 +2021,13 @@ model EmailVerification {
   verified  Boolean  @default(false)
 
   verifiedAt DateTime?
-  deletedAt  DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  user User @relation(name: "UserEmailVerifications", fields: [userId], references: [userId])
+  user User? @relation(name: "UserEmailVerifications", fields: [userId], references: [userId])
 
-  @@unique([userId, email, deletedAt])
   @@index([email])
+  @@index([userId])
 }
 
 model PhoneVerification {
@@ -2030,13 +2040,12 @@ model PhoneVerification {
   verified    Boolean  @default(false)
 
   verifiedAt DateTime?
-  deletedAt  DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
   user User @relation(name: "UserPhoneVerifications", fields: [userId], references: [userId])
 
-  @@unique([userId, phoneNumber, deletedAt])
+  @@index([userId])
   @@index([phoneNumber])
 }
 
@@ -2051,4 +2060,24 @@ model SerialTracker {
   updatedAt DateTime @updatedAt
 
   @@unique([entityCode, year])
+}
+
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+
+  title     String
+  body      String
+  category  NotificationCategory @default(GENERAL)
+  isRead    Boolean              @default(false)
+  actionUrl String? // optional URL or action link
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(name: "UserNotification", fields: [userId], references: [userId])
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@index([category])
 }

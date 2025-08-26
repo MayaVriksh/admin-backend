@@ -8,7 +8,7 @@ module.exports = function resetPasswordTemplate({ name, resetLink }) {
   <html lang="en">
     <head>
       <meta charset="UTF-8" />
-      <title>Reset Password - MAYAVRIKSH</title>
+      <title>Reset Password - MayaVriksh</title>
       ${styles()}
     </head>
     <body>
@@ -23,7 +23,7 @@ module.exports = function resetPasswordTemplate({ name, resetLink }) {
               <a href="${resetLink}" style="display:inline-block;padding:12px 20px;background:#0f4106;color:#fff;text-decoration:none;border-radius:6px;">Reset Password</a>
             </p>
             <p class="small-text">If you did not request this, please ignore this email.</p>
-            <p class="closing">Best regards,<br /><strong>Team MAYAVRIKSH</strong></p>
+            <p class="closing">Best regards,<br /><strong>Team MayaVriksh</strong></p>
           </div>
           ${footer()}
         </div>

@@ -1,6 +1,6 @@
 module.exports = {
-    COMPANY_NAME: "MAYAVRIKSH",
-    COMPANY_TAGLINE: "From Soil to Soul",
+    COMPANY_NAME: "MayaVriksh",
+    COMPANY_TAGLINE: "From Nursery to Balcony, From Soil to Soul",
     SUPPORT_EMAIL: "support@mayavriksh.com",
     CONTACT_NUMBER: "+91 9876543210",
     WEBSITE_URL: "https://mayavriksh.com",

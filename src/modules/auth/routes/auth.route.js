@@ -10,7 +10,9 @@ const {
 } = require("../../../middlewares/authenticate.middleware");
 const AuthController = require("../controllers/auth.controller");
 const AuthValidator = require("../validations/auth.validator");
+
 module.exports = [
+    // Auth Route: User Registration
     {
         method: "POST",
         path: "/auth/register",
@@ -59,6 +61,7 @@ module.exports = [
         }
     },
 
+    // Auth Route: User Login
     {
         method: "POST",
         path: "/auth/login",
@@ -106,6 +109,8 @@ module.exports = [
             }
         }
     },
+
+    // Auth Route: Create New Access Token
     // --- NEW REFRESH TOKEN ROUTE (Need more work)---
     {
         method: "POST",
@@ -131,6 +136,8 @@ module.exports = [
             }
         }
     },
+
+    // Auth Route: User Log Out
     // ----- LOG OUT Route ------
     {
         method: "POST",
@@ -154,6 +161,7 @@ module.exports = [
             }
         }
     },
+
     /**
      * @api {get} /auth/verify-profile Verify User Profile
      * @apiName VerifyProfile
@@ -208,6 +216,7 @@ module.exports = [
         }
     },
 
+    // Auth Route: User profile Deactivation
     {
         method: "PUT",
         path: "/auth/deactivate-profile",
@@ -360,6 +369,86 @@ module.exports = [
                         403: {
                             description:
                                 "Forbidden (e.g., old password incorrect)"
+                        },
+                        500: { description: "Server error" }
+                    }
+                }
+            }
+        }
+    },
+
+    // Auth Route: User Email OTP Generation (Signup or Change Email)
+    {
+        method: "POST",
+        path: "/auth/email/otp",
+        options: {
+            tags: ["api", "Auth"],
+            description: "Generate and send an OTP to the provided email.",
+            notes: "Can be used during signup (no userId) or when a logged-in user wants to change their email.",
+            handler: AuthController.generateEmailOtp,
+            validate: {
+                ...AuthValidator.generateEmailOtpValidation,
+                failAction: (_, h, err) => {
+                    const customErrorMessages = err.details.map(
+                        (detail) => detail.message
+                    );
+                    console.log("Validation Error: ", customErrorMessages);
+                    return h
+                        .response({
+                            success: RESPONSE_FLAGS.FAILURE,
+                            error: ERROR_MESSAGES.COMMON.BAD_REQUEST,
+                            message: customErrorMessages
+                        })
+                        .code(RESPONSE_CODES.BAD_REQUEST)
+                        .takeover();
+                }
+            },
+            plugins: {
+                "hapi-swagger": {
+                    responses: {
+                        200: { description: "OTP sent successfully" },
+                        400: { description: "Validation or logical error" },
+                        500: { description: "Server error" }
+                    }
+                }
+            }
+        }
+    },
+
+    // Auth Route: User Email Verification (verify OTP)
+    {
+        method: "PUT",
+        path: "/auth/email/verify",
+        options: {
+            tags: ["api", "Auth"],
+            description: "Verify an email address using the OTP.",
+            notes: "If successful, marks the email as verified. In change-email flow, update the user's email after verification.",
+            handler: AuthController.verifyEmailOtp,
+            validate: {
+                ...AuthValidator.verifyEmailOtpValidation,
+                failAction: (_, h, err) => {
+                    const customErrorMessages = err.details.map(
+                        (detail) => detail.message
+                    );
+                    console.log("Validation Error: ", customErrorMessages);
+                    return h
+                        .response({
+                            success: RESPONSE_FLAGS.FAILURE,
+                            error: ERROR_MESSAGES.COMMON.BAD_REQUEST,
+                            message: customErrorMessages
+                        })
+                        .code(RESPONSE_CODES.BAD_REQUEST)
+                        .takeover();
+                }
+            },
+            plugins: {
+                "hapi-swagger": {
+                    responses: {
+                        200: { description: "Email verified successfully" },
+                        400: { description: "Validation or logical error" },
+                        403: {
+                            description:
+                                "Forbidden (e.g., OTP expired or invalid)"
                         },
                         500: { description: "Server error" }
                     }
