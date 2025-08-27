@@ -1,4 +1,12 @@
-const GeneralConstants = require("../../../../constants/general.constant.js");
+const {
+    STREET_ADDRESS,
+    LANDMARK,
+    CITY,
+    STATE,
+    COUNTRY,
+    PIN_CODE,
+    FIRST_NAME
+} = require("../../../../constants/general.constant.js");
 const util = require("util");
 const { v4: uuidv4 } = require("uuid");
 const { prisma } = require("../../../../config/prisma.config.js");
@@ -12,6 +20,7 @@ const supplierRepository = require("../repositories/supplier.repository.js");
 const orderEvents = require("../../../../events/order.events.js");
 const ORDER_STATUSES = require("../../../../constants/orderStatus.constant.js");
 const ROLES = require("../../../../constants/roles.constant.js");
+const { sendEmail } = require("../../../../utils/email.util.js");
 
 const showSupplierProfile = async (userId) => {
     const profile = await prisma.supplier.findUnique({
@@ -89,7 +98,8 @@ const completeSupplierProfile = async (
         businessCategory,
         warehouseId
     } = profileFields;
-    return await prisma.$transaction(
+
+    await prisma.$transaction(
         async (tx) => {
             // --- REMOVED: Phone number validation ---
             // This check is no longer needed here because the phone number was
@@ -111,12 +121,12 @@ const completeSupplierProfile = async (
             // --- MODIFIED: Update the User's address JSON blob ---
             // We are only updating the address here, not other User fields. Here
             const address = {
-                [GeneralConstants.ADDRESS_FIELDS.STREET_ADDRESS]: streetAddress,
-                [GeneralConstants.ADDRESS_FIELDS.LANDMARK]: landmark,
-                [GeneralConstants.ADDRESS_FIELDS.CITY]: city,
-                [GeneralConstants.ADDRESS_FIELDS.STATE]: state,
-                [GeneralConstants.ADDRESS_FIELDS.COUNTRY]: country,
-                [GeneralConstants.ADDRESS_FIELDS.PIN_CODE]: pinCode
+                [STREET_ADDRESS]: streetAddress,
+                [LANDMARK]: landmark,
+                [CITY]: city,
+                [STATE]: state,
+                [COUNTRY]: country,
+                [PIN_CODE]: pinCode
             };
 
             await tx.user.update({
@@ -183,6 +193,95 @@ const completeSupplierProfile = async (
             timeout: 15000
         }
     );
+
+    const supplierDetails =
+        await supplierRepository.findSupplierDetailsForEmailByUserId(userId);
+
+    await sendEmail(
+        supplierDetails?.contactPerson?.email,
+        SUPPLIER.APPLICATION_RECEIVED,
+        supplierProfileSubmittedTemplate({
+            contactName: supplierDetails?.contactPerson?.fullName[FIRST_NAME],
+            nurseryName: supplierDetails?.nurseryName
+        })
+    );
+};
+
+const updateSupplierProfile = async (userId, updateData, profileImageData) => {
+    return await prisma.$transaction(async (tx) => {
+        const { email, phoneNumber, emailVerified, phoneVerified } = updateData;
+
+        const profile = await tx.user.findUnique({ where: { userId } });
+        if (!profile) {
+            throw {
+                success: RESPONSE_FLAGS.FAILURE,
+                code: RESPONSE_CODES.BAD_REQUEST,
+                message: ERROR_MESSAGES.USERS.PROFILE_NOT_FOUND
+            };
+        }
+        if (!profile.isActive || profile.deletedAt) {
+            throw {
+                success: RESPONSE_FLAGS.FAILURE,
+                code: RESPONSE_CODES.BAD_REQUEST,
+                message: ERROR_MESSAGES.AUTH.ACCOUNT_INACTIVE
+            };
+        }
+
+        // Check phone number uniqueness
+        if (phoneNumber) {
+            const existingPhoneUser = await tx.user.findFirst({
+                where: {
+                    phoneNumber,
+                    NOT: { userId }
+                }
+            });
+
+            if (existingPhoneUser) {
+                throw {
+                    success: RESPONSE_FLAGS.FAILURE,
+                    code: RESPONSE_CODES.BAD_REQUEST,
+                    message: ERROR_MESSAGES.AUTH.PHONE_ALREADY_EXISTS
+                };
+            }
+        }
+
+        // Check email uniqueness
+        if (email) {
+            const existingEmailUser = await tx.user.findFirst({
+                where: {
+                    email,
+                    NOT: { userId }
+                }
+            });
+
+            if (existingEmailUser) {
+                throw {
+                    success: RESPONSE_FLAGS.FAILURE,
+                    code: RESPONSE_CODES.BAD_REQUEST,
+                    message: ERROR_MESSAGES.AUTH.EMAIL_ALREADY_REGISTERED
+                };
+            }
+        }
+
+        // Update User Table
+        await tx.user.update({
+            where: { userId },
+            data: {
+                ...(email && { email, emailVerified }),
+                ...(phoneNumber && { phoneNumber, phoneVerified }),
+                ...(profileImageData && {
+                    profileImageUrl: profileImageData.mediaUrl,
+                    publicId: profileImageData.publicId
+                })
+            }
+        });
+
+        return {
+            success: RESPONSE_FLAGS.SUCCESS,
+            code: RESPONSE_CODES.SUCCESS,
+            message: SUCCESS_MESSAGES.SUPPLIERS.PROFILE_UPDATED
+        };
+    });
 };
 
 const listAllWarehouses = async () => {
@@ -350,112 +449,6 @@ const listSupplierOrders = async ({
     };
 };
 
-const updateSupplierProfile = async (userId, updateData, profileImageUrl) => {
-    return await prisma.$transaction(async (tx) => {
-        const {
-            email,
-            phoneNumber,
-            streetAddress,
-            landmark,
-            city,
-            state,
-            country,
-            pinCode,
-            latitude,
-            longitude,
-            businessCategory,
-            warehouseId
-        } = updateData;
-
-        // Check phone number uniqueness
-        if (phoneNumber) {
-            const existingUsers = await tx.user.findMany({
-                where: {
-                    phoneNumber,
-                    NOT: { userId }
-                }
-            });
-
-            if (existingUsers.length > 0) {
-                throw {
-                    success: RESPONSE_FLAGS.FAILURE,
-                    code: RESPONSE_CODES.BAD_REQUEST,
-                    message: ERROR_MESSAGES.AUTH.PHONE_ALREADY_EXISTS
-                };
-            }
-        }
-
-        // Check email uniqueness
-        if (email) {
-            const existingEmailUsers = await tx.user.findMany({
-                where: {
-                    email,
-                    NOT: { userId }
-                }
-            });
-
-            if (existingEmailUsers.length > 0) {
-                throw {
-                    success: RESPONSE_FLAGS.FAILURE,
-                    code: RESPONSE_CODES.BAD_REQUEST,
-                    message: ERROR_MESSAGES.AUTH.EMAIL_ALREADY_REGISTERED
-                };
-            }
-        }
-
-        // Prepare address only if at least one field is provided
-        const hasAddressFields =
-            streetAddress ||
-            landmark ||
-            city ||
-            state ||
-            country ||
-            pinCode ||
-            latitude ||
-            longitude;
-
-        // Update User Table
-        await tx.user.update({
-            where: { userId, isActive: true, deletedAt: null },
-            data: {
-                ...(email && { email }),
-                ...(phoneNumber && { phoneNumber }),
-                ...(hasAddressFields && {
-                    address: {
-                        ...(streetAddress && { streetAddress }),
-                        ...(landmark && { landmark }),
-                        ...(city && { city }),
-                        ...(state && { state }),
-                        ...(country && { country }),
-                        ...(pinCode && { pinCode }),
-                        ...(latitude && { latitude }),
-                        ...(longitude && { longitude })
-                    }
-                }),
-                ...(profileImageData && {
-                    profileImageUrl: profileImageData.mediaUrl,
-                    publicId: profileImageData.publicId
-                })
-            }
-        });
-
-        // Update Supplier Table
-        await tx.supplier.update({
-            where: { userId, deletedAt: null },
-            data: {
-                ...(businessCategory && { businessCategory }),
-                ...(warehouseId && { warehouseId })
-            }
-        });
-
-        return {
-            success: RESPONSE_FLAGS.SUCCESS,
-            code: RESPONSE_CODES.SUCCESS,
-            message: SUCCESS_MESSAGES.SUPPLIERS.PROFILE_UPDATED
-        };
-    });
-};
-
 /**
  * Saves QC media metadata to a Purchase Order after verifying ownership.
  * @param {object} params
@@ -514,7 +507,6 @@ const uploadQcMediaForOrder = async ({ userId, orderId, uploadedMedia }) => {
 };
 
 // Add this new function to your supplier service file
-
 const reviewPurchaseOrder = async ({ userId, orderId, reviewData }) => {
     // 1. Security Check: The repository will verify ownership ??
     // --- 1. Security Check: Verify ownership of the Purchase Order ---

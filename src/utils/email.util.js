@@ -3,8 +3,13 @@ const {
     COMPANY_NAME,
     SUPPORT_EMAIL
 } = require("../constants/business.constants");
-const { AUTH } = require("../constants/emailSubjects.constants");
+const { AUTH, SUPPLIER } = require("../constants/emailSubjects.constants");
 const welcomeTemplate = require("../email-templates/users/welcome.template");
+const supplierProfileSubmittedTemplate = require("../email-templates/supplier/supplierProfileSubmitted.template");
+const {
+    findSupplierDetailsForEmailByUserId
+} = require("../modules/users/suppliers/repositories/supplier.repository");
+const { FIRST_NAME } = require("../constants/general.constant");
 require("dotenv").config();
 
 // =============================
@@ -80,6 +85,25 @@ module.exports = { sendEmail, queueEmail, processQueue };
 //         "testingmine87@gmail.com",
 //         AUTH.ACCOUNT_VERIFIED,
 //         welcomeTemplate({ name: "SAKET" })
+//     );
+//     console.log(result);
+// })();
+
+// (async () => {
+//     const supplierDetails = await findSupplierDetailsForEmailByUserId(
+//         "USER-25-DEC9957-0018"
+//     );
+//     console.log(supplierDetails?.contactPerson);
+//     console.log(supplierDetails?.contactPerson?.fullName[FIRST_NAME]);
+//     console.log(supplierDetails?.contactPerson?.email);
+
+//     const result = await sendEmail(
+//         "j6362254@gmail.com",
+//         SUPPLIER.APPLICATION_RECEIVED,
+//         supplierProfileSubmittedTemplate({
+//             contactName: supplierDetails?.contactPerson?.fullName[FIRST_NAME],
+//             nurseryName: supplierDetails?.nurseryName
+//         })
 //     );
 //     console.log(result);
 // })();

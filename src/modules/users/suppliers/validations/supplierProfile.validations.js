@@ -103,10 +103,15 @@ const completeSupplierProfile = {
             })
     })
 };
+
 const updateSupplierProfile = {
     payload: Joi.object({
         email: Joi.string().email().optional().messages({
             "string.email": "📩 Please provide a valid email address."
+        }),
+        emailVerified: Joi.boolean().default(false).messages({
+            "boolean.base":
+                "✅ Email verification status must be true or false."
         }),
         phoneNumber: Joi.string()
             .pattern(/^[6-9]\d{9}$/)
@@ -115,20 +120,10 @@ const updateSupplierProfile = {
                 "string.pattern.base":
                     "📞 Phone number must be a valid 10-digit Indian number."
             }),
-        streetAddress: Joi.string().optional(),
-        landmark: Joi.string().optional(),
-        city: Joi.string().optional(),
-        state: Joi.string().optional(),
-        country: Joi.string().optional(),
-        pinCode: Joi.string().optional(),
-        latitude: Joi.number().optional().messages({
-            "number.base": "🧭 Latitude must be a valid number."
+        phoneVerified: Joi.boolean().default(false).messages({
+            "boolean.base":
+                "✅ Phone verification status must be true or false."
         }),
-        longitude: Joi.number().optional().messages({
-            "number.base": "🧭 Longitude must be a valid number."
-        }),
-        businessCategory: Joi.string().optional(),
-        warehouseId: Joi.string().optional(),
         profileImage: Joi.any()
             .meta({ swaggerType: "file" })
             .description("Profile Image file to upload")
@@ -157,9 +152,10 @@ const orderRequestValidation = {
                 ORDER_STATUSES.PENDING,
                 ORDER_STATUSES.PROCESSING,
                 ORDER_STATUSES.DELIVERED,
-                "ALL ORDERS"
+                ORDER_STATUSES.SHIPPED,
+                ORDER_STATUSES.ALL_ORDERS
             )
-            .default("ALL ORDERS")
+            .default(ORDER_STATUSES.ALL_ORDERS)
             .description("Order status"),
 
         // For searching
@@ -187,8 +183,12 @@ const listHistoryValidation = {
         limit: Joi.number().integer().min(1).max(100).default(10), // Set a max limit for security
         search: Joi.string().allow("").optional(),
         orderStatus: Joi.string()
-            .valid(ORDER_STATUSES.DELIVERED, ORDER_STATUSES.REJECTED, "ALL ORDERS")
-            .default("ALL ORDERS")
+            .valid(
+                ORDER_STATUSES.DELIVERED,
+                ORDER_STATUSES.REJECTED,
+                ORDER_STATUSES.ALL_ORDERS
+            )
+            .default(ORDER_STATUSES.ALL_ORDERS)
             .description("Order status"),
         // Whitelist the fields the user is allowed to sort by
         sortBy: Joi.string()

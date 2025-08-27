@@ -165,13 +165,16 @@ const listSupplierOrders = async ({
                 transactionId: payment.transactionId
             };
         });
+
         // Determine the generic properties based on the productType
         // --- Object 3: For the "Order Items Modal" ---
         const orderItems = order.PurchaseOrderItems.map((item) => {
             const isPlant = item.productType === PRODUCT_TYPES.PLANT;
-            const productVariantName = isPlant ? item.plant?.name : "";
+            const productVariantName = isPlant
+                ? item.plant?.name
+                : item.potVariant?.potName;
             const productVariantSize = isPlant
-                ? item.plantVariant?.plantSize
+                ? item.plantVariant?.size?.plantSize
                 : item.potVariant?.size;
             const sku = isPlant ? item.plantVariant?.sku : item.potVariant?.sku;
             const productVariantColor = isPlant
@@ -495,9 +498,11 @@ const getSupplierOrderHistory = async ({
         });
         const orderItems = order.PurchaseOrderItems.map((item) => {
             const isPlant = item.productType === PRODUCT_TYPES.PLANT;
-            const productVariantName = isPlant ? item.plant?.name : "";
+            const productVariantName = isPlant
+                ? item.plant?.name
+                : item.potVariant?.potName;
             const productVariantSize = isPlant
-                ? item.plantVariant?.plantSize
+                ? item.plantVariant?.size?.plantSize
                 : item.potVariant?.size;
             const sku = isPlant ? item.plantVariant?.sku : item.potVariant?.sku;
             const productVariantColor = isPlant

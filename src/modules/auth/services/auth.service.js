@@ -46,14 +46,6 @@ const generateEmailOtp = async (email, userId = null) => {
         })
     );
 
-    await sendEmail(
-        email,
-        CUSTOMER.WELCOME,
-        welcomeTemplate({
-            name: "Green Friend"
-        })
-    );
-
     console.log(
         `📩 OTP generated for ${email}: ${otp}, expires at ${expiresAt}`
     );
@@ -149,12 +141,13 @@ const register = async (data) => {
         email,
         emailVerified,
         phoneNumber,
+        phoneVerified,
         password,
         role
     } = data;
 
     return await prisma.$transaction(async (tx) => {
-        const existingUserByPhone = await tx.user.findUnique({
+        const existingUserByPhone = await tx.user.findFirst({
             where: { phoneNumber }
         });
         if (existingUserByPhone) {
@@ -165,7 +158,7 @@ const register = async (data) => {
             };
         }
 
-        const existingUserByEmail = await tx.user.findUnique({
+        const existingUserByEmail = await tx.user.findFirst({
             where: { email }
         });
         if (existingUserByEmail) {
@@ -221,6 +214,7 @@ const register = async (data) => {
                 email,
                 emailVerified,
                 phoneNumber,
+                phoneVerified,
                 password: hashedPassword,
                 fullName: {
                     firstName,

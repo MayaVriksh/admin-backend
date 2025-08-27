@@ -90,7 +90,11 @@ const findPurchaseOrdersByAdmin = async ({
                         },
                         plantVariant: {
                             select: {
-                                plantSize: true,
+                                size: {
+                                    select: {
+                                        plantSize: true
+                                    }
+                                },
                                 sku: true,
                                 /** mediaUrl:true */
                                 color: {
@@ -330,7 +334,11 @@ const findHistoricalPurchaseOrders = async ({
                         plant: { select: { name: true } },
                         plantVariant: {
                             select: {
-                                plantSize: true,
+                                size: {
+                                    select: {
+                                        plantSize: true
+                                    }
+                                },
                                 sku: true,
                                 /** mediaUrl:true */
                                 color: {
@@ -401,7 +409,9 @@ const findHistoricalPurchaseOrders = async ({
 // Universal function to create a damage log
 const createDamageLog = async (productType, data, tx) => {
     const model =
-        productType === PRODUCT_TYPES.PLANT ? tx.plantDamagedProduct : tx.potDamagedProduct;
+        productType === PRODUCT_TYPES.PLANT
+            ? tx.plantDamagedProduct
+            : tx.potDamagedProduct;
 
     // --- THIS IS THE FIX ---
     // We must wrap the foreign keys in 'connect' objects to establish the relationships.
@@ -453,21 +463,20 @@ const createRestockLog = async (productType, data, tx) => {
 // Universal function to update warehouse inventory
 const updateWarehouseInventory = async (productType, where, data, tx) => {
     console.log("Admin repository payload:", { where, data });
-  
+
     const model =
-      productType === PRODUCT_TYPES.PLANT
-        ? tx.plantWarehouseInventory
-        : tx.potWarehouseInventory;
-  
+        productType === PRODUCT_TYPES.PLANT
+            ? tx.plantWarehouseInventory
+            : tx.potWarehouseInventory;
+
     const existingInventory = await model.findUnique({ where });
-  
+
     if (existingInventory) {
-      return await model.update({ where, data });
+        return await model.update({ where, data });
     } else {
-      return await model.create({ data });
+        return await model.create({ data });
     }
-  };
-  
+};
 
 module.exports = {
     findAdminByUserId,

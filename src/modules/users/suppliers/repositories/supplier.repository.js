@@ -1,6 +1,7 @@
 const { prisma } = require("../../../../config/prisma.config.js");
 const { v4: uuidv4 } = require("uuid");
 const ORDER_STATUSES = require("../../../../constants/orderStatus.constant.js");
+
 /**
  * Finds a supplier's ID based on their user ID.
  * @param {string} userId - The user's unique ID.
@@ -10,6 +11,21 @@ const findSupplierByUserId = async (userId) => {
     return await prisma.supplier.findUnique({
         where: { userId: userId },
         select: { supplierId: true }
+    });
+};
+
+const findSupplierDetailsForEmailByUserId = async (userId) => {
+    return await prisma.supplier.findUnique({
+        where: { userId: userId },
+        select: {
+            nurseryName:true,
+            contactPerson: {
+                select: {
+                    fullName: true,
+                    email: true
+                }
+            }
+        }
     });
 };
 
@@ -23,17 +39,27 @@ const findPurchaseOrdersBySupplier = async (
     supplierId,
     { page, limit, orderStatus, search, sortBy, order }
 ) => {
-    console.log("findPurchaseOrdersBySupplier: ", page, limit);
+    console.log(
+        "findPurchaseOrdersBySupplier: ",
+        page,
+        limit,
+        orderStatus,
+        order
+    );
 
     const whereClause = {
         supplierId,
         // Exclude historical orders (DELIVERED && COMPLETELY PAID Purchase Orders)
         NOT: {
             OR: [
-                { status: { in: ["REJECTED", "CANCELLED"] } },
+                {
+                    status: {
+                        in: [ORDER_STATUSES.REJECTED, ORDER_STATUSES.CANCELLED]
+                    }
+                },
                 {
                     AND: [
-                        { status: "DELIVERED" },
+                        { status: ORDER_STATUSES.DELIVERED },
                         { paymentPercentage: 100 },
                         { pendingAmount: 0 }
                     ]
@@ -41,7 +67,9 @@ const findPurchaseOrdersBySupplier = async (
             ]
         },
         // Add the active filter if given
-        ...statusFiltersForActivePurchaseOrders[orderStatus || "ALL ORDERS"],
+        ...statusFiltersForActivePurchaseOrders[
+            orderStatus || ORDER_STATUSES.ALL_ORDERS
+        ],
         ...(search && {
             id: { contains: search, mode: "insensitive" }
         })
@@ -269,32 +297,33 @@ const rejectEntireOrder = async (orderId, tx) => {
     // Update the parent order status.
     return await tx.purchaseOrder.update({
         where: { id: orderId },
-        data: { status: "REJECTED", isAccepted: false }
+        data: { status: ORDER_STATUSES.REJECTED, isAccepted: false }
     });
 };
 
 const statusFiltersForActivePurchaseOrders = {
-    PENDING: { status: "PENDING" },
-    PROCESSING: { status: "PROCESSING" },
-    DELIVERED: { status: "DELIVERED" }, // This is "active" delivered, not yet fully paid
-    ALL: {} // no extra filter → includes all active ones
+    PENDING: { status: ORDER_STATUSES.PENDING },
+    PROCESSING: { status: ORDER_STATUSES.PROCESSING },
+    SHIPPED: { status: ORDER_STATUSES.SHIPPED },
+    DELIVERED: { status: ORDER_STATUSES.DELIVERED }, // This is "active" delivered, not yet fully paid
+    ALL_ORDERS: {} // no extra filter → includes all active ones
 };
 
 const statusFiltersForPurchaseOrderHistory = {
-    REJECTED: { status: "REJECTED" },
+    REJECTED: { status: ORDER_STATUSES.REJECTED },
     DELIVERED: {
         AND: [
-            { status: "DELIVERED" },
+            { status: ORDER_STATUSES.DELIVERED },
             { paymentPercentage: 100 },
             { pendingAmount: 0 }
         ]
     },
-    ALL: {
+    ALL_ORDERS: {
         OR: [
-            { status: "REJECTED" },
+            { status: ORDER_STATUSES.REJECTED },
             {
                 AND: [
-                    { status: "DELIVERED" },
+                    { status: ORDER_STATUSES.DELIVERED },
                     { paymentPercentage: 100 },
                     { pendingAmount: 0 }
                 ]
@@ -315,7 +344,7 @@ const findHistoricalPurchaseOrders = async (
 ) => {
     const statusFilter =
         statusFiltersForPurchaseOrderHistory[orderStatus] ||
-        statusFiltersForPurchaseOrderHistory.ALL;
+        statusFiltersForPurchaseOrderHistory.ALL_ORDERS;
 
     const whereClause = {
         supplierId,
@@ -472,5 +501,6 @@ module.exports = {
     orderToReview,
     updateOrderAfterReview,
     rejectEntireOrder,
-    findHistoricalPurchaseOrders
+    findHistoricalPurchaseOrders,
+    findSupplierDetailsForEmailByUserId
 };

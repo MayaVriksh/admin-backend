@@ -94,6 +94,11 @@ const registerUserValidation = {
                 "any.required": "📞 Phone number is required."
             }),
 
+        phoneVerified: Joi.boolean().default(false).messages({
+            "boolean.base":
+                "✅ Phone verification status must be true or false."
+        }),
+
         password: Joi.string()
             .trim()
             .min(8)

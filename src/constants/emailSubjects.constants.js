@@ -42,8 +42,7 @@ module.exports = {
     },
 
     SUPPLIER: {
-        APPLICATION_RECEIVED:
-            "🌿 Supplier Application Received — Let’s grow together",
+        APPLICATION_RECEIVED: "🌿 Supplier Profile Submitted for Review",
         APPLICATION_APPROVED: "🌱 Welcome onboard as a Mayavriksh Supplier!",
         APPLICATION_REJECTED:
             "🍂 Supplier Application Status — Not approved this time",
