@@ -7,7 +7,7 @@ module.exports = function welcomeTemplate({ name }) {
   <!doctype html>
   <html>
     <head>
-      <title>Welcome - MAYAVRIKSH</title>
+      <title>Welcome - MayaVriksh</title>
       ${styles()}
     </head>
     <body>
@@ -15,10 +15,10 @@ module.exports = function welcomeTemplate({ name }) {
         <div class="container">
           ${header()}
           <div class="body">
-            <h2>Welcome to MAYAVRIKSH!</h2>
+            <h2>Welcome to MayaVriksh!</h2>
             <p>Dear ${name},</p>
             <p>We’re excited to have you on board. Explore our collection and enjoy your journey with us.</p>
-            <p class="closing">Warm regards,<br /><strong>Team MAYAVRIKSH</strong></p>
+            <p class="closing">Warm regards,<br /><strong>Team MayaVriksh</strong></p>
           </div>
           ${footer()}
         </div>

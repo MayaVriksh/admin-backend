@@ -8,7 +8,7 @@ module.exports = function orderConfirmationTemplate({ name, orderId, items, tota
   <!doctype html>
   <html>
     <head>
-      <title>Order Confirmation - MAYAVRIKSH</title>
+      <title>Order Confirmation - MayaVriksh</title>
       ${styles()}
     </head>
     <body>
@@ -21,7 +21,7 @@ module.exports = function orderConfirmationTemplate({ name, orderId, items, tota
             <p>Your order <strong>#${orderId}</strong> has been confirmed.</p>
             <ul>${itemsList}</ul>
             <p><strong>Total: ₹${total}</strong></p>
-            <p class="closing">Thank you for shopping with us!<br /><strong>Team MAYAVRIKSH</strong></p>
+            <p class="closing">Thank you for shopping with us!<br /><strong>Team MayaVriksh</strong></p>
           </div>
           ${footer()}
         </div>

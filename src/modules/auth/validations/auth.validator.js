@@ -1,47 +1,39 @@
 const Joi = require("joi");
 
-const loginUserValidation = {
+// Generate Email OTP Validation
+const generateEmailOtpValidation = {
     payload: Joi.object({
-        email: Joi.string().trim().lowercase().email().messages({
+        email: Joi.string().trim().lowercase().email().required().messages({
             "string.base": "📩 Email must be a valid string.",
-            "string.empty":
-                "📩 Email is required if phone number is not provided.",
-            "string.email": "📩 Please enter a valid email address."
+            "string.empty": "📩 Email is required to send OTP.",
+            "string.email": "📩 Please provide a valid email address.",
+            "any.required": "📩 Email is required to generate OTP."
+        })
+    })
+};
+
+// Verify Email OTP Validation
+const verifyEmailOtpValidation = {
+    payload: Joi.object({
+        email: Joi.string().trim().lowercase().email().required().messages({
+            "string.base": "📩 Email must be a valid string.",
+            "string.empty": "📩 Email is required for verification.",
+            "string.email": "📩 Please provide a valid email address.",
+            "any.required": "📩 Email is required to verify OTP."
         }),
-        password: Joi.string()
+        otp: Joi.string()
             .trim()
-            .min(8)
-            .max(16)
-            .pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]+$/) // <-- COPIED THIS RULE
+            .length(6)
+            .pattern(/^\d+$/)
             .required()
             .messages({
-                "string.base": "🔐 Password must be a string.",
-                "string.empty": "🔐 Password is required.",
-                "string.min": "🔐 Password must be at least 8 characters.",
-                "string.max": "🔐 Password must not exceed 16 characters.",
-                "string.pattern.base":
-                    "🔐 Password must include at least one letter and one number." // <-- ADDED THIS MESSAGE
+                "string.base": "🔑 OTP must be a valid string.",
+                "string.empty": "🔑 OTP is required.",
+                "string.length": "🔑 OTP must be exactly 6 digits.",
+                "string.pattern.base": "🔑 OTP must contain only digits.",
+                "any.required": "🔑 OTP is required for verification."
             })
     })
-        .xor("email", "phoneNumber")
-        .messages({
-            "object.missing":
-                "🌿 Please provide either email or phone number to log in."
-        })
-};
-// --- ADDED: Validation for Refresh Token ---
-// This validation checks the request's cookies (state) instead of the payload.
-const refreshTokenValidation = {
-    state: Joi.object({
-        // We are ensuring that the 'mv_access_token' cookie exists and is a non-empty string.
-        mv_access_token: Joi.string().required().messages({
-            "string.base": "🍪 Refresh token must be a string.",
-            "string.empty":
-                "🍪 Refresh token cookie is missing. Please log in.",
-            "any.required":
-                "🍪 Refresh token cookie is required for this operation. Please log in."
-        })
-    }).unknown(true) // IMPORTANT: This allows other cookies to exist without causing a validation error.
 };
 
 const registerUserValidation = {
@@ -85,6 +77,11 @@ const registerUserValidation = {
             "any.required": "📩 Email is required to grow your profile."
         }),
 
+        emailVerified: Joi.boolean().default(false).messages({
+            "boolean.base":
+                "✅ Email verification status must be true or false."
+        }),
+
         phoneNumber: Joi.string()
             .pattern(/^[6-9]\d{9}$/)
             .required()
@@ -96,6 +93,11 @@ const registerUserValidation = {
                     "📞 Phone number must be a valid 10-digit Indian number.",
                 "any.required": "📞 Phone number is required."
             }),
+
+        phoneVerified: Joi.boolean().default(false).messages({
+            "boolean.base":
+                "✅ Phone verification status must be true or false."
+        }),
 
         password: Joi.string()
             .trim()
@@ -122,6 +124,50 @@ const registerUserValidation = {
             "any.required": "🌿 Role is required."
         })
     })
+};
+
+const loginUserValidation = {
+    payload: Joi.object({
+        email: Joi.string().trim().lowercase().email().messages({
+            "string.base": "📩 Email must be a valid string.",
+            "string.empty":
+                "📩 Email is required if phone number is not provided.",
+            "string.email": "📩 Please enter a valid email address."
+        }),
+        password: Joi.string()
+            .trim()
+            .min(8)
+            .max(16)
+            .pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]+$/) // <-- COPIED THIS RULE
+            .required()
+            .messages({
+                "string.base": "🔐 Password must be a string.",
+                "string.empty": "🔐 Password is required.",
+                "string.min": "🔐 Password must be at least 8 characters.",
+                "string.max": "🔐 Password must not exceed 16 characters.",
+                "string.pattern.base":
+                    "🔐 Password must include at least one letter and one number." // <-- ADDED THIS MESSAGE
+            })
+    })
+        .xor("email", "phoneNumber")
+        .messages({
+            "object.missing":
+                "🌿 Please provide either email or phone number to log in."
+        })
+};
+// --- ADDED: Validation for Refresh Token ---
+// This validation checks the request's cookies (state) instead of the payload.
+const refreshTokenValidation = {
+    state: Joi.object({
+        // We are ensuring that the 'mv_access_token' cookie exists and is a non-empty string.
+        mv_access_token: Joi.string().required().messages({
+            "string.base": "🍪 Refresh token must be a string.",
+            "string.empty":
+                "🍪 Refresh token cookie is missing. Please log in.",
+            "any.required":
+                "🍪 Refresh token cookie is required for this operation. Please log in."
+        })
+    }).unknown(true) // IMPORTANT: This allows other cookies to exist without causing a validation error.
 };
 
 const deactivateProfileValidation = {
@@ -174,9 +220,11 @@ const changePasswordValidation = {
 };
 
 module.exports = {
+    generateEmailOtpValidation,
+    verifyEmailOtpValidation,
+    registerUserValidation,
     loginUserValidation,
     refreshTokenValidation,
-    registerUserValidation,
     deactivateProfileValidation,
     reactivateUserValidation,
     changePasswordValidation

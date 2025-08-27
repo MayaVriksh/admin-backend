@@ -119,7 +119,11 @@ const listSupplierOrders = async ({
     userId,
     page,
     limit,
-    search,
+    orderStatus,
+    supplierId,
+    warehouseId,
+    fromDate,
+    toDate,
     sortBy,
     order
 }) => {
@@ -140,7 +144,11 @@ const listSupplierOrders = async ({
     const [totalItems, rawOrders] = await adminRepo.findPurchaseOrdersByAdmin({
         page,
         limit,
-        search,
+        orderStatus,
+        supplierId,
+        warehouseId,
+        fromDate,
+        toDate,
         sortBy,
         order
     });
@@ -165,13 +173,16 @@ const listSupplierOrders = async ({
                 transactionId: payment.transactionId
             };
         });
+
         // Determine the generic properties based on the productType
         // --- Object 3: For the "Order Items Modal" ---
         const orderItems = order.PurchaseOrderItems.map((item) => {
             const isPlant = item.productType === PRODUCT_TYPES.PLANT;
-            const productVariantName = isPlant ? item.plant?.name : "";
+            const productVariantName = isPlant
+                ? item.plant?.name
+                : item.potVariant?.potName;
             const productVariantSize = isPlant
-                ? item.plantVariant?.plantSize
+                ? item.plantVariant?.size?.plantSize
                 : item.potVariant?.size;
             const sku = isPlant ? item.plantVariant?.sku : item.potVariant?.sku;
             const productVariantColor = isPlant
@@ -447,7 +458,11 @@ const getSupplierOrderHistory = async ({
     userId,
     page,
     limit,
-    search,
+    orderStatus,
+    supplierId,
+    warehouseId,
+    fromDate,
+    toDate,
     sortBy,
     order
 }) => {
@@ -467,10 +482,15 @@ const getSupplierOrderHistory = async ({
         await adminRepo.findHistoricalPurchaseOrders({
             page,
             limit,
-            search,
+            orderStatus,
+            supplierId,
+            warehouseId,
+            fromDate,
+            toDate,
             sortBy,
             order
         });
+
     // 3. Perform the EXACT SAME data transformation as listSupplierOrders.
     //    This provides a consistent data structure to the frontend.
     const transformedOrders = rawOrders.map((order) => {
@@ -495,9 +515,11 @@ const getSupplierOrderHistory = async ({
         });
         const orderItems = order.PurchaseOrderItems.map((item) => {
             const isPlant = item.productType === PRODUCT_TYPES.PLANT;
-            const productVariantName = isPlant ? item.plant?.name : "";
+            const productVariantName = isPlant
+                ? item.plant?.name
+                : item.potVariant?.potName;
             const productVariantSize = isPlant
-                ? item.plantVariant?.plantSize
+                ? item.plantVariant?.size?.plantSize
                 : item.potVariant?.size;
             const sku = isPlant ? item.plantVariant?.sku : item.potVariant?.sku;
             const productVariantColor = isPlant

@@ -11,7 +11,17 @@ const SUCCESS_MESSAGES = {
         ACCOUNT_VERIFIED:
             "Your account has taken root successfully 🌱 Welcome to the garden!",
         EMAIL_VERIFIED:
-            "Your email has been gently confirmed like morning dew 💌🌼"
+            "Your email has been gently confirmed like morning dew 💌🌼",
+        EMAIL_UPDATED:
+            "Your email has been replanted successfully 🌿 Future updates will bloom here.",
+        EMAIL_CONFIRMATION_SENT:
+            "A fresh confirmation link has been sent to your inbox 📩🌼",
+        EMAIL_RESENT:
+            "We’ve watered the soil again 🌱 A new verification email is on its way.",
+        EMAIL_PRIMARY_SET:
+            "This email has now become your main garden path 🌿 All updates will arrive here.",
+        EMAIL_NOTIFICATION_ENABLED:
+            "You’ll now receive gentle reminders and updates 🌸 straight to your inbox."
     },
 
     ORDERS: {
@@ -228,7 +238,7 @@ const SUCCESS_MESSAGES = {
     },
 
     OTP: {
-        SENT: "Your OTP is on its way! 🌱 It's valid for the next 2 minutes.",
+        SENT: "Your OTP is on its way! 🌱 It's valid for the next 5 minutes.",
         VERIFIED: "OTP verified successfully! You're all set to grow forward 🌼"
     },
 
@@ -283,6 +293,27 @@ const SUCCESS_MESSAGES = {
         BULK_UPLOAD_SUCCESS:
             "Your green bunch has been uploaded 🌿 All lined up!",
         BULK_UPDATE_SUCCESS: "All selected items nurtured and updated 🌼"
+    },
+
+    NOTIFICATIONS: {
+        FETCHED:
+            "Your notifications have bloomed 🌸 Here are the latest updates!",
+        NOTIFICATION_SENT:
+            "The notification has been delivered with a gentle breeze 🍃",
+        NOTIFICATION_READ:
+            "Notification marked as read 🌿 You’re all caught up!",
+        NOTIFICATION_UNREAD:
+            "Notification set back to unread 🌱 Ready for review later.",
+        NOTIFICATION_DELETED:
+            "Notification removed with care 🍂 It’s no longer in your garden.",
+        ALL_CLEARED:
+            "Your notification garden has been cleared 🌼 Fresh and tidy!",
+        SETTINGS_UPDATED:
+            "Your notification settings have been pruned 🌿 They’ll work just as you like.",
+        SUBSCRIBED:
+            "You’re now subscribed to updates 🌻 Expect fresh news soon!",
+        UNSUBSCRIBED:
+            "You’ve gracefully unsubscribed 🍃 No more updates will sprout here."
     }
 };
 

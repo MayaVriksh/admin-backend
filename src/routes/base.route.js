@@ -1,5 +1,6 @@
 const testRoute = require("./test.route");
 const authRoutes = require("../modules/auth/routes/auth.route");
+const notificationRoutes = require("../modules/auth/routes/notification.route");
 const supplierRoutes = require("../modules/users/suppliers/routes/index.route");
 const adminRoutes = require("../modules/users/admins/routes/index.route");
 module.exports = {
@@ -8,6 +9,7 @@ module.exports = {
         server.route([
             ...testRoute,
             ...authRoutes,
+            ...notificationRoutes,
             ...supplierRoutes,
             ...adminRoutes
         ]);

@@ -1,3 +1,4 @@
-const authRoutes = require("./routes/auth.route");
+const authRoutes = require("./auth.route");
+const notificationRoutes = require("./notification.route");
 
-module.exports = authRoutes;
+module.exports = [authRoutes, notificationRoutes];

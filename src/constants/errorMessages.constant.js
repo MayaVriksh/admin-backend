@@ -166,7 +166,13 @@ const ERROR_MESSAGES = {
         EXPIRED: "This OTP has wilted 🌸 Please request a fresh one.",
         MAX_ATTEMPTS:
             "Too many attempts 🌧️ Let’s take a pause and try again with a new OTP.",
-        ERROR: "We ran into a little hiccup while verifying 🌿 Please try again shortly."
+        ALREADY_USED:
+            "This OTP has already bloomed once 🌸 Please use a fresh code.",
+        BLOCKED:
+            "Your OTP garden is resting after too many tries 🌳 Please wait before trying again.",
+        DELIVERY_FAILED:
+            "The OTP seed didn’t reach your inbox 📩🌧️ Try resending.",
+        ERROR: "Something went wrong in the OTP process 🌱 Please try again later."
     },
 
     RESET_PASSWORD: {
@@ -253,6 +259,27 @@ const ERROR_MESSAGES = {
             "The invoice couldn’t bloom 🌧️ Please try again.",
         BILLING_INFO_MISSING:
             "Billing details are incomplete 🌿 Let’s fill them in."
+    },
+
+    NOTIFICATIONS: {
+        FETCH_FAILED:
+            "We couldn’t fetch your notifications 🌧️ Please refresh and try again.",
+        NOT_FOUND: "No notifications sprouted here yet 🌱 Check back later.",
+        UPDATE_FAILED:
+            "We couldn’t update this notification 🌿 Try again shortly.",
+        DELETE_FAILED:
+            "This notification didn’t want to leave just yet 🍂 Please retry.",
+        MARK_AS_READ_FAILED:
+            "We couldn’t mark this notification as read 🌧️ Try again.",
+        MARK_AS_UNREAD_FAILED:
+            "We couldn’t set this notification back to unread 🌿",
+        CLEAR_ALL_FAILED:
+            "Your notification garden didn’t clear 🌪️ Please try again.",
+        PERMISSION_DENIED: "You don’t have access to these notifications 🚫🌾",
+        DELIVERY_FAILED:
+            "The notification couldn’t be delivered 📩🌧️ Please check again.",
+        INTERNAL_ERROR:
+            "Something went wrong while handling notifications 🌱 Try again later."
     }
 };
 

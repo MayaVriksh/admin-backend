@@ -7,7 +7,7 @@ module.exports = function refundProcessedTemplate({ recipientName, amount, trans
   <!doctype html>
   <html>
     <head>
-      <title>Refund Processed - MAYAVRIKSH</title>
+      <title>Refund Processed - MayaVriksh</title>
       ${styles()}
     </head>
     <body>
@@ -25,7 +25,7 @@ module.exports = function refundProcessedTemplate({ recipientName, amount, trans
               <p><strong>Date & Time:</strong> ${dateTime}</p>
             </div>
             <p>The refund may take 5–7 business days to reflect in your account depending on your bank or payment provider.</p>
-            <p class="closing">If you need help, contact us at <a href="mailto:support@mayavriksh.com">support@mayavriksh.com</a>.<br /><strong>Team MAYAVRIKSH</strong></p>
+            <p class="closing">If you need help, contact us at <a href="mailto:support@mayavriksh.com">support@mayavriksh.com</a>.<br /><strong>Team MayaVriksh</strong></p>
           </div>
           ${footer()}
         </div>

@@ -11,6 +11,7 @@ const {
 const { ROLES } = require("../../../../constants/roles.constant");
 
 module.exports = [
+    // Admin: Get Profile
     {
         method: "GET",
         path: "/admin/my-profile",
@@ -21,6 +22,8 @@ module.exports = [
             description: "Get Admin profile details"
         }
     },
+
+    // Admin: Get Order Requests
     {
         method: "GET",
         // --- MODIFIED: Path changed for the admin section ---
@@ -33,15 +36,15 @@ module.exports = [
 
             // --- MODIFIED: Notes rewritten for an Admin's perspective ---
             notes: `
-This endpoint fetches a paginated list of **active** purchase orders for administrative review. It is the primary data source for the admin's order management dashboard.
+                This endpoint fetches a paginated list of **active** purchase orders for administrative review. It is the primary data source for the admin's order management dashboard.
 
-### UI Logic
--   This data is used to display the main "Purchase Orders Request" table in the admin panel.
--   The \`status\` and \`paymentPercentage\` fields are used to determine which actions are available (e.g., 'Make Payment').
+                ### UI Logic
+                -   This data is used to display the main "Purchase Orders Request" table in the admin panel.
+                -   The \`status\` and \`paymentPercentage\` fields are used to determine which actions are available (e.g., 'Make Payment').
 
-### Lazy Loading
-This endpoint provides the summary data for the list. To view the full details of an order, the frontend must use the order's \`id\` to make a separate call to the \`GET /admin/purchase-orders/{orderId}\` endpoint.
-        `,
+                ### Lazy Loading
+                This endpoint provides the summary data for the list. To view the full details of an order, the frontend must use the order's \`id\` to make a separate call to the \`GET /admin/purchase-orders/{orderId}\` endpoint.
+            `,
 
             // ---: Security now checks for ADMIN roles ---
             pre: [
@@ -78,6 +81,8 @@ This endpoint provides the summary data for the list. To view the full details o
             }
         }
     },
+
+    // Admin: Get Purchase Order Requests by Order ID
     {
         method: "GET",
         path: "/admin/order-requests/{orderId}",
@@ -86,26 +91,26 @@ This endpoint provides the summary data for the list. To view the full details o
             description:
                 "Get a single purchase order by its ID, including all of its items and payment history.",
             notes: `
-This endpoint fetches the complete, detailed state of a single Purchase Order. The frontend UI should change its appearance and available actions based on the \`status\` fields returned in this response.
+                This endpoint fetches the complete, detailed state of a single Purchase Order. The frontend UI should change its appearance and available actions based on the \`status\` fields returned in this response.
 
-### Understanding the Response Data
+                ### Understanding the Response Data
 
-The API returns the main order details, a nested \`PurchaseOrderItems\` array, and a nested \`payments\` array.
+                The API returns the main order details, a nested \`PurchaseOrderItems\` array, and a nested \`payments\` array.
 
-#### Interpreting the Order Status
--   **If \`status\` is \`PENDING\`:** This is a new order awaiting review.
-    -   The UI should open the **interactive "Review Items" modal** where the admin can Accept/Reject each item.
-    -   The \`isAccepted\` field on all items will be \`true\` by default.
-    -   The \`payments\` array will be empty.
+                #### Interpreting the Order Status
+                -   **If \`status\` is \`PENDING\`:** This is a new order awaiting review.
+                    -   The UI should open the **interactive "Review Items" modal** where the admin can Accept/Reject each item.
+                    -   The \`isAccepted\` field on all items will be \`true\` by default.
+                    -   The \`payments\` array will be empty.
 
--   **If \`status\` is \`AWAITING_PAYMENT\`, \`PARTIALLY_PAID\`, or \`PAID\`:** The order has already been reviewed and is locked.
-    -   The UI should open a **read-only "View Order Items" modal**.
-    -   Inside the modal, you must read the \`isAccepted\` boolean for each item to show whether it was **Accepted** or **Rejected** by the admin during the review step.
+                -   **If \`status\` is \`AWAITING_PAYMENT\`, \`PARTIALLY_PAID\`, or \`PAID\`:** The order has already been reviewed and is locked.
+                    -   The UI should open a **read-only "View Order Items" modal**.
+                    -   Inside the modal, you must read the \`isAccepted\` boolean for each item to show whether it was **Accepted** or **Rejected** by the admin during the review step.
 
--   **If \`status\` is \`REJECTED\` or \`CANCELLED\`:** The order is in a final, terminated state. The UI should simply display this status.
+                -   **If \`status\` is \`REJECTED\` or \`CANCELLED\`:** The order is in a final, terminated state. The UI should simply display this status.
 
-#### The \`payments\` Array
-This array contains the full payment history for the order. It will be empty until the Warehouse Manager starts making payments. Use this data to populate the "View Payments" modal.
+                #### The \`payments\` Array
+                This array contains the full payment history for the order. It will be empty until the Warehouse Manager starts making payments. Use this data to populate the "View Payments" modal.
             `,
             pre: [verifyAccessTokenMiddleware, requireRole([ROLES.ADMIN])],
 
@@ -146,6 +151,8 @@ This array contains the full payment history for the order. It will be empty unt
             }
         }
     },
+
+    // Admin: Make Payment for specific Purchase Order ID
     {
         method: "POST",
         path: "/admin/purchase-orders/{orderId}/payments",
@@ -188,6 +195,8 @@ This array contains the full payment history for the order. It will be empty unt
             }
         }
     },
+
+    // Admin: Upload QC for purchase Order ID
     {
         method: "PUT",
         path: "/admin/purchase-orders/{orderId}/qc-media",
@@ -223,6 +232,8 @@ This array contains the full payment history for the order. It will be empty unt
             }
         }
     },
+
+    // Admin: Restock Warehouse Inventory
     {
         method: "PUT",
         path: "/admin/purchase-orders/{orderId}/restock",
@@ -259,6 +270,8 @@ This array contains the full payment history for the order. It will be empty unt
             }
         }
     },
+
+    // Admin: Get Purchase Order History
     {
         method: "GET",
         path: "/admin/order-history",
@@ -267,20 +280,20 @@ This array contains the full payment history for the order. It will be empty unt
             description:
                 "Get a list of historical (completed or rejected) order requests for the authenticated admin.",
             notes: `
-This endpoint fetches a paginated list of orders that are in a final state. The structure of the returned order objects can vary based on whether the order was completed or rejected.
+                This endpoint fetches a paginated list of orders that are in a final state. The structure of the returned order objects can vary based on whether the order was completed or rejected.
 
-### Case 1: Completed Orders
-A successfully completed order will have the following characteristics:
--   \`orderStatus\`: \`"DELIVERED"\`
--   \`paymentPercentage\`: \`100\`
--   \`isAccepted\`: \`"true"\`
--   The \`orderItems\` will show only those items whose \`isAccepted\` : will be \`"true"\` and \`payments\` arrays will be fully populated with the final details of the transaction.
+                ### Case 1: Completed Orders
+                A successfully completed order will have the following characteristics:
+                -   \`orderStatus\`: \`"DELIVERED"\`
+                -   \`paymentPercentage\`: \`100\`
+                -   \`isAccepted\`: \`"true"\`
+                -   The \`orderItems\` will show only those items whose \`isAccepted\` : will be \`"true"\` and \`payments\` arrays will be fully populated with the final details of the transaction.
 
-### Case 2: Rejected/Cancelled Orders
-A rejected or cancelled order will have these characteristics:
--   \`orderStatus\`: \`"REJECTED"\` or \`"CANCELLED"\`
--   The \`payments\` array will typically be empty as no payment was processed.
--   The \`orderItems\` array will still be present, showing all the originally requested items. The frontend can inspect the \`isAccepted: false\` status on these items if needed.
+                ### Case 2: Rejected/Cancelled Orders
+                A rejected or cancelled order will have these characteristics:
+                -   \`orderStatus\`: \`"REJECTED"\` or \`"CANCELLED"\`
+                -   The \`payments\` array will typically be empty as no payment was processed.
+                -   The \`orderItems\` array will still be present, showing all the originally requested items. The frontend can inspect the \`isAccepted: false\` status on these items if needed.
             `,
 
             pre: [verifyAccessTokenMiddleware, requireRole([ROLES.ADMIN])],

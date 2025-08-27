@@ -7,7 +7,7 @@ module.exports = function orderShippedTemplate({ name, orderId, trackingLink }) 
   <!doctype html>
   <html>
     <head>
-      <title>Order Shipped - MAYAVRIKSH</title>
+      <title>Order Shipped - MayaVriksh</title>
       ${styles()}
     </head>
     <body>
@@ -19,7 +19,7 @@ module.exports = function orderShippedTemplate({ name, orderId, trackingLink }) 
             <p>Hi ${name},</p>
             <p>Your order <strong>#${orderId}</strong> has been shipped.</p>
             <p>Track your shipment here: <a href="${trackingLink}">${trackingLink}</a></p>
-            <p class="closing">Happy shopping!<br /><strong>Team MAYAVRIKSH</strong></p>
+            <p class="closing">Happy shopping!<br /><strong>Team MayaVriksh</strong></p>
           </div>
           ${footer()}
         </div>

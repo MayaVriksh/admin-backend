@@ -3,8 +3,13 @@ const {
     COMPANY_NAME,
     SUPPORT_EMAIL
 } = require("../constants/business.constants");
-const { AUTH } = require("../constants/emailSubjects.constants");
+const { AUTH, SUPPLIER } = require("../constants/emailSubjects.constants");
 const welcomeTemplate = require("../email-templates/users/welcome.template");
+const supplierProfileSubmittedTemplate = require("../email-templates/supplier/supplierProfileSubmitted.template");
+const {
+    findSupplierDetailsForEmailByUserId
+} = require("../modules/users/suppliers/repositories/supplier.repository");
+const { FIRST_NAME } = require("../constants/general.constant");
 require("dotenv").config();
 
 // =============================
@@ -20,13 +25,13 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "****" : "MISSING");
+// console.log("EMAIL_USER:", process.env.EMAIL_USER);
+// console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "****" : "MISSING");
 
 // =============================
 // Generic Send Email Function with Retry
 // =============================
-const sendEmail = async ({ to, subject, html, retries = 3 }) => {
+const sendEmail = async (to, subject, html, retries = 2) => {
     let attempt = 0;
 
     while (attempt <= retries) {
@@ -75,11 +80,30 @@ module.exports = { sendEmail, queueEmail, processQueue };
 // =============================
 // Example: Send a test email
 // =============================
-(async () => {
-    const result = await sendEmail({
-        to: "testingmine87@gmail.com",
-        subject: AUTH.ACCOUNT_VERIFIED,
-        html: welcomeTemplate({ name: "SAKET" })
-    });
-    console.log(result);
-})();
+// (async () => {
+//     const result = await sendEmail(
+//         "testingmine87@gmail.com",
+//         AUTH.ACCOUNT_VERIFIED,
+//         welcomeTemplate({ name: "SAKET" })
+//     );
+//     console.log(result);
+// })();
+
+// (async () => {
+//     const supplierDetails = await findSupplierDetailsForEmailByUserId(
+//         "USER-25-DEC9957-0018"
+//     );
+//     console.log(supplierDetails?.contactPerson);
+//     console.log(supplierDetails?.contactPerson?.fullName[FIRST_NAME]);
+//     console.log(supplierDetails?.contactPerson?.email);
+
+//     const result = await sendEmail(
+//         "j6362254@gmail.com",
+//         SUPPLIER.APPLICATION_RECEIVED,
+//         supplierProfileSubmittedTemplate({
+//             contactName: supplierDetails?.contactPerson?.fullName[FIRST_NAME],
+//             nurseryName: supplierDetails?.nurseryName
+//         })
+//     );
+//     console.log(result);
+// })();

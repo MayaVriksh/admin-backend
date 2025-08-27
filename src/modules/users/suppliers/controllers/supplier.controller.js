@@ -163,7 +163,7 @@ const completeSupplierProfile = async (req, h) => {
         //     nurseryUpload.data
         // );
 
-        const result = await SupplierService.completeSupplierProfile(
+        await SupplierService.completeSupplierProfile(
             userId,
             profileFields,
             licenseUpload.data,
@@ -173,9 +173,8 @@ const completeSupplierProfile = async (req, h) => {
 
         return h
             .response({
-                success: result.success,
-                message:
-                    result.message || SUCCESS_MESSAGES.SUPPLIERS.PROFILE_UPDATED
+                success: RESPONSE_FLAGS.SUCCESS,
+                message: SUCCESS_MESSAGES.SUPPLIERS.PROFILE_SUBMITTED_FOR_REVIEW
             })
             .code(result.code);
     } catch (error) {

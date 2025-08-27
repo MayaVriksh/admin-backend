@@ -37,17 +37,32 @@ const showAdminProfile = async (req, h) => {
 const listSupplierOrders = async (req, h) => {
     try {
         const { userId } = req.pre.credentials;
-        const { page, limit, search, sortBy, order } = req.query;
+        const {
+            page = 1,
+            limit,
+            orderStatus,
+            supplierId,
+            warehouseId,
+            fromDate,
+            toDate,
+            sortBy,
+            order
+        } = req.query;
 
         // 1. Call the service. The service does all the complex work.
         const result = await AdminService.listSupplierOrders({
             userId,
             page,
             limit,
-            search,
+            orderStatus,
+            supplierId,
+            warehouseId,
+            fromDate,
+            toDate,
             sortBy,
             order
         });
+
         // 2. Return the entire result object directly.
         //    The controller should not try to access 'purchaseOrderDetails' itself.
         return h.response(result).code(result.code);
@@ -63,6 +78,7 @@ const listSupplierOrders = async (req, h) => {
             .takeover();
     }
 };
+
 const getOrderRequestByOrderId = async (req, h) => {
     try {
         const { userId } = req.pre.credentials;
@@ -87,22 +103,40 @@ const getOrderRequestByOrderId = async (req, h) => {
 const getSupplierOrderHistory = async (req, h) => {
     try {
         const { userId } = req.pre.credentials;
-        const { page = 1, limit, search, sortBy, order } = req.query;
-        console.log(limit);
+        const {
+            page = 1,
+            limit,
+            orderStatus,
+            supplierId,
+            warehouseId,
+            fromDate,
+            toDate,
+            sortBy,
+            order
+        } = req.query;
+
+        console.log("Admin Controller --> getSupplierOrderHistory");
+
         const result = await AdminService.getSupplierOrderHistory({
             userId,
             page,
             limit,
-            search,
+            orderStatus,
+            supplierId,
+            warehouseId,
+            fromDate,
+            toDate,
             sortBy,
-            order,
-            search
+            order
         });
 
         return h.response(result).code(result.code);
     } catch (error) {
         // Log the full error for server-side debugging
-        console.error("Error in getSupplierOrderHistory controller:", error.message);
+        console.error(
+            "Error in getSupplierOrderHistory controller:",
+            error.message
+        );
 
         // Return a standardized JSON error response to the client
         return h
@@ -133,7 +167,10 @@ const recordPayment = async (req, h) => {
         return h.response(result).code(result.code);
     } catch (error) {
         // Log the full error for server-side debugging
-        console.error("Error in getSupplierOrderHistory controller:", error.message);
+        console.error(
+            "Error in getSupplierOrderHistory controller:",
+            error.message
+        );
 
         // Return a standardized JSON error response to the client
         return h

@@ -4,7 +4,7 @@ module.exports = function stylesTemplate() {
   body {
       margin: 0;
       padding: 0;
-      background-color: #dbdbdb;
+      background-color: #acacacff;
       font-family: Arial, sans-serif;
       color: #2e2e2e;
   }
@@ -36,27 +36,32 @@ module.exports = function stylesTemplate() {
   }
   .header h1 {
       margin: 0;
-      font-size: 22px;
+      font-size: 24px;
       color: #fdfdfd;
       font-weight: bold;
   }
   .header p {
       margin: 2px 0 0;
-      font-size: 13px;
+      font-size: 15px;
       color: #cce3cc;
       letter-spacing: 0.5px;
   }
   .body {
       padding: 32px;
       color: #2e2e2e;
+      border-top: 10px solid #013220;
+      border-left: 10px solid #0f4106; 
+      border-right: 10px solid #0f4106; 
+      border-bottom: 10px solid #14532d;
+      box-sizing: border-box;  
   }
   .body h2 {
       margin-top: 0;
-      font-size: 18px;
+      font-size: 20px;
       color: #0f4106;
   }
   .body p {
-      font-size: 15px;
+      font-size: 17px;
       line-height: 1.6;
       margin: 0 0 16px;
   }
@@ -67,7 +72,7 @@ module.exports = function stylesTemplate() {
   .otp span {
       display: inline-block;
       padding: 12px 24px;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: bold;
       color: #fdfdfd;
       background: #0f4106;
@@ -75,7 +80,7 @@ module.exports = function stylesTemplate() {
       letter-spacing: 3px;
   }
   .small-text {
-      font-size: 14px;
+      font-size: 16px;
       color: #555555;
       line-height: 1.6;
       margin: 16px 0;
@@ -87,14 +92,14 @@ module.exports = function stylesTemplate() {
   }
   .closing {
       margin: 32px 0 0;
-      font-size: 14px;
+      font-size: 16px;
       color: #2e2e2e;
   }
   .footer {
     background: #14532d;
     padding: 14px;
     text-align: center;
-    font-size: 12px;
+    font-size: 14px;
     color: #e0e0e0;
 }
 .footer a {
