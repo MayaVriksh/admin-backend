@@ -1,39 +1,157 @@
 const Joi = require("joi");
+const ORDER_STATUSES = require("../../../../constants/orderStatus.constant");
 
 // A single, powerful validation schema for the order list endpoint
 const orderRequestValidation = {
     query: Joi.object({
-        // For pagination
+        // Pagination
         page: Joi.number()
             .integer()
             .min(1)
             .default(1)
-            .description("The page number to retrieve"),
+            .label("Page Number")
+            .description("Page number to retrieve (minimum 1)"),
+
         limit: Joi.number()
             .integer()
             .min(1)
             .max(100)
             .default(10)
-            .description("The number of items to return per page (max 100)"),
+            .label("Page Limit")
+            .description("Number of items per page (1–100)"),
 
-        // For searching
-        search: Joi.string()
+        // Order status filter
+        orderStatus: Joi.string()
+            .valid(
+                ORDER_STATUSES.PENDING,
+                ORDER_STATUSES.PROCESSING,
+                ORDER_STATUSES.DELIVERED,
+                ORDER_STATUSES.SHIPPED,
+                ORDER_STATUSES.ALL_ORDERS
+            )
+            .default(ORDER_STATUSES.ALL_ORDERS)
+            .label("Order Status")
+            .description("Filter by order status"),
+
+        // Search by supplier ID
+        supplierId: Joi.string()
+            .trim()
             .allow("")
             .optional()
-            .description("A search term to filter orders by ID"),
+            .label("Supplier ID Search")
+            .description("Search orders by Supplier ID"),
 
-        // For sorting
+        // Search by warehouse ID
+        warehouseId: Joi.string()
+            .trim()
+            .allow("")
+            .optional()
+            .label("Warehouse ID Search")
+            .description("Search orders by Warehouse ID"),
+
+        // Date range filters
+        fromDate: Joi.date()
+            .iso()
+            .optional()
+            .label("From Date")
+            .description("Start date (inclusive) in ISO format"),
+        toDate: Joi.date()
+            .iso()
+            .optional()
+            .min(Joi.ref("fromDate"))
+            .label("To Date")
+            .description("End date (inclusive) in ISO format"),
+
+        // Sorting
         sortBy: Joi.string()
             .valid("requestedAt", "totalCost", "status")
             .default("requestedAt")
-            .description("The field to sort by"),
+            .label("Sort By")
+            .description("Field to sort results by"),
+
         order: Joi.string()
             .lowercase()
             .valid("asc", "desc")
             .default("desc")
-            .description('The sort order ("asc" or "desc")')
+            .label("Sort Order")
+            .description('Sort order: "asc" or "desc"')
     })
 };
+
+const listHistoryValidation = {
+    query: Joi.object({
+        // Pagination
+        page: Joi.number()
+            .integer()
+            .min(1)
+            .default(1)
+            .label("Page Number")
+            .description("Page number to retrieve (minimum 1)"),
+
+        limit: Joi.number()
+            .integer()
+            .min(1)
+            .max(100)
+            .default(10)
+            .label("Page Limit")
+            .description("Number of items per page (1–100)"),
+
+        // Search by supplier ID
+        supplierId: Joi.string()
+            .trim()
+            .allow("")
+            .optional()
+            .label("Supplier ID Search")
+            .description("Search orders by Supplier ID"),
+
+        // Filter by order status
+        orderStatus: Joi.string()
+            .valid(
+                ORDER_STATUSES.DELIVERED,
+                ORDER_STATUSES.REJECTED,
+                ORDER_STATUSES.ALL_ORDERS
+            )
+            .default(ORDER_STATUSES.ALL_ORDERS)
+            .label("Order Status")
+            .description("Filter orders by status"),
+
+        // Search by warehouse ID
+        warehouseId: Joi.string()
+            .trim()
+            .allow("")
+            .optional()
+            .label("Warehouse ID Search")
+            .description("Search orders by specific Warehouse ID"),
+
+        // Date range filters
+        fromDate: Joi.date()
+            .iso()
+            .optional()
+            .label("From Date")
+            .description("Start date (inclusive) in ISO format"),
+        toDate: Joi.date()
+            .iso()
+            .optional()
+            .min(Joi.ref("fromDate"))
+            .label("To Date")
+            .description("End date (inclusive) in ISO format"),
+
+        // Sorting
+        sortBy: Joi.string()
+            .valid("requestedAt", "totalCost", "status")
+            .default("requestedAt")
+            .label("Sort Field")
+            .description("Field to sort results by"),
+
+        order: Joi.string()
+            .lowercase()
+            .valid("asc", "desc")
+            .default("desc")
+            .label("Sort Order")
+            .description('Sort direction: "asc" or "desc"')
+    })
+};
+
 const orderIdParamValidation = {
     params: Joi.object({
         orderId: Joi.string()
@@ -77,7 +195,7 @@ const restockOrderValidation = {
                         })
                         .description(
                             "Reason for damage (required if unitsDamaged > 0)"
-                        ),
+                        )
                     // damagePhoto: Joi.any()
                     //     .meta({ swaggerType: "file" })
                     //     .optional()
@@ -110,19 +228,7 @@ const qcMediaUploadValidation = {
             .description("One or more image/video files for QC.")
     })
 };
-const listHistoryValidation = {
-    query: Joi.object({
-        page: Joi.number().integer().min(1).default(1),
-        limit: Joi.number().integer().min(1).max(100).default(10), // Set a max limit for security
-        search: Joi.string().allow("").optional(),
-        // Whitelist the fields the user is allowed to sort by
-        sortBy: Joi.string()
-            .valid("requestedAt", "totalCost", "status")
-            .default("requestedAt"),
-        // Allow only 'asc' or 'desc' for the order
-        order: Joi.string().lowercase().valid("asc", "desc").default("desc")
-    })
-};
+
 // A schema for a single order SUMMARY in the list
 const orderSummarySchema = Joi.object({
     id: Joi.string().required(),

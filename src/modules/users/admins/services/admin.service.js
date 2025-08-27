@@ -119,7 +119,11 @@ const listSupplierOrders = async ({
     userId,
     page,
     limit,
-    search,
+    orderStatus,
+    supplierId,
+    warehouseId,
+    fromDate,
+    toDate,
     sortBy,
     order
 }) => {
@@ -140,7 +144,11 @@ const listSupplierOrders = async ({
     const [totalItems, rawOrders] = await adminRepo.findPurchaseOrdersByAdmin({
         page,
         limit,
-        search,
+        orderStatus,
+        supplierId,
+        warehouseId,
+        fromDate,
+        toDate,
         sortBy,
         order
     });
@@ -450,7 +458,11 @@ const getSupplierOrderHistory = async ({
     userId,
     page,
     limit,
-    search,
+    orderStatus,
+    supplierId,
+    warehouseId,
+    fromDate,
+    toDate,
     sortBy,
     order
 }) => {
@@ -470,10 +482,15 @@ const getSupplierOrderHistory = async ({
         await adminRepo.findHistoricalPurchaseOrders({
             page,
             limit,
-            search,
+            orderStatus,
+            supplierId,
+            warehouseId,
+            fromDate,
+            toDate,
             sortBy,
             order
         });
+
     // 3. Perform the EXACT SAME data transformation as listSupplierOrders.
     //    This provides a consistent data structure to the frontend.
     const transformedOrders = rawOrders.map((order) => {

@@ -21,34 +21,63 @@ const findAdminByUserId = async (userId) => {
  * @param {object} options - An object containing pagination and filtering options.
  * @returns {Promise<[number, object[]]>} A tuple containing the total count and the list of orders.
  */
+
 const findPurchaseOrdersByAdmin = async ({
     page,
     limit,
-    search,
+    orderStatus,
+    supplierId,
+    warehouseId,
+    fromDate,
+    toDate,
     sortBy,
     order
 }) => {
-    console.log(page, limit);
+    console.log(
+        "findPurchaseOrdersByAdmin:",
+        page,
+        limit,
+        orderStatus,
+        supplierId,
+        warehouseId,
+        fromDate,
+        toDate,
+        order
+    );
+
     const whereClause = {
-        // Add a NOT clause to exclude all historical orders.
+        // Exclude historical orders (DELIVERED && COMPLETELY PAID Purchase Orders)
         NOT: {
             OR: [
-                // Exclude orders that were rejected or cancelled.
-                { status: { in: ["REJECTED", "CANCELLED"] } },
-                // Exclude orders that are both DELIVERED and 100% paid.
+                {
+                    status: {
+                        in: [ORDER_STATUSES.REJECTED, ORDER_STATUSES.CANCELLED]
+                    }
+                },
                 {
                     AND: [
-                        { status: "DELIVERED" },
+                        { status: ORDER_STATUSES.DELIVERED },
                         { paymentPercentage: 100 },
                         { pendingAmount: 0 }
                     ]
                 }
             ]
         },
-        ...(search && {
-            id: { contains: search, mode: "insensitive" }
-        })
+        // Add the active filter if given
+        ...statusFiltersForActivePurchaseOrders[
+            orderStatus || ORDER_STATUSES.ALL_ORDERS
+        ],
+        ...(warehouseId && { warehouseId }),
+        ...(supplierId && { supplierId }),
+        ...(fromDate &&
+            toDate && {
+                requestedAt: {
+                    gte: new Date(fromDate),
+                    lte: new Date(toDate)
+                }
+            })
     };
+
     const orderBy = {};
     if (sortBy && order) {
         orderBy[sortBy] = order;
@@ -118,9 +147,7 @@ const findPurchaseOrdersByAdmin = async ({
                                 sku: true,
                                 // --- ADDED: Include the nested material name for pots ---
                                 material: {
-                                    select: {
-                                        name: true
-                                    }
+                                    select: { name: true }
                                 },
                                 color: {
                                     select: {
@@ -151,14 +178,18 @@ const findPurchaseOrdersByAdmin = async ({
                         remarks: true,
                         transactionId: true
                     }
-                    // orderBy: {
-                    //     // Show the payments in chronological order
-                    //     requestedAt: 'asc'
-                    // }
                 }
             }
         })
     ]);
+};
+
+const statusFiltersForActivePurchaseOrders = {
+    PENDING: { status: ORDER_STATUSES.PENDING },
+    PROCESSING: { status: ORDER_STATUSES.PROCESSING },
+    SHIPPED: { status: ORDER_STATUSES.SHIPPED },
+    DELIVERED: { status: ORDER_STATUSES.DELIVERED },
+    ALL_ORDERS: {}
 };
 
 /**
@@ -255,38 +286,44 @@ const createPlantRestockLog = async (logData, tx) => {
  * @param {object} options - Pagination and search options.
  * @returns {Promise<[number, object[]]>} A tuple with the total count and the list of orders.
  */
+
 const findHistoricalPurchaseOrders = async ({
     page,
     limit,
-    search,
+    orderStatus,
+    supplierId,
+    warehouseId,
+    fromDate,
+    toDate,
     sortBy,
     order
 }) => {
+    const statusFilter =
+        statusFiltersForPurchaseOrderHistory[orderStatus] ||
+        statusFiltersForPurchaseOrderHistory.ALL_ORDERS;
+
     const whereClause = {
-        OR: [
-            { status: { in: ["REJECTED"] } },
-            {
-                AND: [
-                    { status: "DELIVERED" },
-                    { paymentPercentage: 100 },
-                    { pendingAmount: 0 }
-                ]
-            }
-        ],
-        ...(search && {
-            id: { contains: search, mode: "insensitive" }
-        })
+        ...statusFilter,
+        ...(supplierId && { supplierId }),
+        ...(warehouseId && { warehouseId }),
+        ...(fromDate &&
+            toDate && {
+                requestedAt: {
+                    gte: new Date(fromDate),
+                    lte: new Date(toDate)
+                }
+            })
     };
+
     const orderBy = {};
     if (sortBy && order) {
         orderBy[sortBy] = order;
     } else {
-        // Default sort if none is provided
         orderBy["requestedAt"] = "desc";
     }
 
-    console.log("vvsdfasd");
-    // The data fetching transaction is identical to the active orders one.
+    console.log("Admin Repository --> findHistoricalPurchaseOrders --> ");
+
     return await prisma.$transaction([
         prisma.purchaseOrder.count({ where: whereClause }),
         prisma.purchaseOrder.findMany({
@@ -315,16 +352,22 @@ const findHistoricalPurchaseOrders = async ({
                         contactPerson: {
                             // Following the relation from Supplier to User
                             select: {
-                                address: true, // Assuming 'address' is a field on the User model
+                                address: true,
                                 phoneNumber: true
                             }
                         }
                     }
                 },
+                warehouse: {
+                    select: {
+                        name: true,
+                        officeEmail: true,
+                        officeAddress: true,
+                        officePhone: true
+                    }
+                },
                 PurchaseOrderItems: {
-                    where: {
-                        isAccepted: true
-                    },
+                    where: { isAccepted: true },
                     select: {
                         id: true,
                         productType: true,
@@ -334,24 +377,15 @@ const findHistoricalPurchaseOrders = async ({
                         plant: { select: { name: true } },
                         plantVariant: {
                             select: {
-                                size: {
-                                    select: {
-                                        plantSize: true
-                                    }
-                                },
+                                size: { select: { plantSize: true } },
                                 sku: true,
-                                /** mediaUrl:true */
                                 color: {
-                                    select: {
-                                        name: true,
-                                        hexCode: true
-                                    }
+                                    select: { name: true, hexCode: true }
                                 },
                                 plantVariantImages: {
-                                    // This is the relation name
-                                    where: { isPrimary: true }, // Filter for the primary image
-                                    take: 1, // We only need one
-                                    select: { mediaUrl: true } // Select just the URL
+                                    where: { isPrimary: true },
+                                    take: 1,
+                                    select: { mediaUrl: true }
                                 }
                             }
                         },
@@ -361,20 +395,11 @@ const findHistoricalPurchaseOrders = async ({
                                 potName: true,
                                 size: true,
                                 sku: true,
-                                // --- ADDED: Include the nested material name for pots ---
-                                material: {
-                                    select: {
-                                        name: true
-                                    }
-                                },
+                                material: { select: { name: true } },
                                 color: {
-                                    select: {
-                                        name: true,
-                                        hexCode: true
-                                    }
+                                    select: { name: true, hexCode: true }
                                 },
                                 images: {
-                                    // This is the relation name for pot variant images
                                     where: { isPrimary: true },
                                     take: 1,
                                     select: { mediaUrl: true }
@@ -396,14 +421,33 @@ const findHistoricalPurchaseOrders = async ({
                         remarks: true,
                         transactionId: true
                     }
-                    // orderBy: {
-                    //     // Show the payments in chronological order
-                    //     requestedAt: 'asc'
-                    // }
                 }
             }
         })
     ]);
+};
+
+const statusFiltersForPurchaseOrderHistory = {
+    REJECTED: { status: ORDER_STATUSES.REJECTED },
+    DELIVERED: {
+        AND: [
+            { status: ORDER_STATUSES.DELIVERED },
+            { paymentPercentage: 100 },
+            { pendingAmount: 0 }
+        ]
+    },
+    ALL_ORDERS: {
+        OR: [
+            { status: ORDER_STATUSES.REJECTED },
+            {
+                AND: [
+                    { status: ORDER_STATUSES.DELIVERED },
+                    { paymentPercentage: 100 },
+                    { pendingAmount: 0 }
+                ]
+            }
+        ]
+    }
 };
 
 // Universal function to create a damage log
