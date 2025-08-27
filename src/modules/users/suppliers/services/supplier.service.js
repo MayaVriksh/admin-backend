@@ -21,6 +21,10 @@ const orderEvents = require("../../../../events/order.events.js");
 const ORDER_STATUSES = require("../../../../constants/orderStatus.constant.js");
 const ROLES = require("../../../../constants/roles.constant.js");
 const { sendEmail } = require("../../../../utils/email.util.js");
+const {
+    SUPPLIER
+} = require("../../../../constants/emailSubjects.constants.js");
+const supplierProfileSubmittedTemplate = require("../../../../email-templates/supplier/supplierProfileSubmitted.template.js");
 
 const showSupplierProfile = async (userId) => {
     const profile = await prisma.supplier.findUnique({

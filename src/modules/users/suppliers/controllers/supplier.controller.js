@@ -176,7 +176,7 @@ const completeSupplierProfile = async (req, h) => {
                 success: RESPONSE_FLAGS.SUCCESS,
                 message: SUCCESS_MESSAGES.SUPPLIERS.PROFILE_SUBMITTED_FOR_REVIEW
             })
-            .code(result.code);
+            .code(RESPONSE_CODES.SUCCESS);
     } catch (error) {
         console.error("Supplier Profile Completion Error:", error.message);
         if (error && error.success === RESPONSE_FLAGS.FAILURE && error.code) {

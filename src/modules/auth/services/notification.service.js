@@ -1,4 +1,5 @@
 const { prisma } = require("../../../config/prisma.config");
+const NotificationRepository = require("../repositories/notification.repository");
 
 const getUserNotifications = async (
     userId,
@@ -75,7 +76,18 @@ const markNotificationsRead = async (userId, notificationIds) => {
     });
 };
 
+const createNotification = async (userId, title, body, category, actionUrl) => {
+    await NotificationRepository.saveNotification(
+        userId,
+        title,
+        body,
+        category,
+        actionUrl
+    );
+};
+
 module.exports = {
     getUserNotifications,
-    markNotificationsRead
+    markNotificationsRead,
+    createNotification
 };
