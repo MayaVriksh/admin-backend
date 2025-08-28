@@ -770,6 +770,7 @@ model Plants {
   PurchaseOrderItems            PurchaseOrderItems[]            @relation(name: "PlantToPurchaseOrder")
   WarehouseCartItem             WarehouseCartItem[]             @relation(name: "PlantToWarehouseCartItem")
   PlantSizeProfile              PlantSizeProfile[]              @relation(name: "PlantsToPlantSizeProfile")
+  PlantFertilizers              PlantFertilizers[]              @relation(name: "PlantSizeprofileToPlantFertilizers")
 }
 
 model PlantSizeProfile {
@@ -780,12 +781,11 @@ model PlantSizeProfile {
   height    Decimal
   weight    Decimal
 
-  plant                   Plants                   @relation(name: "PlantsToPlantSizeProfile", fields: [plantId], references: [plantId])
-  PlantVariants           PlantVariants[]          @relation(name: "PlantVariantsToPlantSizeProfile") // One size profile can have many color variants
-  PlantCareGuidelines     PlantCareGuidelines?     @relation(name: "PlantSizeprofileToPlantCareGuidelines")
-  PlantFertilizers        PlantFertilizers?        @relation(name: "PlantSizeprofileToPlantFertilizers")
-  PlantFertilizerSchedule PlantFertilizerSchedule? @relation(name: "PlantSizeprofileToPlantFertilizerSchedule")
-  compatiblePots          PotVariants[]
+  plant                   Plants                    @relation(name: "PlantsToPlantSizeProfile", fields: [plantId], references: [plantId])
+  PlantVariants           PlantVariants[]           @relation(name: "PlantVariantsToPlantSizeProfile") // One size profile can have many color variants
+  PlantCareGuidelines     PlantCareGuidelines[]     @relation(name: "PlantSizeprofileToPlantCareGuidelines")
+  PlantFertilizerSchedule PlantFertilizerSchedule[] @relation(name: "PlantSizeprofileToPlantFertilizerSchedule")
+  compatiblePots          PotVariants[]             @relation(name: "CompatiblePots")
 
   @@unique([plantId, plantSize]) // Ensures "Small Peace Lily" is defined only once
 }
@@ -901,17 +901,17 @@ model Fertilizers {
 
 model PlantFertilizers {
   id           String @id
-  plantSizeId  String @unique
+  plantId      String @unique
   fertilizerId String
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  PlantSizeProfile PlantSizeProfile @relation(name: "PlantSizeprofileToPlantFertilizers", fields: [plantSizeId], references: [plantSizeId])
-  fertilizer       Fertilizers      @relation(name: "FertilizerToProduct", fields: [fertilizerId], references: [fertilizerId])
+  plant      Plants      @relation(name: "PlantSizeprofileToPlantFertilizers", fields: [plantId], references: [plantId])
+  fertilizer Fertilizers @relation(name: "FertilizerToProduct", fields: [fertilizerId], references: [fertilizerId])
 
-  @@unique([plantSizeId, fertilizerId])
+  @@unique([plantId, fertilizerId])
 }
 
 model PlantFertilizerSchedule {
@@ -1077,7 +1077,7 @@ model PotVariants {
   PotOrderItem          PotOrderItem[]          @relation(name: "PotOrderItemToPotVariant")
   PurchaseOrderItems    PurchaseOrderItems[]    @relation(name: "PotVariantToPurchaseOrder")
   WarehouseCartItem     WarehouseCartItem[]     @relation(name: "PotVariantToWarehouseCartItem")
-  PlantSizeProfile      PlantSizeProfile[]
+  PlantSizeProfile      PlantSizeProfile[]      @relation(name: "CompatiblePots")
 
   @@unique([categoryId, size, colorId, materialId])
   @@index([categoryId])
