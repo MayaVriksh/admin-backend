@@ -522,6 +522,152 @@ const updateWarehouseInventory = async (productType, where, data, tx) => {
     }
 };
 
+/**
+ * Atomically adds an item to the cart or updates its quantity if it already exists.
+ * @param {object} itemData - The fully validated data for the cart item.
+ * @returns {Promise<object>} The created or updated cart item.
+ */
+const upsertCartItem = async (itemData) => {
+    const {
+        warehouseId,
+        supplierId,
+        productType,
+        plantId,
+        plantVariantId,
+        potCategoryId,
+        potVariantId,
+        unitsRequested,
+        unitCostPrice
+    } = itemData;
+
+    // --- MODIFIED: The whereClause now uses the new 4-part unique key ---
+    // Prisma generates this key name by joining the fields from your @@unique constraint.
+    const whereClause = productType === 'PLANT'
+        ? {
+            warehouseId_supplierId_plantId_plantVariantId: {
+                warehouseId,
+                supplierId,
+                plantId,
+                plantVariantId
+            }
+        }
+        : {
+            warehouseId_supplierId_potCategoryId_potVariantId: {
+                warehouseId,
+                supplierId,
+                potCategoryId,
+                potVariantId
+            }
+        };
+
+    // ---: The createData object now includes the supplierId ---
+    const createData = {
+        cartItemId: uuidv4(),
+        warehouseId,
+        supplierId,
+        productType,
+        unitsRequested,
+        unitCostPrice,
+        plantId: productType === 'PLANT' ? plantId : null,
+        plantVariantId: productType === 'PLANT' ? plantVariantId : null,
+        potCategoryId: productType === 'POT' ? potCategoryId : null,
+        potVariantId: productType === 'POT' ? potVariantId : null,
+    };
+
+    return await prisma.warehouseCartItem.upsert({
+        where: whereClause,
+        update: {
+            unitsRequested: { increment: unitsRequested },
+            unitCostPrice: unitCostPrice,
+            updatedAt: new Date()
+        },
+        create: createData
+    });
+};
+
+/**
+ * Fetches all cart items for a specific warehouse, including related
+ * supplier and product variant details needed for display and calculations.
+ * @param {string} warehouseId - The ID of the warehouse.
+ * @returns {Promise<Array<object>>} A flat list of cart items.
+ */
+const findCartItemsByWarehouseId = async (warehouseId) => {
+    return await prisma.warehouseCartItem.findMany({
+        where: {
+            warehouseId: warehouseId
+        },
+        select: {
+            cartItemId: true,
+            productType: true,
+            unitsRequested: true,
+            unitCostPrice: true,
+            plantId: true,
+            plantVariantId: true,
+            potCategoryId: true,
+            potVariantId: true,
+            supplier: {
+                select: {
+                    supplierId: true,
+                    nurseryName: true
+                }
+            },
+            plantVariant: {
+                select: {
+                    sku: true,
+                    plant: { select: { name: true } },
+                    size: { select: { plantSize: true } },
+                    color: { select: { name: true } },
+                    plantVariantImages: { where: { isPrimary: true }, select: { mediaUrl: true } }
+                }
+            },
+            potVariant: {
+                select: {
+                    sku: true,
+                    potName: true,
+                    size: true,
+                    color: { select: { name: true } },
+                    images: { where: { isPrimary: true }, select: { mediaUrl: true } }
+                }
+            }
+        }
+    });
+};
+
+/**
+ * Creates a PurchaseOrder and its associated PurchaseOrderItems within a transaction.
+ * @param {object} orderData - The prepared data for the PurchaseOrder.
+ * @param {Array<object>} itemsData - The prepared data for the PurchaseOrderItems.
+ * @param {object} tx - The Prisma transaction client.
+ * @returns {Promise<object>} The newly created PurchaseOrder.
+ */
+const createOrderAndItems = async (orderData, itemsData, tx) => {
+    // Step 1: Create the parent PurchaseOrder record.
+    const purchaseOrder = await tx.purchaseOrder.create({
+        data: orderData
+    });
+
+    // Step 2: Prepare all PurchaseOrderItems, linking them to the new purchaseOrderId.
+    const itemsToCreate = itemsData.map(item => ({
+        id: uuidv4(),
+        purchaseOrderId: purchaseOrder.id,
+        productType: item.productType,
+        plantId: item.plantId,
+        plantVariantId: item.plantVariantId,
+        potCategoryId: item.potCategoryId,
+        potVariantId: item.potVariantId,
+        unitsRequested: item.unitsRequested,
+        unitCostPrice: item.unitCostPrice,
+        totalCost: item.totalCost
+    }));
+
+    // Step 3: Create all item records in a single, efficient batch operation.
+    await tx.purchaseOrderItems.createMany({
+        data: itemsToCreate
+    });
+
+    return purchaseOrder;
+};
+
 module.exports = {
     findAdminByUserId,
     findPurchaseOrdersByAdmin,
@@ -533,7 +679,8 @@ module.exports = {
     findHistoricalPurchaseOrders,
     createDamageLog,
     createRestockLog,
-    updateWarehouseInventory
+    updateWarehouseInventory,
+    upsertCartItem,
+    findCartItemsByWarehouseId,
+    createOrderAndItems,
 };
-
-// PCOD-25-5C5DB89-0064

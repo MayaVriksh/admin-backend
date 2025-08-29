@@ -495,6 +495,7 @@ model Supplier {
   PlantSupplierInventory        PlantSupplierInventory[]        @relation(name: "SupplierToPlantInventory")
   PotSupplierInventory          PotSupplierInventory[]          @relation(name: "SupplierToPotInventory")
   PurchaseOrder                 PurchaseOrder[]                 @relation(name: "SupplierToPurchaseOrder")
+  WarehouseCartItem             WarehouseCartItem[]
 
   @@unique([userId, warehouseId])
 }
@@ -1848,6 +1849,7 @@ model PotRestockEventLog {
 model WarehouseCartItem {
   cartItemId     String  @id
   warehouseId    String
+  supplierId     String
   plantId        String?
   plantVariantId String?
   potCategoryId  String?
@@ -1862,13 +1864,14 @@ model WarehouseCartItem {
   deletedAt DateTime?
 
   warehouse    Warehouse      @relation(name: "warehouseCartItemToWarehouse", fields: [warehouseId], references: [warehouseId])
+  supplier     Supplier       @relation(fields: [supplierId], references: [supplierId])
   plant        Plants?        @relation(name: "PlantToWarehouseCartItem", fields: [plantId], references: [plantId])
   plantVariant PlantVariants? @relation(name: "PlantVariantToWarehouseCartItem", fields: [plantVariantId], references: [variantId])
   potCategory  PotCategory?   @relation(name: "PotCategoryToWarehouseCartItem", fields: [potCategoryId], references: [categoryId])
   potVariant   PotVariants?   @relation(name: "PotVariantToWarehouseCartItem", fields: [potVariantId], references: [potVariantId])
 
-  @@unique([warehouseId, plantId, plantVariantId])
-  @@unique([warehouseId, potCategoryId, potVariantId])
+  @@unique([warehouseId, supplierId, plantId, plantVariantId])
+  @@unique([warehouseId, supplierId, potCategoryId, potVariantId])
 }
 
 model PurchaseOrderItems {

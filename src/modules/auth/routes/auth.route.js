@@ -225,7 +225,7 @@ module.exports = [
             description:
                 "Deactivate the currently authenticated user's profile.",
             notes: "This action will also clear the user's refresh token, effectively logging them out.",
-            // <-- MODIFIED: Switched from the old `authenticate` to the new `verifyAccessTokenMiddleware`.
+            // <--  : Switched from the old `authenticate` to the new `verifyAccessTokenMiddleware`.
             // This makes the initial check fast and stateless.
             pre: [verifyAccessTokenMiddleware],
             // Your controller will need a minor update to get the userId from `req.pre.credentials.userId`.
@@ -335,7 +335,7 @@ module.exports = [
             tags: ["api", "Auth"],
             description: "Change the currently authenticated user's password.",
             notes: "Requires the user's old password and a new password.",
-            // <-- MODIFIED: Switched from the old `authenticate` to the new `verifyAccessTokenMiddleware`.
+            // <--  : Switched from the old `authenticate` to the new `verifyAccessTokenMiddleware`.
             pre: [verifyAccessTokenMiddleware],
             // Your controller gets the userId from `req.pre.credentials.userId` and passwords from `req.payload`.
             handler: AuthController.changePassword,

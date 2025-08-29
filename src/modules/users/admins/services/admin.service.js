@@ -12,6 +12,7 @@ const ORDER_STATUSES = require("../../../../constants/orderStatus.constant.js");
 const ROLES = require("../../../../constants/roles.constant.js");
 const uploadMedia = require("../../../../utils/uploadMedia.js");
 const { PRODUCT_TYPES } = require("../../../../constants/general.constant.js");
+const { generateCustomId } = require("../../../../utils/generateCustomId.js");
 
 const showAdminProfile = async (userId) => {
     const profile = await prisma.admin.findUnique({
@@ -921,6 +922,159 @@ const restockInventory = async ({
     );
 };
 
+const addItemToWarehouseCart = async (payload) => {
+    // The repository handles the core logic with upsert
+    const cartItem = await adminRepo.upsertCartItem(payload);
+
+    return {
+        success: true,
+        code: 200,
+        message: "Item added to cart successfully.",
+        data: cartItem
+    };
+};
+
+/**
+ * Retrieves all items in a warehouse cart, groups them by supplier,
+ * and calculates subtotals and a grand total.
+ * @param {string} warehouseId - The ID of the warehouse.
+ * @returns {Promise<object>} A structured response with supplier-grouped carts.
+ */
+const getWarehouseCart = async (warehouseId) => {
+    // 1. Fetch the flat list of all cart items for the warehouse from the repository.
+    // This query is efficient and includes the supplier and variant details.
+    const flatCartItems = await adminRepo.findCartItemsByWarehouseId(warehouseId);
+
+    if (!flatCartItems || flatCartItems.length === 0) {
+        return {
+            success: true,
+            code: 200,
+            // Return a structured but empty response
+            data: { suppliers: [], grandTotal: 0, totalItems: 0 }
+        };
+    }
+
+    // --- 2. THIS IS THE NEW LOGIC: Transform the data on the backend ---
+    let grandTotal = 0;
+    
+    const groupedBySupplier = flatCartItems.reduce((acc, item) => {
+        const supplierName = item.supplier.nurseryName;
+        
+        // If this is the first time we've seen this supplier, create an entry.
+        if (!acc[supplierName]) {
+            acc[supplierName] = {
+                supplierId: item.supplier.supplierId,
+                nurseryName: supplierName,
+                items: [],
+                subtotal: 0
+            };
+        }
+
+        const itemTotal = Number(item.unitsRequested) * Number(item.unitCostPrice);
+        const isPlant = item.productType === 'PLANT';
+        const variant = isPlant ? item.plantVariant : item.potVariant;
+        const name = isPlant 
+            ? `${variant.plant.name} - ${variant.size.plantSize}, ${variant.color.name}` 
+            : `${variant.potName} - ${variant.size}, ${variant.color.name}`;
+        const imageUrl = isPlant 
+            ? variant.plantVariantImages[0]?.mediaUrl 
+            : variant.images[0]?.mediaUrl;
+
+        // Add the transformed item to this supplier's group.
+        acc[supplierName].items.push({
+            cartItemId: item.cartItemId,
+            productType: item.productType,
+            unitsRequested: item.unitsRequested,
+            unitCostPrice: item.unitCostPrice,
+            itemTotalCost: itemTotal,
+            variantId: isPlant ? item.plantVariantId : item.potVariantId,
+            sku: variant.sku,
+            name: name,
+            imageUrl: imageUrl
+        });
+
+        // Update the subtotal for this supplier.
+        acc[supplierName].subtotal += itemTotal;
+        
+        return acc;
+    }, {});
+
+    // 3. Convert the grouped object into an array and calculate the grand total.
+    const supplierCarts = Object.values(groupedBySupplier);
+    supplierCarts.forEach(cart => {
+        grandTotal += cart.subtotal;
+    });
+
+    // 4. Return the final, structured response, ready for the UI.
+    return {
+        success: true,
+        code: 200,
+        message: "Cart items retrieved successfully.",
+        data: {
+            suppliers: supplierCarts, // This is now an array of supplier objects
+            grandTotal: grandTotal,
+            totalItems: flatCartItems.length
+        }
+    };
+};
+
+
+const createPurchaseOrderFromCart = async (payload) => {
+    const { warehouseId, supplierId, expectedDateOfArrival, deliveryCharges } = payload;
+
+    return await prisma.$transaction(async (tx) => {
+        // Step 1: Fetch the trusted cart items directly from the database using the warehouseId.
+        // This is the authoritative source of truth.
+        const trustedCartItems = await tx.warehouseCartItem.findMany({
+            where: { warehouseId: warehouseId }
+        });
+
+        if (trustedCartItems.length === 0) {
+            throw { code: 400, message: "The cart is empty. Please add items before creating a purchase order." };
+        }
+
+        // Step 2: Securely calculate all costs on the backend using the trusted data.
+        let itemsTotalCost = 0;
+        const processedItems = trustedCartItems.map(item => {
+            const totalItemCost = Number(item.unitsRequested) * Number(item.unitCostPrice);
+            itemsTotalCost += totalItemCost;
+            return { ...item, totalCost: totalItemCost }; // Add calculated totalCost to each item
+        });
+
+        const finalTotalCost = itemsTotalCost + (deliveryCharges || 0);
+
+        // Step 3: Prepare the data for the main PurchaseOrder.
+        const orderData = {
+            id: generateCustomId('PCOD'), // Assuming a custom ID generator
+            warehouseId,
+            supplierId,
+            expectedDateOfArrival,
+            deliveryCharges,
+            totalCost: finalTotalCost,
+            pendingAmount: finalTotalCost, // Initially, the full amount is pending
+            status: 'PENDING'
+        };
+
+        // Step 4: Call the repository to create the order and its items.
+        const newPurchaseOrder = await PurchaseOrderRepository.createOrderAndItems(orderData, processedItems, tx);
+
+        // Step 5: Clear the entire cart for that warehouse.
+        await tx.warehouseCartItem.deleteMany({
+            where: { warehouseId: warehouseId }
+        });
+
+        // Step 6 (Optional but recommended): Emit an event for real-time notifications.
+        // eventEmitter.emit('purchaseOrder.created', { order: newPurchaseOrder, supplierId: supplierId });
+
+        return {
+            success: true,
+            code: 201,
+            message: "Purchase Order created successfully from cart items.",
+            data: newPurchaseOrder
+        };
+    });
+};
+
 module.exports = {
     showAdminProfile,
     listSupplierOrders,
@@ -928,5 +1082,9 @@ module.exports = {
     getOrderRequestByOrderId,
     recordPaymentForOrder,
     uploadQcMediaForOrder,
-    restockInventory
+    restockInventory,
+    addItemToWarehouseCart,
+    getWarehouseCart,
+    createPurchaseOrderFromCart,
+
 };

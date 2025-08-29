@@ -89,7 +89,7 @@ const completeSupplierProfile = async (
     profileImageData,
     nurseryMediaAssets
 ) => {
-    // --- MODIFIED: Destructure only the fields we receive from the controller ---
+    // ---  : Destructure only the fields we receive from the controller ---
     const {
         nurseryName,
         streetAddress,
@@ -122,7 +122,7 @@ const completeSupplierProfile = async (
                     };
                 }
             }
-            // --- MODIFIED: Update the User's address JSON blob ---
+            // ---  : Update the User's address JSON blob ---
             // We are only updating the address here, not other User fields. Here
             const address = {
                 [STREET_ADDRESS]: streetAddress,

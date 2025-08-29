@@ -11,7 +11,7 @@ const uploadMedia = require("../../../../utils/uploadMedia.js");
 const showAdminProfile = async (req, h) => {
     try {
         // const { userId } = req.auth;
-        // <-- MODIFIED: Get userId from `req.pre.credentials`.
+        // <--  : Get userId from `req.pre.credentials`.
         // This data comes directly from the verified JWT payload, with no extra DB call.
         const { userId } = req.pre.credentials;
         const result = await AdminService.showAdminProfile(userId);
@@ -264,6 +264,44 @@ const restockInventory = async (req, h) => {
     }
 };
 
+const addItemToWarehouseCart = async (req, h) => {
+    try {
+        const result = await AdminService.addItemToWarehouseCart(req.payload);
+        return h.response(result).code(result.code);
+    } catch (error) {
+        console.error("Add to Warehouse Cart Controller Error:", error);
+        return h.response({
+            success: false, message: error.message
+        }).code(error.code || 500);
+    }
+};
+
+const getWarehouseCart = async (req, h) => {
+    try {
+        const { warehouseId } = req.params;
+        const result = await AdminService.getWarehouseCart(warehouseId);
+        return h.response(result).code(result.code);
+    } catch (error) {
+        console.error("Get Warehouse Cart Controller Error:", error);
+        return h.response({
+            success: false, 
+            message: error.message || "Failed to retrieve warehouse cart."
+        }).code(error.code || 500);
+    }
+};
+
+const createPurchaseOrderFromCart = async (req, h) => {
+    try {
+        const result = await AdminService.createPurchaseOrderFromCart(req.payload);
+        return h.response(result).code(result.code);
+    } catch (error) {
+        console.error("Create Purchase Order From Cart Controller Error:", error);
+        return h.response({
+            success: false, message: error.message || "An unexpected error occurred while trying to Add Warehouse Cart Items."
+        }).code(error.code || 500);
+    }
+};
+
 module.exports = {
     showAdminProfile,
     listSupplierOrders,
@@ -271,5 +309,8 @@ module.exports = {
     getSupplierOrderHistory,
     recordPayment,
     uploadQcMedia,
-    restockInventory
+    restockInventory,
+    addItemToWarehouseCart,
+    getWarehouseCart,
+    createPurchaseOrderFromCart,
 };

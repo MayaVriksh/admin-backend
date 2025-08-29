@@ -26,15 +26,15 @@ module.exports = [
     // Admin: Get Order Requests
     {
         method: "GET",
-        // --- MODIFIED: Path changed for the admin section ---
+        // ---  : Path changed for the admin section ---
         path: "/admin/order-requests",
         options: {
-            // --- MODIFIED: Tags and description updated for Admins ---
+            // ---  : Tags and description updated for Admins ---
             tags: ["api", "Admin Purchase Order"],
             description:
                 "Get a list of all active purchase orders across all Admins.",
 
-            // --- MODIFIED: Notes rewritten for an Admin's perspective ---
+            // ---  : Notes rewritten for an Admin's perspective ---
             notes: `
                 This endpoint fetches a paginated list of **active** purchase orders for administrative review. It is the primary data source for the admin's order management dashboard.
 
@@ -52,13 +52,13 @@ module.exports = [
                 requireRole([ROLES.ADMIN, ROLES.SUPER_ADMIN])
             ],
 
-            // --- MODIFIED: Validator points to an Admin-specific validation schema ---
+            // ---  : Validator points to an Admin-specific validation schema ---
             validate: {
                 ...AdminValidator.orderRequestValidation, // Assumes you create this
                 failAction: handleValidationFailure
             },
 
-            // --- MODIFIED: Handler now points to the AdminController ---
+            // ---  : Handler now points to the AdminController ---
             handler: AdminController.listSupplierOrders,
 
             plugins: {
@@ -326,6 +326,75 @@ module.exports = [
                             description: "Forbidden: User is not a admin."
                         }
                     }
+                }
+            }
+        }
+    },
+    {
+        method: "POST",
+        path: "/admin/warehouse-cart/add",
+        options: {
+            tags: ["api", "Admin Inventory"],
+            description: "Add or update an item in the warehouse purchase order cart.",
+            notes: "This endpoint performs several crucial checks: 1. Verifies that the product variant exists. 2. Ensures the product is active and available for ordering. 3. Uses a database 'upsert' to atomically add the item or update its quantity if it's already in the cart.",
+            pre: [
+                verifyAccessTokenMiddleware,
+                requireRole([ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.WAREHOUSE_MANAGER])
+            ],
+            validate: {
+                ...AdminValidator.addToWarehouseCartValidation,
+                failAction: handleValidationFailure,
+            },
+            handler: AdminController.addItemToWarehouseCart,
+            plugins: {
+                "hapi-swagger": {
+                    payloadType: 'json'
+                }
+            }
+        }
+    },
+    {
+        method: "GET",
+        path: "/admin/warehouse-cart/{warehouseId}",
+        options: {
+            tags: ["api", "Admin", "Warehouse Cart"],
+            description: "Get all items for a warehouse's cart, grouped by supplier, with calculated totals.",
+            notes: "This endpoint fetches all cart items for a given warehouse, performs server-side grouping by supplier, and calculates subtotals and a grand total. The response is structured and ready for direct rendering in the UI.",
+            pre: [
+                verifyAccessTokenMiddleware,
+                requireRole([ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.WAREHOUSE_MANAGER])
+            ],
+            validate: {
+                ...AdminValidator.getWarehouseCartValidation,
+                failAction: handleValidationFailure,
+            },
+            handler: AdminController.getWarehouseCart,
+            plugins: {
+                "hapi-swagger": {
+                    // You would define a response schema here for full documentation
+                }
+            }
+        }
+    },
+    {
+        method: "POST",
+        path: "/admin/purchase-orders/from-cart",
+        options: {
+            tags: ["api", "Admin Inventory"],
+            description: "Create a new Purchase Order from all items in a warehouse's cart.",
+            notes: "This is a secure endpoint that ignores any client-side financial data. It fetches all items and prices for the given warehouseId directly from the database to build the order.",
+            pre: [
+                verifyAccessTokenMiddleware,
+                requireRole([ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.WAREHOUSE_MANAGER])
+            ],
+            validate: {
+                ...AdminValidator.createPurchaseOrderFromCartValidation,
+                failAction: handleValidationFailure,
+            },
+            handler: AdminController.createPurchaseOrderFromCart,
+            plugins: {
+                "hapi-swagger": {
+                    payloadType: 'json'
                 }
             }
         }

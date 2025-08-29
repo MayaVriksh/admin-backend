@@ -271,7 +271,6 @@ const register = async (data) => {
  * @param {object} user - The full user object from Prisma and password from UI, for matching passwords.
  */
 const _verifyUserCredentials = async (user, password) => {
-    console.log("User Detail In AuthService Page for Logging In:", user);
 
     if (!user) {
         throw {

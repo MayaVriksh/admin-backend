@@ -234,7 +234,7 @@ This endpoint intentionally **does not** return the detailed \`PurchaseOrderItem
             description:
                 "Submit an Order Items review (Accept/Reject) for a Purchase Order.",
 
-            // --- MODIFIED: Added detailed notes with examples ---
+            // ---  : Added detailed notes with examples ---
             notes: `
 This endpoint handles a supplier's review of a purchase order. It supports two main scenarios:
 

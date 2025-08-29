@@ -11,7 +11,7 @@ const uploadMedia = require("../../../../utils/uploadMedia.js");
 const showSupplierProfile = async (req, h) => {
     try {
         // const { userId } = req.auth;
-        // <-- MODIFIED: Get userId from `req.pre.credentials`.
+        // <--  : Get userId from `req.pre.credentials`.
         // This data comes directly from the verified JWT payload, with no extra DB call.
         const { userId } = req.pre.credentials;
         const result = await SupplierService.showSupplierProfile(userId);

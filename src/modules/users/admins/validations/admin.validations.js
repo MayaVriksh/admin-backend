@@ -345,6 +345,57 @@ const recordPaymentValidation = {
     })
 };
 
+
+const addToWarehouseCartValidation = {
+    payload: Joi.object({
+        warehouseId: Joi.string().required(),
+        productType: Joi.string().valid('PLANT', 'POT').required(),
+        supplierId: Joi.string().required().description("The ID of the supplier for this cart item."),
+        plantId: Joi.string().when('productType', {
+            is: 'PLANT',
+            // If it's a PLANT, it's required and cannot be empty.
+            then: Joi.string().required(),
+            // Otherwise (if it's a POT), it's optional AND can be an empty string or null.
+            otherwise: Joi.string().optional().allow('', null)
+        }),
+        plantVariantId: Joi.string().when('productType', {
+            is: 'PLANT',
+            then: Joi.string().required(),
+            otherwise: Joi.string().optional().allow('', null)
+        }),
+
+    
+        potCategoryId: Joi.string().when('productType', {
+            is: 'POT',
+            then: Joi.string().required(),
+            otherwise: Joi.string().optional().allow('', null)
+        }),
+        potVariantId: Joi.string().when('productType', {
+            is: 'POT',
+            then: Joi.string().required(),
+            otherwise: Joi.string().optional().allow('', null)
+        }),
+
+        unitsRequested: Joi.number().integer().min(1).required(),
+        unitCostPrice: Joi.number().positive().required()
+    })
+};
+
+const getWarehouseCartValidation = {
+    params: Joi.object({
+        warehouseId: Joi.string().required().description("The ID of the warehouse whose cart is being fetched")
+    })
+};
+
+const createPurchaseOrderFromCartValidation = {
+    payload: Joi.object({
+        warehouseId: Joi.string().required().description("The ID of the warehouse whose cart is being converted to an order."),
+        supplierId: Joi.string().required().description("The ID of the supplier for this order."),
+        expectedDateOfArrival: Joi.date().iso().required().description("The expected delivery date in ISO format."),
+        deliveryCharges: Joi.number().min(0).optional().default(0).description("Optional delivery charges for the order.")
+    })
+};
+
 module.exports = {
     orderRequestValidation,
     listHistoryValidation,
@@ -353,5 +404,8 @@ module.exports = {
     orderIdParamValidation,
     restockOrderValidation,
     getOrderByIdResponseSchema,
-    recordPaymentValidation
+    recordPaymentValidation,
+    addToWarehouseCartValidation,
+    getWarehouseCartValidation,
+    createPurchaseOrderFromCartValidation,
 };
