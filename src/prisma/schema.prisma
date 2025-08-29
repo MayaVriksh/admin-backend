@@ -771,7 +771,6 @@ model Plants {
   PurchaseOrderItems            PurchaseOrderItems[]            @relation(name: "PlantToPurchaseOrder")
   WarehouseCartItem             WarehouseCartItem[]             @relation(name: "PlantToWarehouseCartItem")
   PlantSizeProfile              PlantSizeProfile[]              @relation(name: "PlantsToPlantSizeProfile")
-  PlantFertilizers              PlantFertilizers[]              @relation(name: "PlantSizeprofileToPlantFertilizers")
 }
 
 model PlantSizeProfile {
@@ -896,23 +895,7 @@ model Fertilizers {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  productFertilizers  PlantFertilizers[]        @relation(name: "FertilizerToProduct")
   fertilizerSchedules PlantFertilizerSchedule[] @relation(name: "FertilizerToSchedule")
-}
-
-model PlantFertilizers {
-  id           String @id
-  plantId      String @unique
-  fertilizerId String
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
-  plant      Plants      @relation(name: "PlantSizeprofileToPlantFertilizers", fields: [plantId], references: [plantId])
-  fertilizer Fertilizers @relation(name: "FertilizerToProduct", fields: [fertilizerId], references: [fertilizerId])
-
-  @@unique([plantId, fertilizerId])
 }
 
 model PlantFertilizerSchedule {
@@ -934,6 +917,8 @@ model PlantFertilizerSchedule {
 
   PlantSizeProfile PlantSizeProfile @relation(name: "PlantSizeprofileToPlantFertilizerSchedule", fields: [plantSizeId], references: [plantSizeId])
   fertilizer       Fertilizers      @relation(name: "FertilizerToSchedule", fields: [fertilizerId], references: [fertilizerId])
+
+  @@unique([plantSizeId, fertilizerId])
 }
 
 model PlantGenericCostComponent {
