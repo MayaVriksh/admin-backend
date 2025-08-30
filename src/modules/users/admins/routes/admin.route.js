@@ -371,7 +371,7 @@ module.exports = [
             handler: AdminController.getWarehouseCart,
             plugins: {
                 "hapi-swagger": {
-                    // You would define a response schema here for full documentation
+                    payloadType: 'json'
                 }
             }
         }

@@ -614,7 +614,7 @@ const findCartItemsByWarehouseId = async (warehouseId) => {
             plantVariant: {
                 select: {
                     sku: true,
-                    plant: { select: { name: true } },
+                    plants: { select: { name: true } },
                     size: { select: { plantSize: true } },
                     color: { select: { name: true } },
                     plantVariantImages: { where: { isPrimary: true }, select: { mediaUrl: true } }

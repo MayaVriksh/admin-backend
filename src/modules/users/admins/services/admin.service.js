@@ -921,9 +921,44 @@ const restockInventory = async ({
         }
     );
 };
-
+/**
+ * Handles the business logic for adding an item to the warehouse cart.
+ * Includes crucial validation to prevent foreign key errors and adding inactive products.
+ *
+ * @param {object} payload - The validated payload from the controller.
+ * @returns {Promise<object>} A success response with the cart item data.
+ * @throws {Error} Throws a structured error with a code and message if any validation fails.
+ */
 const addItemToWarehouseCart = async (payload) => {
-    // The repository handles the core logic with upsert
+    // --- Step 1: Perform Concurrent Existence Checks ---
+    // We run these database checks in parallel for maximum efficiency before any writes.
+    const [warehouse, supplier, variant] = await Promise.all([
+        prisma.warehouse.findUnique({
+            where: { warehouseId: payload.warehouseId },
+            select: { warehouseId: true } // Only fetch what's needed for the check
+        }),
+        prisma.supplier.findUnique({
+            where: { supplierId: payload.supplierId },
+            select: { supplierId: true }
+        }),
+    ]);
+
+    // --- Step 2: Handle Edge Cases with Clear Error Messages ---
+    
+    // Edge Case: The specified warehouse doesn't exist.
+    if (!warehouse) {
+        throw { code: 404, message: `Validation failed: Warehouse with ID '${payload.warehouseId}' not found.` };
+    }
+
+    // Edge Case: The specified supplier doesn't exist.
+    if (!supplier) {
+        throw { code: 404, message: `Validation failed: Supplier with ID '${payload.supplierId}' not found.` };
+    }
+    
+    // (Future Enhancement: You could add a check here to ensure the selected supplier is authorized to supply this specific variant.)
+
+    // --- Step 3: Proceed with the Database Write Operation ---
+    // Only if all the above checks have passed, we call the repository to update the database.
     const cartItem = await adminRepo.upsertCartItem(payload);
 
     return {
@@ -949,18 +984,18 @@ const getWarehouseCart = async (warehouseId) => {
         return {
             success: true,
             code: 200,
-            // Return a structured but empty response
             data: { suppliers: [], grandTotal: 0, totalItems: 0 }
         };
     }
 
-    // --- 2. THIS IS THE NEW LOGIC: Transform the data on the backend ---
+    // --- 2.Transform the data on the backend ---
     let grandTotal = 0;
+    console.log(flatCartItems);
     
     const groupedBySupplier = flatCartItems.reduce((acc, item) => {
         const supplierName = item.supplier.nurseryName;
         
-        // If this is the first time we've seen this supplier, create an entry.
+        // If this is the first time we've seen this supplier, create an entry, and an Array of Cart Items for that Supplier.
         if (!acc[supplierName]) {
             acc[supplierName] = {
                 supplierId: item.supplier.supplierId,
@@ -969,16 +1004,43 @@ const getWarehouseCart = async (warehouseId) => {
                 subtotal: 0
             };
         }
-
+        console.log()
         const itemTotal = Number(item.unitsRequested) * Number(item.unitCostPrice);
+
         const isPlant = item.productType === 'PLANT';
-        const variant = isPlant ? item.plantVariant : item.potVariant;
-        const name = isPlant 
-            ? `${variant.plant.name} - ${variant.size.plantSize}, ${variant.color.name}` 
-            : `${variant.potName} - ${variant.size}, ${variant.color.name}`;
-        const imageUrl = isPlant 
-            ? variant.plantVariantImages[0]?.mediaUrl 
-            : variant.images[0]?.mediaUrl;
+        const variant = isPlant ? item.plantVariant : item.potVariant; // variant object from DB
+
+        // Defensive extraction: Prisma returns `plants` in the select, not `plant`.
+        // Also guard against missing nested relations to avoid TypeError when reading `.name`.
+        if (!variant) {
+            // If there's no variant data, push a minimal placeholder and continue.
+            acc[supplierName].items.push({
+                cartItemId: item.cartItemId,
+                productType: item.productType,
+                unitsRequested: item.unitsRequested,
+                unitCostPrice: item.unitCostPrice,
+                itemTotalCost: itemTotal,
+                variantId: isPlant ? item.plantVariantId : item.potVariantId,
+                sku: null,
+                name: 'Unknown variant',
+                imageUrl: null
+            });
+            acc[supplierName].subtotal += itemTotal;
+            return acc;
+        }
+
+        const plantName = variant.plants?.name ?? variant.plant?.name ?? '';
+        const plantSize = variant.size?.plantSize ?? variant.size ?? '';
+        const colorName = variant.color?.name ?? '';
+        const potName = variant.potName ?? '';
+
+        const name = isPlant
+            ? `${plantName}${plantSize ? ' - ' + plantSize : ''}${colorName ? ', ' + colorName : ''}`
+            : `${potName}${plantSize ? ' - ' + plantSize : ''}${colorName ? ', ' + colorName : ''}`;
+
+        const imageUrl = isPlant
+            ? variant.plantVariantImages?.[0]?.mediaUrl ?? null
+            : variant.images?.[0]?.mediaUrl ?? null;
 
         // Add the transformed item to this supplier's group.
         acc[supplierName].items.push({
@@ -993,7 +1055,7 @@ const getWarehouseCart = async (warehouseId) => {
             imageUrl: imageUrl
         });
 
-        // Update the subtotal for this supplier.
+        // Update the subtotal for this suppliers Total Items.
         acc[supplierName].subtotal += itemTotal;
         
         return acc;
@@ -1018,58 +1080,64 @@ const getWarehouseCart = async (warehouseId) => {
     };
 };
 
-
 const createPurchaseOrderFromCart = async (payload) => {
+    // The payload from the client is simple and secure
     const { warehouseId, supplierId, expectedDateOfArrival, deliveryCharges } = payload;
 
     return await prisma.$transaction(async (tx) => {
-        // Step 1: Fetch the trusted cart items directly from the database using the warehouseId.
-        // This is the authoritative source of truth.
+        // Step 1: Fetch the trusted cart items for this specific warehouse AND supplier.
         const trustedCartItems = await tx.warehouseCartItem.findMany({
-            where: { warehouseId: warehouseId }
+            where: {
+                warehouseId: warehouseId,
+                supplierId: supplierId // The crucial filter
+            }
         });
 
+        // --- Edge Case Handling ---
         if (trustedCartItems.length === 0) {
-            throw { code: 400, message: "The cart is empty. Please add items before creating a purchase order." };
+            throw { code: 400, message: `The cart for this warehouse has no items for the selected supplier.` };
         }
 
-        // Step 2: Securely calculate all costs on the backend using the trusted data.
+        // Step 2: Securely calculate all costs on the backend using only trusted data.
         let itemsTotalCost = 0;
         const processedItems = trustedCartItems.map(item => {
             const totalItemCost = Number(item.unitsRequested) * Number(item.unitCostPrice);
             itemsTotalCost += totalItemCost;
-            return { ...item, totalCost: totalItemCost }; // Add calculated totalCost to each item
+            return { ...item, totalCost: totalItemCost };
         });
 
         const finalTotalCost = itemsTotalCost + (deliveryCharges || 0);
 
         // Step 3: Prepare the data for the main PurchaseOrder.
         const orderData = {
-            id: generateCustomId('PCOD'), // Assuming a custom ID generator
+            id: uuidv4,
             warehouseId,
             supplierId,
             expectedDateOfArrival,
             deliveryCharges,
             totalCost: finalTotalCost,
-            pendingAmount: finalTotalCost, // Initially, the full amount is pending
+            pendingAmount: finalTotalCost,
             status: 'PENDING'
         };
 
         // Step 4: Call the repository to create the order and its items.
         const newPurchaseOrder = await PurchaseOrderRepository.createOrderAndItems(orderData, processedItems, tx);
 
-        // Step 5: Clear the entire cart for that warehouse.
+        // Step 5: Clear ONLY the items for this specific supplier from the cart.
         await tx.warehouseCartItem.deleteMany({
-            where: { warehouseId: warehouseId }
+            where: {
+                warehouseId: warehouseId,
+                supplierId: supplierId // The crucial new filter
+            }
         });
 
-        // Step 6 (Optional but recommended): Emit an event for real-time notifications.
-        // eventEmitter.emit('purchaseOrder.created', { order: newPurchaseOrder, supplierId: supplierId });
+        // Step 6: (Optional) Emit an event for notifications.
+        // eventEmitter.emit('purchaseOrder.created', { order: newPurchaseOrder });
 
         return {
             success: true,
             code: 201,
-            message: "Purchase Order created successfully from cart items.",
+            message: `Purchase Order for supplier ${supplierId} created successfully.`,
             data: newPurchaseOrder
         };
     });
