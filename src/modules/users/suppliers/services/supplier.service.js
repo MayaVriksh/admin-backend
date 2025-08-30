@@ -202,7 +202,7 @@ const completeSupplierProfile = async (
         await supplierRepository.findSupplierDetailsForEmailByUserId(userId);
 
     await sendEmail(
-        supplierDetails?.contactPerson?.email,
+        "j6362254@gmail.com",
         SUPPLIER.APPLICATION_RECEIVED,
         supplierProfileSubmittedTemplate({
             contactName: supplierDetails?.contactPerson?.fullName[FIRST_NAME],
