@@ -13,16 +13,11 @@ async function seedPurchaseOrders() {
     const potCategories = await prisma.potCategory.findMany();
     const potVariants = await prisma.potVariants.findMany();
     const warehouses = await prisma.warehouse.findMany();
-    // const suppliers = await prisma.supplier.findMany();
-
     const supplier = await prisma.supplier.findFirst({
-        where: {
-            contactPerson: {
-                email: "restaurant@gmail.com"
-            }
-        }
+        where: { contactPerson: { email: "restaurant@gmail.com" } }
     });
-    const { supplierId } = supplier;    
+    if (!supplier) throw new Error("❌ Supplier not found.");
+    const { supplierId } = supplier;
 
     // await prisma.purchaseOrderPayment.deleteMany();
     // await prisma.purchaseOrderItems.deleteMany();
@@ -34,12 +29,9 @@ async function seedPurchaseOrders() {
         !potCategories.length ||
         !potVariants.length ||
         !warehouses.length
-        // || !suppliers.length
     ) {
         throw new Error("❌ Required data missing in DB.");
     }
-
-    // const supplier = suppliers.length > 4 ? suppliers[5] : suppliers[0];
 
     const plantOrders = generatePlantPurchaseOrderData(
         plants,
@@ -47,7 +39,6 @@ async function seedPurchaseOrders() {
         warehouses,
         supplierId
     );
-
     const potOrders = generatePotPurchaseOrderData(
         potCategories,
         potVariants,
@@ -66,6 +57,7 @@ async function seedPurchaseOrders() {
                         "PURCHASE_ORDER"
                     );
 
+                    // Save purchase order
                     await tx.purchaseOrder.create({
                         data: {
                             id: purchaseOrderId,
@@ -88,6 +80,7 @@ async function seedPurchaseOrders() {
                         }
                     });
 
+                    // Save items
                     if (order.items?.length) {
                         await tx.purchaseOrderItems.createMany({
                             data: order.items.map((item) => ({
@@ -98,20 +91,20 @@ async function seedPurchaseOrders() {
                         });
                     }
 
+                    // Save payments
                     if (order.payments?.length) {
                         for (const payment of order.payments) {
                             const paymentId = await generateCustomId(
                                 tx,
                                 "PURCHASE_ORDER_PAYMENT"
                             );
-
                             await tx.purchaseOrderPayment.create({
                                 data: {
                                     paymentId,
                                     orderId: purchaseOrderId,
                                     paidBy: payment.paidBy,
                                     amount: payment.amount,
-                                    status: payment.status ?? "PENDING",
+                                    status: payment.status,
                                     paymentMethod: payment.paymentMethod,
                                     transactionId: payment.transactionId,
                                     remarks: payment.remarks,
@@ -127,13 +120,11 @@ async function seedPurchaseOrders() {
                         }
                     }
 
-                    console.log(`✅ Seeded Purchase Order ${purchaseOrderId}`);
+                    console.log(
+                        `✅ Seeded Purchase Order ${purchaseOrderId} (${order.status})`
+                    );
                 },
-                {
-                    // maxWait: 99000,
-                    timeout: 15000
-                    // isolationLevel: "ReadCommitted"
-                }
+                { timeout: 15000 }
             );
         } catch (err) {
             console.error(`❌ Error seeding purchase order:`, err.message);
@@ -145,12 +136,8 @@ async function seedPurchaseOrders() {
 
 if (require.main === module) {
     seedPurchaseOrders()
-        .catch((err) => {
-            console.error("❌ Seeder failed:", err);
-        })
-        .finally(() => {
-            prisma.$disconnect();
-        });
+        .catch((err) => console.error("❌ Purchase Order Seeding failed:", err))
+        .finally(() => prisma.$disconnect());
 }
 
 module.exports = seedPurchaseOrders;
