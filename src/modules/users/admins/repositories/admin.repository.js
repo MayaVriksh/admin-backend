@@ -429,6 +429,7 @@ const findHistoricalPurchaseOrders = async ({
 
 const statusFiltersForPurchaseOrderHistory = {
     REJECTED: { status: ORDER_STATUSES.REJECTED },
+    CANCELLED: { status: ORDER_STATUSES.CANCELLED },
     DELIVERED: {
         AND: [
             { status: ORDER_STATUSES.DELIVERED },

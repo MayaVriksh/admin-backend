@@ -18,7 +18,7 @@ const findSupplierDetailsForEmailByUserId = async (userId) => {
     return await prisma.supplier.findUnique({
         where: { userId: userId },
         select: {
-            nurseryName:true,
+            nurseryName: true,
             contactPerson: {
                 select: {
                     fullName: true,
@@ -311,6 +311,7 @@ const statusFiltersForActivePurchaseOrders = {
 
 const statusFiltersForPurchaseOrderHistory = {
     REJECTED: { status: ORDER_STATUSES.REJECTED },
+    CANCELLED: { status: ORDER_STATUSES.CANCELLED },
     DELIVERED: {
         AND: [
             { status: ORDER_STATUSES.DELIVERED },
