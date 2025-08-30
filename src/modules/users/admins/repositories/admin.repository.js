@@ -177,6 +177,10 @@ const findPurchaseOrdersByAdmin = async ({
                         paidAt: true,
                         remarks: true,
                         transactionId: true
+                    },
+                    orderBy: {
+                        // Show the payments in chronological order
+                        requestedAt: "asc"
                     }
                 }
             }
@@ -420,6 +424,10 @@ const findHistoricalPurchaseOrders = async ({
                         paidAt: true,
                         remarks: true,
                         transactionId: true
+                    },
+                    orderBy: {
+                        // Show the payments in chronological order
+                        requestedAt: "asc"
                     }
                 }
             }
@@ -543,23 +551,24 @@ const upsertCartItem = async (itemData) => {
 
     // --- MODIFIED: The whereClause now uses the new 4-part unique key ---
     // Prisma generates this key name by joining the fields from your @@unique constraint.
-    const whereClause = productType === 'PLANT'
-        ? {
-            warehouseId_supplierId_plantId_plantVariantId: {
-                warehouseId,
-                supplierId,
-                plantId,
-                plantVariantId
-            }
-        }
-        : {
-            warehouseId_supplierId_potCategoryId_potVariantId: {
-                warehouseId,
-                supplierId,
-                potCategoryId,
-                potVariantId
-            }
-        };
+    const whereClause =
+        productType === "PLANT"
+            ? {
+                  warehouseId_supplierId_plantId_plantVariantId: {
+                      warehouseId,
+                      supplierId,
+                      plantId,
+                      plantVariantId
+                  }
+              }
+            : {
+                  warehouseId_supplierId_potCategoryId_potVariantId: {
+                      warehouseId,
+                      supplierId,
+                      potCategoryId,
+                      potVariantId
+                  }
+              };
 
     // ---: The createData object now includes the supplierId ---
     const createData = {
@@ -569,12 +578,12 @@ const upsertCartItem = async (itemData) => {
         productType,
         unitsRequested,
         unitCostPrice,
-        plantId: productType === 'PLANT' ? plantId : null,
-        plantVariantId: productType === 'PLANT' ? plantVariantId : null,
-        potCategoryId: productType === 'POT' ? potCategoryId : null,
-        potVariantId: productType === 'POT' ? potVariantId : null,
+        plantId: productType === "PLANT" ? plantId : null,
+        plantVariantId: productType === "PLANT" ? plantVariantId : null,
+        potCategoryId: productType === "POT" ? potCategoryId : null,
+        potVariantId: productType === "POT" ? potVariantId : null
     };
-    
+
     return await prisma.warehouseCartItem.upsert({
         where: whereClause,
         update: {
@@ -618,7 +627,10 @@ const findCartItemsByWarehouseId = async (warehouseId) => {
                     plants: { select: { name: true } },
                     size: { select: { plantSize: true } },
                     color: { select: { name: true } },
-                    plantVariantImages: { where: { isPrimary: true }, select: { mediaUrl: true } }
+                    plantVariantImages: {
+                        where: { isPrimary: true },
+                        select: { mediaUrl: true }
+                    }
                 }
             },
             potVariant: {
@@ -627,7 +639,10 @@ const findCartItemsByWarehouseId = async (warehouseId) => {
                     potName: true,
                     size: true,
                     color: { select: { name: true } },
-                    images: { where: { isPrimary: true }, select: { mediaUrl: true } }
+                    images: {
+                        where: { isPrimary: true },
+                        select: { mediaUrl: true }
+                    }
                 }
             }
         }
@@ -648,7 +663,7 @@ const createOrderAndItems = async (orderData, itemsData, tx) => {
     });
 
     // Step 2: Prepare all PurchaseOrderItems, linking them to the new purchaseOrderId.
-    const itemsToCreate = itemsData.map(item => ({
+    const itemsToCreate = itemsData.map((item) => ({
         id: uuidv4(),
         purchaseOrderId: purchaseOrder.id,
         productType: item.productType,
@@ -683,5 +698,5 @@ module.exports = {
     updateWarehouseInventory,
     upsertCartItem,
     findCartItemsByWarehouseId,
-    createOrderAndItems,
+    createOrderAndItems
 };

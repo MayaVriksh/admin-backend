@@ -176,11 +176,11 @@ const findPurchaseOrdersBySupplier = async (
                         paidAt: true,
                         remarks: true,
                         transactionId: true
+                    },
+                    orderBy: {
+                        // Show the payments in chronological order
+                        requestedAt: "asc"
                     }
-                    // orderBy: {
-                    //     // Show the payments in chronological order
-                    //     requestedAt: 'asc'
-                    // }
                 }
             }
         })
@@ -481,11 +481,11 @@ const findHistoricalPurchaseOrders = async (
                         paidAt: true,
                         remarks: true,
                         transactionId: true
+                    },
+                    orderBy: {
+                        // Show the payments in chronological order
+                        requestedAt: "asc"
                     }
-                    // orderBy: {
-                    //     // Show the payments in chronological order
-                    //     requestedAt: 'asc'
-                    // }
                 }
             }
         })

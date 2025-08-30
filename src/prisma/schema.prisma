@@ -1935,6 +1935,7 @@ model PurchaseOrderPayment {
   resourceType  String?
   requestedAt   DateTime  @default(now())
   paidAt        DateTime?
+  // change ? --> /?/
 
   purchaseOrder PurchaseOrder @relation(name: "PurchaseOrderPaymentToPurchaseOrder", fields: [orderId], references: [id])
 }

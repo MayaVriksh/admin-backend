@@ -163,7 +163,8 @@ const orderRequestValidation = {
         search: Joi.string()
             .allow("")
             .optional()
-            .description("A search term to filter orders by ID"),
+            .description("A search term to filter orders by ID")
+            .trim(),
 
         // For sorting
         sortBy: Joi.string()
@@ -182,7 +183,7 @@ const listHistoryValidation = {
     query: Joi.object({
         page: Joi.number().integer().min(1).default(1),
         limit: Joi.number().integer().min(1).max(100).default(10), // Set a max limit for security
-        search: Joi.string().allow("").optional(),
+        search: Joi.string().allow("").optional().trim(),
         orderStatus: Joi.string()
             .valid(
                 ORDER_STATUSES.DELIVERED,
