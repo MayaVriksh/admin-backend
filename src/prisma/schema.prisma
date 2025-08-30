@@ -860,7 +860,7 @@ model HumidityLevel {
 
 model PlantCareGuidelines {
   plantCareId     String @id
-  plantSizeId     String @unique
+  plantSizeId     String 
   sunlightTypeId  String
   humidityLevelId String
 
