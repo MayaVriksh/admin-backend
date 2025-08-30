@@ -834,6 +834,7 @@ model SunlightTypes {
 
   typeName    String
   icon        String
+  publicId    String
   description String?
 
   createdAt DateTime  @default(now())
