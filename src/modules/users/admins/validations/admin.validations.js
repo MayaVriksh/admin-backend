@@ -106,9 +106,10 @@ const listHistoryValidation = {
 
         // Filter by order status
         orderStatus: Joi.string()
-            .valid(
+           .valid(
                 ORDER_STATUSES.DELIVERED,
                 ORDER_STATUSES.REJECTED,
+                ORDER_STATUSES.CANCELLED,
                 ORDER_STATUSES.ALL_ORDERS
             )
             .default(ORDER_STATUSES.ALL_ORDERS)

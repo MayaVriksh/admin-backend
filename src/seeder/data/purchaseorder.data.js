@@ -6,16 +6,21 @@ function getRandomElement(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function buildPayments(totalCost, status) {
+function buildPayments(totalCost, status, requestedAt) {
     const payments = [];
     let remaining = totalCost;
 
-    if (status === "PROCESSING") {
+    if (
+        status === ORDER_STATUSES.PROCESSING ||
+        status === ORDER_STATUSES.PENDING
+    ) {
         return payments;
     }
 
     const paymentCount =
-        status === "DELIVERED" ? 1 : Math.floor(Math.random() * 3) + 1;
+        status === ORDER_STATUSES.DELIVERED
+            ? 1
+            : Math.floor(Math.random() * 3) + 1;
 
     for (let i = 0; i < paymentCount; i++) {
         const isLast = i === paymentCount - 1;
@@ -24,8 +29,20 @@ function buildPayments(totalCost, status) {
             : parseFloat((Math.random() * (remaining / 2)).toFixed(2));
 
         let paymentStatus = "PENDING";
-        if (status === "DELIVERED") paymentStatus = "PAID";
+        if (status === ORDER_STATUSES.DELIVERED) paymentStatus = "PAID";
         else if (Math.random() > 0.5) paymentStatus = "PAID";
+
+        // Payment timestamps
+        const requestedAtPayment = new Date(
+            requestedAt.getTime() + Math.floor(Math.random() * 2) * 86400000
+        );
+        const paidAt =
+            paymentStatus === "PAID"
+                ? new Date(
+                      requestedAtPayment.getTime() +
+                          Math.floor(Math.random() * 3) * 3600000
+                  )
+                : null;
 
         payments.push({
             paymentId: uuidv4(),
@@ -42,14 +59,61 @@ function buildPayments(totalCost, status) {
                       ? "Initial Payment"
                       : `Installment ${i + 1}`,
             receiptUrl: null,
-            requestedAt: new Date(),
-            paidAt: paymentStatus === "PAID" ? new Date() : null
+            requestedAt: requestedAtPayment,
+            paidAt
         });
 
         remaining -= amount;
     }
 
     return payments;
+}
+
+function getRequestedAt() {
+    // Order requested 1–15 days ago
+    const daysAgo = Math.floor(Math.random() * 15) + 1;
+    return new Date(Date.now() - daysAgo * 86400000);
+}
+
+function getTimestampsByStatus(status, requestedAt) {
+    let acceptedAt = null;
+    let deliveredAt = null;
+
+    switch (status) {
+        case ORDER_STATUSES.PROCESSING:
+        case ORDER_STATUSES.PENDING:
+            break;
+
+        case ORDER_STATUSES.SHIPPED:
+            acceptedAt = new Date(
+                requestedAt.getTime() +
+                    (Math.floor(Math.random() * 3) + 1) * 86400000
+            );
+            break;
+
+        case ORDER_STATUSES.DELIVERED:
+            acceptedAt = new Date(
+                requestedAt.getTime() +
+                    (Math.floor(Math.random() * 3) + 1) * 86400000
+            );
+            deliveredAt = new Date(
+                acceptedAt.getTime() +
+                    (Math.floor(Math.random() * 2) + 1) * 86400000
+            );
+            break;
+
+        case ORDER_STATUSES.REJECTED:
+        case ORDER_STATUSES.CANCELLED:
+            if (Math.random() > 0.5) {
+                acceptedAt = new Date(
+                    requestedAt.getTime() +
+                        (Math.floor(Math.random() * 2) + 1) * 86400000
+                );
+            }
+            break;
+    }
+
+    return { acceptedAt, deliveredAt };
 }
 
 function generatePurchaseOrderData(
@@ -62,7 +126,12 @@ function generatePurchaseOrderData(
 ) {
     const data = [];
     const statuses = Object.values(ORDER_STATUSES).filter(
-        (s) => s !== "ALL_ORDERS"
+        (s) =>
+            s !== ORDER_STATUSES.ALL_ORDERS &&
+            s !== ORDER_STATUSES.CONFIRMED &&
+            s !== ORDER_STATUSES.APPROVED &&
+            s !== ORDER_STATUSES.RETURNED &&
+            s !== ORDER_STATUSES.UNDER_REVIEW
     );
 
     for (const status of statuses) {
@@ -116,18 +185,13 @@ function generatePurchaseOrderData(
                 .reduce((sum, item) => sum + item.totalCost, 0);
             const totalCost = totalItemCost + deliveryCharge;
 
-            const payments = buildPayments(totalCost, status);
+            const requestedAt = getRequestedAt();
+            const { acceptedAt, deliveredAt } = getTimestampsByStatus(
+                status,
+                requestedAt
+            );
 
-            let acceptedAt = null;
-            let deliveredAt = null;
-            if (status !== "PROCESSING") {
-                acceptedAt = new Date(
-                    Date.now() - Math.floor(Math.random() * 5) * 86400000
-                );
-            }
-            if (status === "DELIVERED") {
-                deliveredAt = new Date();
-            }
+            const payments = buildPayments(totalCost, status, requestedAt);
 
             data.push({
                 warehouseId: warehouse.warehouseId,
@@ -150,12 +214,16 @@ function generatePurchaseOrderData(
                                   100
                           ),
                 status,
-                isAccepted: status !== "PROCESSING" ? true : false,
+                isAccepted: ![
+                    ORDER_STATUSES.PROCESSING,
+                    ORDER_STATUSES.PENDING
+                ].includes(status),
                 invoiceUrl: null,
                 expectedDateOfArrival: new Date(
-                    Date.now() + (i + 3) * 86400000
+                    requestedAt.getTime() +
+                        (Math.floor(Math.random() * 5) + 3) * 86400000
                 ),
-                requestedAt: new Date(),
+                requestedAt,
                 acceptedAt,
                 deliveredAt,
                 supplierReviewNotes: null,
