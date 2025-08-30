@@ -216,8 +216,8 @@ const updateSupplierProfile = async (req, h) => {
         const { userId } = req.pre.credentials;
         const { profileImageUrl, ...updateData } = req.payload;
 
-        // console.log("Profile image: ", typeof profileImageUrl);
-        // console.log("Profile image header: ", profileImageUrl?.hapi?.headers);
+        console.log("Profile image: ", typeof profileImageUrl);
+        console.log("Profile image header: ", profileImageUrl?.hapi?.headers);
 
         // Profile Image Upload
         let profileUpload = null;
@@ -238,7 +238,7 @@ const updateSupplierProfile = async (req, h) => {
             }
         }
 
-        // console.log("profileUpload: ", profileUpload);
+        console.log("profileUpload: ", profileUpload);
 
         // update supplier profile
         const result = await SupplierService.updateSupplierProfile(

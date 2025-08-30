@@ -340,10 +340,17 @@ const recordPaymentForOrder = async ({
                     status: "PARTIALLY_PAID"
                 }
             });
-
+        // This check prevents an admin from accidentally paying more than what's left.
+        
             const newTotalPaid =
                 order.totalCost - order.pendingAmount + paymentDetails.amount;
             const newPendingAmount = order.totalCost - newTotalPaid;
+            if (newPendingAmount > order.totalCost) {
+            throw {
+                code: 400,
+                message: `Payment amount of ₹${newPendingAmount} exceeds the Total Cost of ₹${order.totalCost}.`
+            };
+        }
             const newPaymentPercentage = Math.min(
                 100,
                 Math.round((newTotalPaid / order.totalCost) * 100)
@@ -355,10 +362,10 @@ const recordPaymentForOrder = async ({
                     ? "COMPLETED"
                     : `INSTALLMENT_${existingPaymentCount + 1}`;
 
-            let newOrderStatus = order.status;
-            if (order.status === "PROCESSING") {
-                newOrderStatus = "SHIPPING";
-            }
+            // let newOrderStatus = order.status;
+            // if (order.status === "PROCESSING") {
+            //     newOrderStatus = "SHIPPING";
+            // }
 
             await tx.purchaseOrderPayment.create({
                 data: {
@@ -380,7 +387,7 @@ const recordPaymentForOrder = async ({
                 data: {
                     pendingAmount: newPendingAmount,
                     paymentPercentage: newPaymentPercentage,
-                    status: newOrderStatus
+                    // status: newOrderStatus
                 }
             });
 
@@ -1092,7 +1099,8 @@ const createPurchaseOrderFromCart = async (payload) => {
                 supplierId: supplierId // The crucial filter
             }
         });
-
+        console.log("trustedCartItems",trustedCartItems);
+        
         // --- Edge Case Handling ---
         if (trustedCartItems.length === 0) {
             throw { code: 400, message: `The cart for this warehouse has no items for the selected supplier.` };
@@ -1106,11 +1114,12 @@ const createPurchaseOrderFromCart = async (payload) => {
             return { ...item, totalCost: totalItemCost };
         });
 
+        console.log("processedItems",processedItems);
         const finalTotalCost = itemsTotalCost + (deliveryCharges || 0);
 
         // Step 3: Prepare the data for the main PurchaseOrder.
         const orderData = {
-            id: uuidv4,
+            id: uuidv4(),
             warehouseId,
             supplierId,
             expectedDateOfArrival,
@@ -1120,8 +1129,10 @@ const createPurchaseOrderFromCart = async (payload) => {
             status: 'PENDING'
         };
 
+        console.log("orderData",orderData);
+
         // Step 4: Call the repository to create the order and its items.
-        const newPurchaseOrder = await PurchaseOrderRepository.createOrderAndItems(orderData, processedItems, tx);
+        const newPurchaseOrder = await adminRepo.createOrderAndItems(orderData, processedItems, tx);
 
         // Step 5: Clear ONLY the items for this specific supplier from the cart.
         await tx.warehouseCartItem.deleteMany({

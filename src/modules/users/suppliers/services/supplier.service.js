@@ -495,7 +495,7 @@ const uploadQcMediaForOrder = async ({ userId, orderId, uploadedMedia }) => {
         isPrimary: media.isPrimary || false,
         uploadedBy: ROLES.ROLES.SUPPLIER
     }));
-
+    
     // 3. Save the URLs and public IDs to the database via the repository.
     await supplierRepository.addMediaToPurchaseOrder(
         orderId,

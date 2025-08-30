@@ -573,7 +573,7 @@ const upsertCartItem = async (itemData) => {
         potCategoryId: productType === 'POT' ? potCategoryId : null,
         potVariantId: productType === 'POT' ? potVariantId : null,
     };
-
+    
     return await prisma.warehouseCartItem.upsert({
         where: whereClause,
         update: {
