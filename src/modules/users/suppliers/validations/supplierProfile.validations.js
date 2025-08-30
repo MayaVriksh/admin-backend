@@ -70,7 +70,7 @@ const completeSupplierProfile = {
             "string.empty": "🏬 Please provide the warehouse ID.",
             "any.required": "🏬 Warehouse ID is required."
         }),
-        profileImage: Joi.any()
+        profileImageUrl: Joi.any()
             .meta({ swaggerType: "file" })
             .description("Profile image file to upload")
             .required()
@@ -125,7 +125,7 @@ const updateSupplierProfile = {
             "boolean.base":
                 "✅ Phone verification status must be true or false."
         }),
-        profileImage: Joi.any()
+        profileImageUrl: Joi.any()
             .meta({ swaggerType: "file" })
             .description("Profile Image file to upload")
             .optional()

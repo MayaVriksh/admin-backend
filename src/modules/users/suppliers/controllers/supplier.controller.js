@@ -41,15 +41,15 @@ const completeSupplierProfile = async (req, h) => {
         const {
             tradeLicenseImage,
             nurseryImages,
-            profileImage,
+            profileImageUrl,
             ...profileFields
         } = req.payload;
 
         console.log("Received payload fields:", {
             tradeLicenseImageType: typeof tradeLicenseImage,
             tradeLicenseHeaders: tradeLicenseImage?.hapi?.headers,
-            profilePhotoType: typeof profileImage,
-            profilePhotoHeaders: profileImage?.hapi?.headers,
+            profilePhotoType: typeof profileImageUrl,
+            profilePhotoHeaders: profileImageUrl?.hapi?.headers,
             nurseryImagesType: typeof nurseryImages,
             nurseryImagesLength: nurseryImages?.length
         });
@@ -137,22 +137,19 @@ const completeSupplierProfile = async (req, h) => {
         }
 
         // Profile Image Upload
-        let profileUpload = null;
-        if (profileImage) {
-            profileUpload = await uploadMedia({
-                files: profileImage,
-                folder: "suppliers/profile_images",
-                publicIdPrefix: "profile"
-            });
-            if (!profileUpload.success) {
-                return h
-                    .response({
-                        success: false,
-                        message: profileUpload.message
-                    })
-                    .code(RESPONSE_CODES.BAD_REQUEST)
-                    .takeover();
-            }
+        const profileUpload = await uploadMedia({
+            files: profileImageUrl,
+            folder: "suppliers/profile_images",
+            publicIdPrefix: "profile"
+        });
+        if (!profileUpload.success) {
+            return h
+                .response({
+                    success: false,
+                    message: profileUpload.message
+                })
+                .code(RESPONSE_CODES.BAD_REQUEST)
+                .takeover();
         }
 
         // console.log(
@@ -217,16 +214,16 @@ const updateSupplierProfile = async (req, h) => {
     try {
         // const { userId } = req.auth;
         const { userId } = req.pre.credentials;
-        const { profileImage, ...updateData } = req.payload;
+        const { profileImageUrl, ...updateData } = req.payload;
 
-        // console.log("Profile image: ", typeof profileImage);
-        // console.log("Profile image header: ", profileImage?.hapi?.headers);
+        // console.log("Profile image: ", typeof profileImageUrl);
+        // console.log("Profile image header: ", profileImageUrl?.hapi?.headers);
 
         // Profile Image Upload
         let profileUpload = null;
-        if (profileImage) {
+        if (profileImageUrl) {
             profileUpload = await uploadMedia({
-                files: profileImage,
+                files: profileImageUrl,
                 folder: "suppliers/profile_images",
                 publicIdPrefix: "profile"
             });
