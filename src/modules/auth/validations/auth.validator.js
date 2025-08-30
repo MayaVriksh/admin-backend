@@ -3,24 +3,36 @@ const Joi = require("joi");
 // Generate Email OTP Validation
 const generateEmailOtpValidation = {
     payload: Joi.object({
-        email: Joi.string().trim().lowercase().email().required().messages({
-            "string.base": "📩 Email must be a valid string.",
-            "string.empty": "📩 Email is required to send OTP.",
-            "string.email": "📩 Please provide a valid email address.",
-            "any.required": "📩 Email is required to generate OTP."
-        })
+        email: Joi.string()
+            .trim()
+            .lowercase()
+            .email()
+            .required()
+            .messages({
+                "string.base": "📩 Email must be a valid string.",
+                "string.empty": "📩 Email is required to send OTP.",
+                "string.email": "📩 Please provide a valid email address.",
+                "any.required": "📩 Email is required to generate OTP."
+            })
+            .default("restaurant@gmail.com")
     })
 };
 
 // Verify Email OTP Validation
 const verifyEmailOtpValidation = {
     payload: Joi.object({
-        email: Joi.string().trim().lowercase().email().required().messages({
-            "string.base": "📩 Email must be a valid string.",
-            "string.empty": "📩 Email is required for verification.",
-            "string.email": "📩 Please provide a valid email address.",
-            "any.required": "📩 Email is required to verify OTP."
-        }),
+        email: Joi.string()
+            .trim()
+            .lowercase()
+            .email()
+            .required()
+            .messages({
+                "string.base": "📩 Email must be a valid string.",
+                "string.empty": "📩 Email is required for verification.",
+                "string.email": "📩 Please provide a valid email address.",
+                "any.required": "📩 Email is required to verify OTP."
+            })
+            .default("restaurant@gmail.com"),
         otp: Joi.string()
             .trim()
             .length(6)
@@ -70,12 +82,18 @@ const registerUserValidation = {
                     "🌿 Only letters and spaces are allowed in the last name."
             }),
 
-        email: Joi.string().trim().lowercase().email().required().messages({
-            "string.base": "📩 Email must be a valid string.",
-            "string.email": "📩 Please provide a valid email address.",
-            "string.empty": "📩 Email is required to plant your account.",
-            "any.required": "📩 Email is required to grow your profile."
-        }),
+        email: Joi.string()
+            .trim()
+            .lowercase()
+            .email()
+            .required()
+            .messages({
+                "string.base": "📩 Email must be a valid string.",
+                "string.email": "📩 Please provide a valid email address.",
+                "string.empty": "📩 Email is required to plant your account.",
+                "any.required": "📩 Email is required to grow your profile."
+            })
+            .default("restaurant@gmail.com"),
 
         emailVerified: Joi.boolean().default(false).messages({
             "boolean.base":
@@ -114,7 +132,8 @@ const registerUserValidation = {
                 "string.pattern.base":
                     "🔐 Password must include both letters and numbers.",
                 "any.required": "🔐 Password is required."
-            }),
+            })
+            .default("res@12345"),
 
         role: Joi.string().trim().min(3).required().messages({
             "string.base": "🌿 Role must be a valid string.",
@@ -128,17 +147,22 @@ const registerUserValidation = {
 
 const loginUserValidation = {
     payload: Joi.object({
-        email: Joi.string().trim().lowercase().email().messages({
-            "string.base": "📩 Email must be a valid string.",
-            "string.empty":
-                "📩 Email is required if phone number is not provided.",
-            "string.email": "📩 Please enter a valid email address."
-        }),
+        email: Joi.string()
+            .trim()
+            .lowercase()
+            .email()
+            .messages({
+                "string.base": "📩 Email must be a valid string.",
+                "string.empty":
+                    "📩 Email is required if phone number is not provided.",
+                "string.email": "📩 Please enter a valid email address."
+            })
+            .default("restaurant@gmail.com"),
         password: Joi.string()
             .trim()
             .min(8)
             .max(16)
-            .pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]+$/) // <-- COPIED THIS RULE
+            .pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]+$/) 
             .required()
             .messages({
                 "string.base": "🔐 Password must be a string.",
@@ -148,12 +172,13 @@ const loginUserValidation = {
                 "string.pattern.base":
                     "🔐 Password must include at least one letter and one number." // <-- ADDED THIS MESSAGE
             })
+            .default("res@12345")
     })
-        .xor("email", "phoneNumber")
-        .messages({
-            "object.missing":
-                "🌿 Please provide either email or phone number to log in."
-        })
+    // .xor("email", "phoneNumber")
+    // .messages({
+    //     "object.missing":
+    //         "🌿 Please provide either email or phone number to log in."
+    // })
 };
 // --- ADDED: Validation for Refresh Token ---
 // This validation checks the request's cookies (state) instead of the payload.
@@ -195,11 +220,17 @@ const reactivateUserValidation = {
 
 const changePasswordValidation = {
     payload: Joi.object({
-        oldPassword: Joi.string().trim().min(8).max(16).required().messages({
-            "string.empty": "🔐 Old password is required.",
-            "string.min": "🔐 Old password must be at least 8 characters.",
-            "string.max": "🔐 Old password must not exceed 16 characters."
-        }),
+        oldPassword: Joi.string()
+            .trim()
+            .min(8)
+            .max(16)
+            .required()
+            .messages({
+                "string.empty": "🔐 Old password is required.",
+                "string.min": "🔐 Old password must be at least 8 characters.",
+                "string.max": "🔐 Old password must not exceed 16 characters."
+            })
+            .default("res@12345"),
         newPassword: Joi.string()
             .trim()
             .min(8)
@@ -216,6 +247,7 @@ const changePasswordValidation = {
                 "any.invalid":
                     "🔐 New password must be different from the old one 🌿"
             })
+            .default("NewRes@12345")
     })
 };
 

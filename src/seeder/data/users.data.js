@@ -22,7 +22,7 @@ const adminUsers = [
                 [LAST_NAME]: "Sharma"
             },
             email: "arjun.sharma.admin@example.com",
-            phoneNumber: "+919876543210",
+            phoneNumber: "9876543210",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -48,7 +48,7 @@ const adminUsers = [
                 [LAST_NAME]: "Vriksh"
             },
             email: "maya.vriksh2025@gmail.com",
-            phoneNumber: "+919876543211",
+            phoneNumber: "9876543211",
             password: "Maya@1234",
             profileImageUrl: null,
             phoneVerified: true,
@@ -74,7 +74,7 @@ const adminUsers = [
                 [LAST_NAME]: "Desai"
             },
             email: "sameer.desai.admin@example.com",
-            phoneNumber: "+919876543212",
+            phoneNumber: "9876543212",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -100,7 +100,7 @@ const adminUsers = [
                 [LAST_NAME]: "Patel"
             },
             email: "vivek.patel.admin@example.com",
-            phoneNumber: "+919876543213",
+            phoneNumber: "9876543213",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -126,7 +126,7 @@ const adminUsers = [
                 [LAST_NAME]: "Bhatt"
             },
             email: "nihar.bhatt.admin@example.com",
-            phoneNumber: "+919876543214",
+            phoneNumber: "9876543214",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -155,7 +155,7 @@ const superAdminUsers = [
                 [LAST_NAME]: "Khanna"
             },
             email: "amit.khanna.superadmin@example.com",
-            phoneNumber: "+919876543215",
+            phoneNumber: "9876543215",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -181,7 +181,7 @@ const superAdminUsers = [
                 [LAST_NAME]: "Sen"
             },
             email: "kunal.sen.superadmin@example.com",
-            phoneNumber: "+919876543216",
+            phoneNumber: "9876543216",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -207,7 +207,7 @@ const superAdminUsers = [
                 [LAST_NAME]: "Goyal"
             },
             email: "rahul.goyal.superadmin@example.com",
-            phoneNumber: "+919876543217",
+            phoneNumber: "9876543217",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -233,7 +233,7 @@ const superAdminUsers = [
                 [LAST_NAME]: "Mehta"
             },
             email: "siddharth.mehta.superadmin@example.com",
-            phoneNumber: "+919876543218",
+            phoneNumber: "9876543218",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -259,7 +259,7 @@ const superAdminUsers = [
                 [LAST_NAME]: "Rathi"
             },
             email: "varun.rathi.superadmin@example.com",
-            phoneNumber: "+919876543219",
+            phoneNumber: "9876543219",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -288,7 +288,7 @@ const customerUsers = [
                 [LAST_NAME]: "Sharma"
             },
             email: "rohan.sharma.customer@example.com",
-            phoneNumber: "+919876543220",
+            phoneNumber: "9876543220",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -314,7 +314,7 @@ const customerUsers = [
                 [LAST_NAME]: "Saxena"
             },
             email: "prateek.saxena.customer@example.com",
-            phoneNumber: "+919876543221",
+            phoneNumber: "9876543221",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -340,7 +340,7 @@ const customerUsers = [
                 [LAST_NAME]: "Mishra"
             },
             email: "saurabh.mishra.customer@example.com",
-            phoneNumber: "+919876543222",
+            phoneNumber: "9876543222",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -366,7 +366,7 @@ const customerUsers = [
                 [LAST_NAME]: "Verma"
             },
             email: "aakash.verma.customer@example.com",
-            phoneNumber: "+919876543223",
+            phoneNumber: "9876543223",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -392,7 +392,7 @@ const customerUsers = [
                 [LAST_NAME]: "Yadav"
             },
             email: "manish.yadav.customer@example.com",
-            phoneNumber: "+919876543224",
+            phoneNumber: "9876543224",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -421,7 +421,7 @@ const supplierUsers = [
                 [LAST_NAME]: "Verma"
             },
             email: "restaurant@gmail.com",
-            phoneNumber: "+919090902345",
+            phoneNumber: "9090902345",
             password: "res@12345",
             profileImageUrl: null,
             phoneVerified: true,
@@ -453,7 +453,7 @@ const supplierUsers = [
                 [LAST_NAME]: "Singhania"
             },
             email: "rajeev.singhania@mayavriksh.com",
-            phoneNumber: "+919876543230",
+            phoneNumber: "9876543230",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -485,7 +485,7 @@ const supplierUsers = [
                 [LAST_NAME]: "Patel"
             },
             email: "ashok.patel@mayavriksh.com",
-            phoneNumber: "+919876543231",
+            phoneNumber: "9876543231",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -517,7 +517,7 @@ const supplierUsers = [
                 [LAST_NAME]: "Mehta"
             },
             email: "satyam.mehta@mayavriksh.com",
-            phoneNumber: "+919876543232",
+            phoneNumber: "9876543232",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -549,7 +549,7 @@ const supplierUsers = [
                 [LAST_NAME]: "Bhagat"
             },
             email: "karan.bhagat@mayavriksh.com",
-            phoneNumber: "+919876543233",
+            phoneNumber: "9876543233",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -581,7 +581,7 @@ const supplierUsers = [
                 [LAST_NAME]: "Rao"
             },
             email: "deepak.rao@mayavriksh.com",
-            phoneNumber: "+919876543234",
+            phoneNumber: "9876543234",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -616,7 +616,7 @@ const keyAreaManagerUsers = [
                 [LAST_NAME]: "Pratap"
             },
             email: "ravindra.pratap.kam@example.com",
-            phoneNumber: "+919876543240",
+            phoneNumber: "9876543240",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -642,7 +642,7 @@ const keyAreaManagerUsers = [
                 [LAST_NAME]: "Dwivedi"
             },
             email: "umesh.dwivedi.kam@example.com",
-            phoneNumber: "+919876543241",
+            phoneNumber: "9876543241",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -668,7 +668,7 @@ const keyAreaManagerUsers = [
                 [LAST_NAME]: "Saxena"
             },
             email: "dinesh.saxena.kam@example.com",
-            phoneNumber: "+919876543242",
+            phoneNumber: "9876543242",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -694,7 +694,7 @@ const keyAreaManagerUsers = [
                 [LAST_NAME]: "Goyal"
             },
             email: "sanjay.goyal.kam@example.com",
-            phoneNumber: "+919876543243",
+            phoneNumber: "9876543243",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,
@@ -720,7 +720,7 @@ const keyAreaManagerUsers = [
                 [LAST_NAME]: "Tripathi"
             },
             email: "harsh.tripathi.kam@example.com",
-            phoneNumber: "+919876543244",
+            phoneNumber: "9876543244",
             password: "password@123",
             profileImageUrl: null,
             phoneVerified: true,

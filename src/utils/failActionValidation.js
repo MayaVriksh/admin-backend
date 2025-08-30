@@ -23,8 +23,7 @@ const handleValidationFailure = (request, h, err) => {
     return h
         .response({
             success: RESPONSE_FLAGS.FAILURE,
-            error: ERROR_MESSAGES.COMMON.BAD_REQUEST,
-            message: customErrorMessages
+            message: ERROR_MESSAGES.COMMON.BAD_REQUEST
         })
         .code(RESPONSE_CODES.BAD_REQUEST)
         .takeover();

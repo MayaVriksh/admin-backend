@@ -73,6 +73,7 @@ const completeSupplierProfile = {
         profileImage: Joi.any()
             .meta({ swaggerType: "file" })
             .description("Profile image file to upload")
+            .required()
             .label("profile_image")
             .messages({
                 "any.base": "🌿 Please upload a valid profile image file."

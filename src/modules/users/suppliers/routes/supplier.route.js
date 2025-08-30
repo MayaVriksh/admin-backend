@@ -150,15 +150,15 @@ module.exports = [
 
             // ---: Detailed notes for frontend developers ---
             notes: `
-This endpoint fetches a paginated list of **active** purchase orders for the supplier. Active orders are those that require action or are in transit (e.g., \`PENDING\`, \`AWAITING_PAYMENT\`, \`PROCESSING\`, \`SHIPPED\`).
+                This endpoint fetches a paginated list of **active** purchase orders for the supplier. Active orders are those that require action or are in transit (e.g., \`PENDING\`, \`AWAITING_PAYMENT\`, \`PROCESSING\`, \`SHIPPED\`).
 
-### UI Logic & Lazy Loading
-This endpoint provides the summary data needed to render the main "Purchase Order Request" table.
+                ### UI Logic & Lazy Loading
+                This endpoint provides the summary data needed to render the main "Purchase Order Request" table.
 
--   The \`status\` and \`paymentPercentage\` fields should be used to display the correct status badges and progress bars.
--   The \`_count.media\` field (which counts the number of QC images) should be used to conditionally show either an **"Upload Img for QC"** button (if count is 0) or an **"Edit QC Images"** button (if count is > 0).
+                -   The \`status\` and \`paymentPercentage\` fields should be used to display the correct status badges and progress bars.
+                -   The \`_count.media\` field (which counts the number of QC images) should be used to conditionally show either an **"Upload Img for QC"** button (if count is 0) or an **"Edit QC Images"** button (if count is > 0).
 
-This endpoint intentionally **does not** return the detailed \`PurchaseOrderItems\` or \`payments\` arrays to keep the initial page load fast. To view the details of an order, the frontend must use the order's \`id\` from this response to make a separate call to the \`GET /supplier/order-requests/{orderId}\` endpoint.
+                This endpoint intentionally **does not** return the detailed \`PurchaseOrderItems\` or \`payments\` arrays to keep the initial page load fast. To view the details of an order, the frontend must use the order's \`id\` from this response to make a separate call to the \`GET /supplier/order-requests/{orderId}\` endpoint.
             `,
 
             pre: [verifyAccessTokenMiddleware, requireRole([ROLES.SUPPLIER])],
