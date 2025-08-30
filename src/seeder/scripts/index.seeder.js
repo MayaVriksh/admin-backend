@@ -5,7 +5,6 @@ const seedWarehouses = require("./warehouses.seeder");
 const seedUsers = require("./users/users.seeder");
 const seedTags = require("./tags.seeder");
 const seedColors = require("./colors.seeder");
-const seedPotMaterials = require("./potMaterials.seeder");
 const seedPlants = require("./plants.seeder");
 const seedPotMaterials = require("./potMaterials.seeder");
 const seedPots = require("./pots.seeder");
@@ -21,7 +20,6 @@ async function runSeeder() {
         await seedUsers();
         await seedTags();
         await seedColors();
-        await seedPotMaterials();
         await seedPlants();
         await seedPotMaterials();
         await seedPots();
