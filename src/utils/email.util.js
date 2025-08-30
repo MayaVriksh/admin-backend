@@ -10,6 +10,8 @@ const {
     findSupplierDetailsForEmailByUserId
 } = require("../modules/users/suppliers/repositories/supplier.repository");
 const { FIRST_NAME } = require("../constants/general.constant");
+const { RESPONSE_FLAGS, RESPONSE_CODES } = require("../constants/responseCodes.constant");
+const ERROR_MESSAGES = require("../constants/errorMessages.constant");
 require("dotenv").config();
 
 // =============================
@@ -43,19 +45,26 @@ const sendEmail = async (to, subject, html, retries = 2) => {
                 html
             });
 
-            // Gmail does not provide preview links like Ethereal
             console.log(
                 `✅ Email sent to ${to} | Subject: ${subject} | MessageID: ${info.messageId}`
             );
-            return { success: true, messageId: info.messageId };
+            return info.messageId; // return only the messageId
         } catch (error) {
             console.error(
                 `❌ Attempt ${attempt + 1} failed to send email:`,
                 error
             );
 
-            // Gmail sometimes blocks temporarily; wait before retrying
-            if (attempt === retries) return { success: false, error };
+            if (attempt === retries) {
+                // Throw a structured error that can be caught in controller
+                throw {
+                    success: RESPONSE_FLAGS.FAILURE,
+                    code: RESPONSE_CODES.INTERNAL_SERVER_ERROR,
+                    message: ERROR_MESSAGES.EMAIL.SEND_FAILED,
+                    details: error.message
+                };
+            }
+
             attempt++;
             await new Promise((res) => setTimeout(res, 2000 * attempt)); // exponential backoff
         }

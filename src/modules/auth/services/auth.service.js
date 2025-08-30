@@ -30,6 +30,19 @@ const welcomeTemplate = require("../../../email-templates/users/welcome.template
 const generateEmailOtp = async (email, userId = null) => {
     console.log("In AuthService: Generating Email OTP");
 
+    // Check if email already exists in User table
+    const existingUser = await prisma.user.findUnique({
+        where: { email }
+    });
+
+    if (existingUser) {
+        throw {
+            success: RESPONSE_FLAGS.FAILURE,
+            code: RESPONSE_CODES.CONFLICT,
+            message: ERROR_MESSAGES.AUTH.EMAIL_ALREADY_EXISTS
+        };
+    }
+
     const otp = generateOtpCode(6);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
@@ -271,14 +284,11 @@ const register = async (data) => {
  * @param {object} user - The full user object from Prisma and password from UI, for matching passwords.
  */
 const _verifyUserCredentials = async (user, password) => {
-
     if (!user) {
         throw {
             success: RESPONSE_FLAGS.FAILURE,
             code: RESPONSE_CODES.UNAUTHORIZED,
-            message: email
-                ? ERROR_MESSAGES.AUTH.EMAIL_NOT_EXISTS
-                : ERROR_MESSAGES.AUTH.PHONE_NOT_EXISTS
+            message: ERROR_MESSAGES.AUTH.EMAIL_NOT_EXISTS
         };
     }
 

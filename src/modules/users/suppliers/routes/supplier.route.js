@@ -123,6 +123,7 @@ module.exports = [
                 parse: true,
                 output: "stream",
                 multipart: true,
+                maxBytes: 10 * 1024 * 1024,
                 allow: ["multipart/form-data", "application/json"]
             },
             plugins: {

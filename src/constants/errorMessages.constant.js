@@ -42,6 +42,30 @@ const ERROR_MESSAGES = {
             "You don’t have permission to access this garden 🌿",
         NOT_LOGGED_IN: "You’re not logged in yet 🌱 Please sign in to continue."
     },
+
+    EMAIL: {
+        SEND_FAILED:
+            "Oops! We couldn’t send your email this time 🌧️ Please try again later.",
+        INVALID_RECIPIENT:
+            "The email address seems a little lost 🌿 Please check and try again.",
+        TEMPLATE_NOT_FOUND:
+            "We couldn’t find the email template 🌱 Please contact support.",
+        SUBJECT_MISSING:
+            "The email seems to be missing its title 🌼 Please provide a subject.",
+        EMAIL_QUEUE_FAILED:
+            "Your email got stuck in the garden path 🌾 Please try sending again.",
+        ATTACHMENT_TOO_LARGE:
+            "The attachment is too big to fit in our garden basket 🌿 Try a smaller file.",
+        UNSUPPORTED_FORMAT:
+            "The email format isn’t supported in this greenhouse 🌱 Please adjust and resend.",
+        GMAIL_BLOCKED:
+            "Gmail didn’t let our email through 🌧️ Please check your address or try later.",
+        TOO_MANY_REQUESTS:
+            "The garden is busy sending emails 🌿 Slow down and try again in a bit.",
+        CONNECTION_ERROR:
+            "The email path got blocked 🌱 We couldn’t reach the mail server. Please try again."
+    },
+
     ORDERS: {
         ORDER_FAILED:
             "Something interrupted the bloom 🌧️ Please try placing your order again.",

@@ -8,6 +8,7 @@ const seedColors = require("./colors.seeder");
 const seedPlants = require("./plants.seeder");
 const seedPotMaterials = require("./potMaterials.seeder");
 const seedPots = require("./pots.seeder");
+const seedFertilizers = require("./fertilizers.seeder");
 const seedPurchaseOrders = require("./purchaseorder.seeder");
 
 async function runSeeder() {
@@ -23,6 +24,7 @@ async function runSeeder() {
         await seedPlants();
         await seedPotMaterials();
         await seedPots();
+        await seedFertilizers();
         await seedPurchaseOrders();
 
         console.log("✅ All seeders executed successfully!");
