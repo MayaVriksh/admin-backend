@@ -275,135 +275,129 @@ const deleteFromCloudinary = async (publicId) => {
 const recordPaymentForOrder = async ({
     orderId,
     paidByUserId,
-    paymentDetails,
-    receiptFile
+    paymentDetails, // Contains amount (optional), remarks, paymentMethod, transactionId
+    receiptFile,
+    remarks,
 }) => {
-    let receiptUrl = null;
-    let publicId = null;
+    let uploadedReceipt = null; // To hold upload data for potential rollback
+
     try {
-        // Step 1: Upload the receipt file (if any) BEFORE the transaction
-        if (receiptFile) {
+        // --- STEP 1: PRE-VALIDATION & DATA FETCHING ---
+        // Before any writes or file uploads, fetch the authoritative state from the DB.
+        const order = await prisma.purchaseOrder.findUnique({
+            where: { id: orderId },
+            select: { totalCost: true, pendingAmount: true, status: true, isAccepted: true }
+        });
+
+        const checkUserActive = await prisma.User.findUnique({
+            where: { userId: paidByUserId },
+            select: { isActive: true }
+        });
+        if (!checkUserActive)
+            throw {
+                code: 404,
+                message: "User is not active or doesnot exist."
+            };
+        // --- STEP 2: EDGE CASE HANDLING (FAIL-FAST PRINCIPLE) ---
+        // These are the "guard clauses" that stop the process if business rules are violated.
+        if (!order) {
+            throw { code: 404, message: "Purchase Order not found." };
+        }
+        if (!order.isAccepted || order.status === "PENDING") {
+            throw { code: 400, message: "Payment cannot be made until the supplier has accepted the order." };
+        }
+        const currentPending = order.pendingAmount ?? order.totalCost;
+        if (currentPending <= 0) {
+            throw { code: 400, message: "This order is already fully paid." };
+        }
+
+        // --- STEP 3: SECURELY DETERMINE & VALIDATE PAYMENT AMOUNT ---
+        // Never trust the amount sent from the client for a "Full Payment".
+        const amountToPay = remarks === 'FULL_PAYMENT' 
+            ? currentPending 
+            : Number(paymentDetails.amount);
+
+        // This is the CRITICAL overpayment check.
+        if (amountToPay > currentPending) {
+            throw {
+                code: 400,
+                message: `Payment amount of ₹${amountToPay.toLocaleString()} exceeds the pending amount of ₹${currentPending.toLocaleString()}.`
+            };
+        }
+
+        // --- STEP 4: HANDLE FILE UPLOAD (ONLY AFTER VALIDATION PASSES) ---
+        if (receiptFile && receiptFile.hapi.filename) {
             const uploadResult = await uploadMedia({
                 files: receiptFile,
                 folder: `admins/receipts/PCOD_${orderId}`,
                 publicIdPrefix: `receipt_${Date.now()}`
             });
-            if (!uploadResult.success)
-                throw new Error("Receipt upload failed.");
-            receiptUrl = uploadResult.data.mediaUrl;
-            console.log(receiptUrl);
+            if (!uploadResult.success) throw new Error("Receipt upload failed.");
+            uploadedReceipt = uploadResult.data; // Save for DB and potential rollback
         }
 
-        // Step 2: Run the transaction for all DB operations
-        return await prisma.$transaction(async (tx) => {
-            const order = await tx.purchaseOrder.findUnique({
-                where: { id: orderId },
-                select: {
-                    totalCost: true,
-                    pendingAmount: true,
-                    status: true,
-                    isAccepted: true
-                }
+        // --- STEP 5: EXECUTE ALL DATABASE WRITES IN A SINGLE ATOMIC TRANSACTION ---
+        const updatedOrder = await prisma.$transaction(async (tx) => {
+            // A. Count previous installments to generate the correct new remark.
+            const existingInstallmentCount = await tx.purchaseOrderPayment.count({
+                where: { orderId: orderId, remarks: { startsWith: 'INSTALLMENT' } }
             });
-            const checkUserActive = await tx.User.findUnique({
-                where: { userId: paidByUserId },
-                select: { isActive: true }
-            });
-            if (!checkUserActive)
-                throw {
-                    code: 404,
-                    message: "User is not active or doesnot exist."
-                };
-            if (!order)
-                throw { code: 404, message: "Purchase Order not found." };
-            if ((order.pendingAmount || 0) <= 0)
-                throw {
-                    code: 400,
-                    message: "This order is already fully paid."
-                };
-            if (order.status === "PENDING")
-                throw {
-                    code: 400,
-                    message:
-                        "The Order is to be accepted yet by Supplier for Payment"
-                };
-            if (order.isAccepted === false)
-                throw {
-                    code: 400,
-                    message:
-                        "Trying to make payment on an order that has not been accepted by admin"
-                };
+            
+            const finalRemarks = remarks === 'INSTALLMENT'
+                ? `INSTALLMENT_${existingInstallmentCount + 1}`
+                : 'COMPLETED';
 
-            const existingPaymentCount = await tx.purchaseOrderPayment.count({
-                where: {
-                    orderId: orderId,
-                    status: "PARTIALLY_PAID"
-                }
-            });
-        // This check prevents an admin from accidentally paying more than what's left.
-        
-            const newTotalPaid =
-                order.totalCost - order.pendingAmount + paymentDetails.amount;
-            const newPendingAmount = order.totalCost - newTotalPaid;
-            if (newPendingAmount > order.totalCost) {
-            throw {
-                code: 400,
-                message: `Payment amount of ₹${newPendingAmount} exceeds the Total Cost of ₹${order.totalCost}.`
-            };
-        }
-            const newPaymentPercentage = Math.min(
-                100,
-                Math.round((newTotalPaid / order.totalCost) * 100)
-            );
-            const newPaymentStatus =
-                newPendingAmount <= 0 ? "PAID" : "PARTIALLY_PAID";
-            const finalRemarks =
-                newPendingAmount <= 0 && finalRemarks === "INSTALLMENT"
-                    ? "COMPLETED"
-                    : `INSTALLMENT_${existingPaymentCount + 1}`;
 
-            // let newOrderStatus = order.status;
-            // if (order.status === "PROCESSING") {
-            //     newOrderStatus = "SHIPPING";
-            // }
+            // C. Securely calculate the new financial state for the Purchase Order.
+            const newPendingAmount = currentPending - amountToPay;
+            const totalPaid = Number(order.totalCost) - newPendingAmount;
+            const newPaymentPercentage = Math.min(100, Math.round((totalPaid / Number(order.totalCost)) * 100));
+            const newPaymentStatus = newPendingAmount <= 0 ? "PAID" : "PARTIALLY_PAID";
+            console.log(currentPending)
+            console.log(amountToPay)
+            console.log(newPendingAmount)
 
+            // B. Create the new payment record.
             await tx.purchaseOrderPayment.create({
                 data: {
                     paymentId: uuidv4(),
                     orderId: orderId,
                     paidBy: paidByUserId,
-                    amount: paymentDetails.amount,
+                    amount: amountToPay,
                     paymentMethod: paymentDetails.paymentMethod,
                     transactionId: paymentDetails.transactionId,
                     remarks: finalRemarks,
-                    receiptUrl: receiptUrl,
-                    status: newPaymentStatus,
+                    receiptUrl: uploadedReceipt?.mediaUrl || null,
+                    publicId: uploadedReceipt?.publicId || null,
+                    status: newPaymentStatus, // The transaction itself is considered complete/paid
                     paidAt: new Date()
                 }
             });
 
-            const updatedPurchaseOrder = await tx.purchaseOrder.update({
+            // E. Update the parent Purchase Order.
+            return await tx.purchaseOrder.update({
                 where: { id: orderId },
                 data: {
                     pendingAmount: newPendingAmount,
                     paymentPercentage: newPaymentPercentage,
-                    // status: newOrderStatus
                 }
             });
-
-            console.log(newPaymentStatus, finalRemarks);
-            return {
-                success: true,
-                code: 201,
-                message: "Payment recorded successfully.",
-                data: updatedPurchaseOrder
-            };
         });
+
+        return {
+            success: true,
+            code: 201,
+            message: "Payment recorded successfully.",
+            data: updatedOrder
+        };
+
     } catch (err) {
-        // If transaction fails and file was uploaded, delete from Cloudinary
-        if (publicId) {
-            await deleteFromCloudinary(publicId);
+        // If any step fails and a file was uploaded, delete it from Cloudinary.
+        if (uploadedReceipt?.publicId) {
+            console.log("Transaction failed, rolling back file upload...");
+            await deleteFromCloudinary(uploadedReceipt.publicId);
         }
+        // Re-throw the original error to be handled by the controller.
         throw err;
     }
 };

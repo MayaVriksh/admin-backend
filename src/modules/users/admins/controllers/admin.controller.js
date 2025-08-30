@@ -156,13 +156,14 @@ const recordPayment = async (req, h) => {
         const { userId } = req.pre.credentials;
         const { orderId } = req.params;
         // Destructure the payload to separate the file from the text fields
-        const { receipt, ...paymentDetails } = req.payload;
+        const { receipt, remarks, ...paymentDetails } = req.payload;
 
         const result = await AdminService.recordPaymentForOrder({
             orderId,
             paidByUserId: userId,
             paymentDetails,
-            receiptFile: receipt
+            receiptFile: receipt,
+            remarks,
         });
         return h.response(result).code(result.code);
     } catch (error) {
