@@ -12,7 +12,7 @@
         "lint": "eslint . --ext .js,.ts",
         "format": "prettier --write .",
         "prisma": "prisma",
-        "prisma:generate": "prisma generate",
+        "prisma:generate": "prisma generate --no-engine",
         "prisma:migrate": "prisma migrate dev",
         "prisma:studio": "prisma studio",
         "seed:all": "node src/seeder/scripts/index.seeder.js",

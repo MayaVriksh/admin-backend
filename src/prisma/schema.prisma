@@ -495,7 +495,7 @@ model Supplier {
   PlantSupplierInventory        PlantSupplierInventory[]        @relation(name: "SupplierToPlantInventory")
   PotSupplierInventory          PotSupplierInventory[]          @relation(name: "SupplierToPotInventory")
   PurchaseOrder                 PurchaseOrder[]                 @relation(name: "SupplierToPurchaseOrder")
-  WarehouseCartItem             WarehouseCartItem[]
+  WarehouseCartItem             WarehouseCartItem[]             @relation(name: "WarehouseCartItemToSupplier")
 
   @@unique([userId, warehouseId])
 }
@@ -1850,7 +1850,7 @@ model WarehouseCartItem {
   deletedAt DateTime?
 
   warehouse    Warehouse      @relation(name: "warehouseCartItemToWarehouse", fields: [warehouseId], references: [warehouseId])
-  supplier     Supplier       @relation(fields: [supplierId], references: [supplierId])
+  supplier     Supplier       @relation(name: "WarehouseCartItemToSupplier", fields: [supplierId], references: [supplierId])
   plant        Plants?        @relation(name: "PlantToWarehouseCartItem", fields: [plantId], references: [plantId])
   plantVariant PlantVariants? @relation(name: "PlantVariantToWarehouseCartItem", fields: [plantVariantId], references: [variantId])
   potCategory  PotCategory?   @relation(name: "PotCategoryToWarehouseCartItem", fields: [potCategoryId], references: [categoryId])
