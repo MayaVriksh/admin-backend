@@ -833,7 +833,7 @@ model SunlightTypes {
   sunlightId String @id
 
   typeName    String
-  icon        String
+  mediaUrl    String
   publicId    String
   description String?
 
