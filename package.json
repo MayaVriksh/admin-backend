@@ -27,6 +27,7 @@
         "seed:pots": "node src/seeder/scripts/pots.seeder.js",
         "seed:fertilizers": "node src/seeder/scripts/fertilizers.seeder.js",
         "seed:purchase_order": "node src/seeder/scripts/purchaseOrder.seeder.js",
+        "seed:warehouse_inventory": "node src/seeder/scripts/warehouseInventory.seeder.js",
         "send_grid_email": "node src/utils/sendgrid.js",
         "nodemailer_email": "node src/utils/email.util.js",
         "postinstall": "prisma generate --no-engine"
