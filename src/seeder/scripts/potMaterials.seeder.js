@@ -23,7 +23,8 @@ async function seedPotMaterials() {
                     await tx.potMaterial.create({
                         data: {
                             materialId: uuidv4(),
-                            name: material.name
+                            name: material.name,
+                            description: material.description
                         }
                     });
 
