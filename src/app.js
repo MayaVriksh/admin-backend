@@ -49,6 +49,12 @@ const createServer = async () => {
         path: "/"
     });
 
+    console.log("NODE_ENV: ", process.env.NODE_ENV);
+    console.log(
+        "NODE_ENV Condn: ",
+        process.env.NODE_ENV !== "production" ? "Strict" : "None"
+    );
+
     // This cookie is ONLY for the long-lived Refresh Token.
     server.state("mv_refresh_token", {
         ttl: 7 * 24 * 60 * 60 * 1000, // 7 days, matches refresh token expiry
