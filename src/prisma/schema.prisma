@@ -486,16 +486,16 @@ model Supplier {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  contactPerson                 User                            @relation(name: "UserToSupplier", fields: [userId], references: [userId])
-  warehouse                     Warehouse?                      @relation(name: "SupplierToWareHouse", fields: [warehouseId], references: [warehouseId])
-  mediaAssets                   NurseryMediaAsset[]             @relation(name: "SupplierToNurseryMedia")
-  SupplierToMayaVrikshInventory SupplierToMayaVrikshInventory[] @relation(name: "SupplierToMayaVrikshInventory")
-  PlantRestockEventLog          PlantRestockEventLog[]          @relation(name: "SupplierToPlantRestockEvent")
-  PotRestockEventLog            PotRestockEventLog[]            @relation(name: "SupplierToPotRestockEvent")
-  PlantSupplierInventory        PlantSupplierInventory[]        @relation(name: "SupplierToPlantInventory")
-  PotSupplierInventory          PotSupplierInventory[]          @relation(name: "SupplierToPotInventory")
-  PurchaseOrder                 PurchaseOrder[]                 @relation(name: "SupplierToPurchaseOrder")
-  WarehouseCartItem             WarehouseCartItem[]             @relation(name: "WarehouseCartItemToSupplier")
+  contactPerson          User                     @relation(name: "UserToSupplier", fields: [userId], references: [userId])
+  warehouse              Warehouse?               @relation(name: "SupplierToWareHouse", fields: [warehouseId], references: [warehouseId])
+  mediaAssets            NurseryMediaAsset[]      @relation(name: "SupplierToNurseryMedia")
+  PlantRestockEventLog   PlantRestockEventLog[]   @relation(name: "SupplierToPlantRestockEvent")
+  PotRestockEventLog     PotRestockEventLog[]     @relation(name: "SupplierToPotRestockEvent")
+  PlantSupplierInventory PlantSupplierInventory[] @relation(name: "SupplierToPlantInventory")
+  PotSupplierInventory   PotSupplierInventory[]   @relation(name: "SupplierToPotInventory")
+  PurchaseOrder          PurchaseOrder[]          @relation(name: "SupplierToPurchaseOrder")
+  WarehouseCartItem      WarehouseCartItem[]      @relation(name: "WarehouseCartItemToSupplier")
+  // SupplierToMayaVrikshInventory SupplierToMayaVrikshInventory[] @relation(name: "SupplierToMayaVrikshInventory")
 
   @@unique([userId, warehouseId])
 }
@@ -751,26 +751,26 @@ model Plants {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  plantCategories               PlantCategory[]                 @relation(name: "ProductCategories")
-  plantWarehouseInventory       PlantWarehouseInventory[]       @relation(name: "PlantToWarehouseInventory")
-  variants                      PlantVariants[]                 @relation(name: "ProductToVariant")
-  SupplierToMayaVrikshInventory SupplierToMayaVrikshInventory[] @relation(name: "ProductToSupplierMayaVrikshInventory")
-  returns                       ReturnsRefunds[]                @relation(name: "ProductToReturn")
-  exchanges                     ReturnsRefunds[]                @relation(name: "ProductToExchange")
-  restockEvents                 PlantRestockEventLog[]          @relation(name: "PlantToRestockEvent")
-  promotionProducts             PromotionProduct[]              @relation(name: "PromotionProductToPlant")
-  Review                        Review[]                        @relation(name: "PlantToReview")
-  PlantSupplierInventory        PlantSupplierInventory[]        @relation(name: "ProductToSupplierInventory")
-  PlantStockAuditLog            PlantStockAuditLog[]            @relation(name: "ProductToStockAudit")
-  PlantDamagedProduct           PlantDamagedProduct[]           @relation(name: "PlantToPlantDamagedProduct")
-  PlantSalesAnalytics           PlantSalesAnalytics[]           @relation(name: "PlantToAnalytics")
-  NotifyMeSubscription          NotifyMeSubscription[]          @relation(name: "NotifyMeSubscriptionToPlants")
-  PlantOrderItem                PlantOrderItem[]                @relation(name: "PlantOrderItemToPlant")
-  PlantCheckoutLater            PlantCheckoutLater[]            @relation(name: "PlantCheckoutLaterToPlant")
-  PlantCartItem                 PlantCartItem[]                 @relation(name: "PlantCartItemToPlant")
-  PurchaseOrderItems            PurchaseOrderItems[]            @relation(name: "PlantToPurchaseOrder")
-  WarehouseCartItem             WarehouseCartItem[]             @relation(name: "PlantToWarehouseCartItem")
-  PlantSizeProfile              PlantSizeProfile[]              @relation(name: "PlantsToPlantSizeProfile")
+  plantCategories         PlantCategory[]           @relation(name: "ProductCategories")
+  plantWarehouseInventory PlantWarehouseInventory[] @relation(name: "PlantToWarehouseInventory")
+  variants                PlantVariants[]           @relation(name: "ProductToVariant")
+  // SupplierToMayaVrikshInventory SupplierToMayaVrikshInventory[] @relation(name: "ProductToSupplierMayaVrikshInventory")
+  returns                 ReturnsRefunds[]          @relation(name: "ProductToReturn")
+  exchanges               ReturnsRefunds[]          @relation(name: "ProductToExchange")
+  restockEvents           PlantRestockEventLog[]    @relation(name: "PlantToRestockEvent")
+  promotionProducts       PromotionProduct[]        @relation(name: "PromotionProductToPlant")
+  Review                  Review[]                  @relation(name: "PlantToReview")
+  PlantSupplierInventory  PlantSupplierInventory[]  @relation(name: "ProductToSupplierInventory")
+  PlantStockAuditLog      PlantStockAuditLog[]      @relation(name: "ProductToStockAudit")
+  PlantDamagedProduct     PlantDamagedProduct[]     @relation(name: "PlantToPlantDamagedProduct")
+  PlantSalesAnalytics     PlantSalesAnalytics[]     @relation(name: "PlantToAnalytics")
+  NotifyMeSubscription    NotifyMeSubscription[]    @relation(name: "NotifyMeSubscriptionToPlants")
+  PlantOrderItem          PlantOrderItem[]          @relation(name: "PlantOrderItemToPlant")
+  PlantCheckoutLater      PlantCheckoutLater[]      @relation(name: "PlantCheckoutLaterToPlant")
+  PlantCartItem           PlantCartItem[]           @relation(name: "PlantCartItemToPlant")
+  PurchaseOrderItems      PurchaseOrderItems[]      @relation(name: "PlantToPurchaseOrder")
+  WarehouseCartItem       WarehouseCartItem[]       @relation(name: "PlantToWarehouseCartItem")
+  PlantSizeProfile        PlantSizeProfile[]        @relation(name: "PlantsToPlantSizeProfile")
 }
 
 model PlantSizeProfile {
@@ -880,6 +880,8 @@ model PlantCareGuidelines {
   PlantSizeProfile PlantSizeProfile @relation(name: "PlantSizeprofileToPlantCareGuidelines", fields: [plantSizeId], references: [plantSizeId])
   sunlightType     SunlightTypes    @relation(name: "SunlightToPlantCare", fields: [sunlightTypeId], references: [sunlightId])
   humidityLevel    HumidityLevel    @relation(name: "HumidityToPlantCare", fields: [humidityLevelId], references: [humidityId])
+
+  @@unique([plantSizeId, season])
 }
 
 model Fertilizers {
@@ -919,7 +921,7 @@ model PlantFertilizerSchedule {
   PlantSizeProfile PlantSizeProfile @relation(name: "PlantSizeprofileToPlantFertilizerSchedule", fields: [plantSizeId], references: [plantSizeId])
   fertilizer       Fertilizers      @relation(name: "FertilizerToSchedule", fields: [fertilizerId], references: [fertilizerId])
 
-  @@unique([plantSizeId, fertilizerId])
+  @@unique([plantSizeId, fertilizerId, applicationSeason])
 }
 
 model PlantGenericCostComponent {
@@ -1076,7 +1078,8 @@ model PotVariants {
 model PotMaterial {
   materialId String @id
 
-  name String @unique
+  name        String @unique
+  description String
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -1426,22 +1429,22 @@ model ReferralUsage {
 
 // ---------------------- Supplier & Inventory -------------------------
 
-model SupplierToMayaVrikshInventory {
-  id         String @id
-  supplierId String
-  plantId    String
+// model SupplierToMayaVrikshInventory {
+//   id         String @id
+//   supplierId String
+//   plantId    String
 
-  units     Int
-  unitCost  Decimal
-  totalCost Decimal
+//   units     Int
+//   unitCost  Decimal
+//   totalCost Decimal
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+//   createdAt DateTime  @default(now())
+//   updatedAt DateTime  @updatedAt
+//   deletedAt DateTime?
 
-  supplier Supplier @relation(name: "SupplierToMayaVrikshInventory", fields: [supplierId], references: [supplierId])
-  plants   Plants   @relation(name: "ProductToSupplierMayaVrikshInventory", fields: [plantId], references: [plantId])
-}
+//   supplier Supplier @relation(name: "SupplierToMayaVrikshInventory", fields: [supplierId], references: [supplierId])
+//   plants   Plants   @relation(name: "ProductToSupplierMayaVrikshInventory", fields: [plantId], references: [plantId])
+// }
 
 model PlantStockAuditLog {
   auditId        String  @id
