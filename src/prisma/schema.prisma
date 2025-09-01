@@ -2046,6 +2046,7 @@ model PhoneVerification {
   user User? @relation(name: "UserPhoneVerifications", fields: [userId], references: [userId])
 
   @@index([userId])
+  @@index([phoneNumber])
 }
 
 model SerialTracker {
