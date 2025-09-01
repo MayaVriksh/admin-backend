@@ -909,9 +909,9 @@ model Fertilizers {
 }
 
 model PlantFertilizerSchedule {
-  fertilizerEntryId String @id
-  plantSizeId       String
-  fertilizerId      String
+  fertilizerScheduleId String @id
+  plantSizeId          String
+  fertilizerId         String
 
   applicationFrequency String
   applicationMethod    String
@@ -2031,10 +2031,10 @@ model EmailVerification {
 }
 
 model PhoneVerification {
-  id     String @id
+  id     String  @id
   userId String?
 
-  phoneNumber String @unique // The phone number itself should be unique
+  phoneNumber String
   otp         String
   expiresAt   DateTime
   verified    Boolean  @default(false)
