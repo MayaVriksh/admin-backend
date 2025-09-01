@@ -251,6 +251,35 @@ const changePasswordValidation = {
     })
 };
 
+/** -------------------------- Customer quick Sign In Auth Flow ------------------- */
+const sendOtpValidation = {
+    payload: Joi.object({
+        phoneNumber: Joi.string().length(10).pattern(/^[0-9]+$/).required()
+            .description("A 10-digit Indian mobile number without the country code.")
+            .messages({
+                "string.length": "Phone number must be exactly 10 digits.",
+                "string.pattern.base": "Phone number must only contain digits.",
+                "any.required": "Phone number is required."
+            })
+    })
+};
+
+const verifyOtpValidation = {
+    payload: Joi.object({
+        phoneNumber: Joi.string().length(10).pattern(/^[0-9]+$/).required(),
+        otp: Joi.string().length(6).required().description("The 6-digit OTP sent to the user.")
+    })
+};
+
+const quickRegisterValidation = {
+    payload: Joi.object({
+        phoneNumber: Joi.string().length(10).pattern(/^[0-9]+$/).required(),
+        email: Joi.string().email().required(),
+        firstName: Joi.string().required(),
+        lastName: Joi.string().required()
+    })
+};
+
 module.exports = {
     generateEmailOtpValidation,
     verifyEmailOtpValidation,
@@ -259,5 +288,8 @@ module.exports = {
     refreshTokenValidation,
     deactivateProfileValidation,
     reactivateUserValidation,
-    changePasswordValidation
+    changePasswordValidation,
+    sendOtpValidation,
+    verifyOtpValidation,
+    quickRegisterValidation
 };

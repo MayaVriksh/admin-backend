@@ -253,6 +253,52 @@ const changePassword = async (req, h) => {
     }
 };
 
+/** -------------------------- Customer quick Sign In Auth Flow ------------------- */
+
+
+const sendOtp = async (req, h) => {
+    try {
+        const { phoneNumber } = req.payload;
+        const result = await AuthService.sendOtpToCustomer(phoneNumber);
+        return h.response(result).code(result.code);
+    } catch (error) {
+        return h.response({ success: false, message: error.message }).code(error.code || 500);
+    }
+};
+
+const verifyOtp = async (req, h) => {
+    try {
+        const { phoneNumber, otp } = req.payload;
+        const result = await AuthService.verifyOtpAndCheckUser(phoneNumber, otp);
+        
+        // If the user existed and was logged in, the service will return a refresh token
+        if (result.data?.refreshToken) {
+            return h.response(result)
+                .state("mv_refresh_token", result.data.refreshToken)
+                .code(result.code);
+        }
+        return h.response(result).code(result.code);
+    } catch (error) {
+        return h.response({ success: false, message: error.message }).code(error.code || 500);
+    }
+};
+
+const quickRegister = async (req, h) => {
+    try {
+        const result = await AuthService.quickRegisterCustomer(req.payload);
+        
+        // The service will return a refresh token for the newly created user
+        return h.response(result)
+            .state("mv_refresh_token", result.data.refreshToken)
+            .code(result.code);
+    } catch (error) {
+        return h.response({ success: false, message: error.message }).code(error.code || 500);
+    }
+};
+
+// module.exports = {  }; // For Customer Login, should be in different foler in auth
+
+
 module.exports = {
     generateEmailOtp,
     verifyEmailOtp,
@@ -262,5 +308,8 @@ module.exports = {
     deactivateUser,
     reactivateUser,
     logout,
-    changePassword
+    changePassword,
+    sendOtp,
+    verifyOtp,
+    quickRegister
 };
