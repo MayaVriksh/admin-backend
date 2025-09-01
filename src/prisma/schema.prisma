@@ -2025,9 +2025,9 @@ model EmailVerification {
 
 model PhoneVerification {
   id     String @id
-  userId String
+  userId String?
 
-  phoneNumber String
+  phoneNumber String @unique // The phone number itself should be unique
   otp         String
   expiresAt   DateTime
   verified    Boolean  @default(false)
@@ -2036,7 +2036,7 @@ model PhoneVerification {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  user User @relation(name: "UserPhoneVerifications", fields: [userId], references: [userId])
+  user User? @relation(name: "UserPhoneVerifications", fields: [userId], references: [userId])
 
   @@index([userId])
   @@index([phoneNumber])
