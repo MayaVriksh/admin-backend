@@ -304,6 +304,17 @@ const ERROR_MESSAGES = {
             "The notification couldn’t be delivered 📩🌧️ Please check again.",
         INTERNAL_ERROR:
             "Something went wrong while handling notifications 🌱 Try again later."
+    },
+
+    PLANTS: {
+        ALREADY_EXISTS:
+            "🌱 A plant with this name or scientific name already exists.",
+        NOT_FOUND: "🌾 Plant not found.",
+        NOT_FOUND: "❌ Plant not found.",
+        ALREADY_EXISTS:
+            "🚫 Plant with this name or scientific name already exists.",
+        VARIANTS_NOT_FOUND: "❌ Plant variants not found.",
+        MEDIA_UPLOAD_FAILED: "⚠️ Failed to upload plant variant media."
     }
 };
 

@@ -314,6 +314,22 @@ const SUCCESS_MESSAGES = {
             "You’re now subscribed to updates 🌻 Expect fresh news soon!",
         UNSUBSCRIBED:
             "You’ve gracefully unsubscribed 🍃 No more updates will sprout here."
+    },
+
+    PLANTS: {
+        CREATED: "🌱 Plant added to the collection successfully.",
+        FETCHED: "🌼 Plant(s) retrieved successfully.",
+        UPDATED: "🌳 Plant updated successfully.",
+        DELETED: "🍀 Plant removed from the collection gracefully.",
+
+        VARIANTS_CREATED:
+            "🌸 Plant with variants and media planted successfully.",
+        VARIANTS_FETCHED:
+            "🌼 Plant with variants and media is thriving and ready.",
+        VARIANTS_UPDATED:
+            "🌺 Plant with variants and media refreshed successfully.",
+        VARIANTS_DELETED:
+            "🗑️ Plant with variants and media has been gently removed."
     }
 };
 
