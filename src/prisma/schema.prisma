@@ -692,13 +692,14 @@ model PotVariantImage {
 }
 
 model PlantVariantImage {
-  id             String  @id
+  id             String @id
   plantVariantId String
-  publicId       String
-  mediaUrl       String
-  mediaType      String? // image or mp4 files
-  resourceType   String?
-  isPrimary      Boolean @default(false)
+
+  mediaUrl     String
+  publicId     String
+  mediaType    String? // image or mp4 files
+  resourceType String?
+  isPrimary    Boolean @default(false)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -733,19 +734,21 @@ model Plants {
   isProductActive     Boolean  @default(true)
   isFeatured          Boolean
   auraType            String?
-  bestForEmotion      String?
-  bestGiftFor         String?
+  bestForEmotion      String[] @default([])
+  bestGiftFor         String[] @default([])
   biodiversityBooster Boolean?
   carbonAbsorber      Boolean?
-  funFacts            String?
-  godAligned          Boolean?
+  funFacts            String[] @default([])
+  godAligned          String[] @default([]) // energetic or spiritual alignment of the plant
   insideBox           String[] @default([])
+  plantClass          String?
   maintenance         String? // Easy || Medium || Hard
   plantSeries         String?
   placeOfOrigin       String?
   repotting           String?
   soil                String?
-  spiritualUseCase    String?
+  spiritualUseCase    String[] @default([])
+  associatedDeity     String[] @default([]) // e.g., “Lakshmi” or “Ganesh”
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -771,6 +774,10 @@ model Plants {
   PurchaseOrderItems      PurchaseOrderItems[]      @relation(name: "PlantToPurchaseOrder")
   WarehouseCartItem       WarehouseCartItem[]       @relation(name: "PlantToWarehouseCartItem")
   PlantSizeProfile        PlantSizeProfile[]        @relation(name: "PlantsToPlantSizeProfile")
+
+  @@index([name])
+  @@index([isFeatured])
+  @@index([isProductActive])
 }
 
 model PlantSizeProfile {
@@ -902,9 +909,9 @@ model Fertilizers {
 }
 
 model PlantFertilizerSchedule {
-  fertilizerEntryId String @id
-  plantSizeId       String
-  fertilizerId      String
+  fertilizerScheduleId String @id
+  plantSizeId          String
+  fertilizerId         String
 
   applicationFrequency String
   applicationMethod    String
@@ -2024,8 +2031,8 @@ model EmailVerification {
 }
 
 model PhoneVerification {
-  id     String @id
-  userId String
+  id     String  @id
+  userId String?
 
   phoneNumber String
   otp         String
@@ -2036,7 +2043,7 @@ model PhoneVerification {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  user User @relation(name: "UserPhoneVerifications", fields: [userId], references: [userId])
+  user User? @relation(name: "UserPhoneVerifications", fields: [userId], references: [userId])
 
   @@index([userId])
   @@index([phoneNumber])

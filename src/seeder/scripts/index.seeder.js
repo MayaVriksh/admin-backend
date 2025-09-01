@@ -21,7 +21,8 @@ async function runSeeder() {
         await seedUsers();
         await seedTags();
         await seedColors();
-        await seedPlants();
+        await seedPlants.seedPlants();
+        await seedPlants.seedPlantVariantImages();
         await seedPotMaterials();
         await seedPots();
         await seedFertilizers();

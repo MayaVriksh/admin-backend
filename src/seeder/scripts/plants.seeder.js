@@ -4,8 +4,10 @@ const generateCustomId = require("../../utils/generateCustomId");
 const {
     plants,
     plantSizeProfiles,
-    plantVariants
+    plantVariants,
+    mediaUrls
 } = require("../data/plants.data");
+const { v4: uuid } = require("uuid");
 
 async function seedPlants() {
     try {
@@ -55,22 +57,26 @@ async function seedPlants() {
                                 carbonAbsorber: plant.carbonAbsorber,
                                 funFacts: plant.funFacts,
                                 godAligned: plant.godAligned,
+                                associatedDeity: plant.associatedDeity,
                                 insideBox: plant.insideBox,
+                                plantClass: plant.plantClass,
                                 plantSeries: plant.plantSeries,
                                 repotting: plant.repotting,
                                 soil: plant.soil,
-                                spiritualUseCase: plant.spiritualUseCase
+                                spiritualUseCase: plant.spiritualUseCase,
+                                createdAt: plant.createdAt,
+                                updatedAt: plant.updatedAt
                             }
                         });
 
                         console.log(`🌱 Created Plant '${plant.name}'`);
 
-                        // size profiles
+                        // Size Profiles
                         const sizesForPlant = plantSizeProfiles.filter(
                             (s) => s.plantId === plant.plantId
                         );
-
                         const sizeIdMap = {};
+
                         for (const sizeProfile of sizesForPlant) {
                             const plantSizeId = await generateCustomId(
                                 tx,
@@ -94,7 +100,7 @@ async function seedPlants() {
                             );
                         }
 
-                        // variants
+                        // Variants
                         const variantsForPlant = plantVariants.filter(
                             (v) => v.plantId === plant.plantId
                         );
@@ -116,7 +122,9 @@ async function seedPlants() {
                                     colorId: color.id,
                                     sku: variant.sku,
                                     mrp: variant.mrp,
-                                    isProductActive: variant.isProductActive
+                                    isProductActive: variant.isProductActive,
+                                    createdAt: variant.createdAt,
+                                    updatedAt: variant.updatedAt
                                 }
                             });
 
@@ -129,7 +137,7 @@ async function seedPlants() {
                             `✅ Plant '${plant.name}' seeded with ${sizesForPlant.length} sizes & ${variantsForPlant.length} variants`
                         );
                     },
-                    { timeout: 15000 }
+                    { timeout: 15000 } // max timeout
                 );
             } catch (error) {
                 console.error(
@@ -147,14 +155,57 @@ async function seedPlants() {
     }
 }
 
-if (require.main === module) {
-    seedPlants()
-        .catch((e) => {
-            console.error("❌ Seeding failed:", e.stack || e);
-        })
-        .finally(async () => {
-            await prisma.$disconnect();
-        });
+// Separate function for PlantVariantImages
+async function seedPlantVariantImages() {
+    try {
+        console.log("🖼️ Seeding Plant Variant Images...");
+
+        const plantVariants = await prisma.plantVariants.findMany();
+
+        for (const variant of plantVariants) {
+            try {
+                for (let i = 0; i < mediaUrls.length; i++) {
+                    await prisma.plantVariantImage.create({
+                        data: {
+                            id: uuid(),
+                            plantVariantId: variant.variantId,
+                            mediaUrl: mediaUrls[i],
+                            isPrimary: i === 4,
+                            publicId: "Yo",
+                            mediaType: "image",
+                            resourceType: "image",
+                            createdAt: new Date(),
+                            updatedAt: new Date()
+                        }
+                    });
+                }
+
+                console.log(`✅ Seeded images for variant ${variant.sku}`);
+            } catch (err) {
+                console.error(
+                    `❌ Failed to seed images for variant ${variant.sku}:`,
+                    err.message
+                );
+            }
+        }
+
+        console.log("🎉 All Plant Variant Images seeded.");
+    } catch (err) {
+        console.error(
+            "❌ Error seeding Plant Variant Images:",
+            err.stack || err
+        );
+    } finally {
+        await prisma.$disconnect();
+    }
 }
 
-module.exports = seedPlants;
+// Run seeders if called directly
+if (require.main === module) {
+    (async () => {
+        await seedPlants();
+        await seedPlantVariantImages();
+    })();
+}
+
+module.exports = { seedPlants, seedPlantVariantImages };
