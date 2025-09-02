@@ -1,5 +1,6 @@
 const { prisma } = require("../../config/prisma.config");
 const generateFertilizers = require("../data/fertilizers.data");
+const { v4: uuidv4 } = require("uuid");
 
 async function seedFertilizers() {
     console.log("🌱 Seeding Fertilizers...");
@@ -47,15 +48,21 @@ async function seedPlantFertilizerSchedules() {
             );
             return;
         }
+        const seasons = ["Spring", "Summer", "Autumn", "Winter"];
 
         for (const size of plantSizes) {
-            for (const fert of fertilizers) {
+            for (const season of seasons) {
+                // Pick a random fertilizer
+                const randomFertilizer =
+                    fertilizers[Math.floor(Math.random() * fertilizers.length)];
+
+                // Check if schedule already exists
                 const existingSchedule =
                     await prisma.plantFertilizerSchedule.findFirst({
                         where: {
                             plantSizeId: size.plantSizeId,
-                            fertilizerId: fert.fertilizerId,
-                            applicationSeason: "Spring"
+                            fertilizerId: randomFertilizer.fertilizerId,
+                            applicationSeason: season
                         }
                     });
 
@@ -64,10 +71,10 @@ async function seedPlantFertilizerSchedules() {
                         data: {
                             fertilizerScheduleId: uuidv4(),
                             plantSizeId: size.plantSizeId,
-                            fertilizerId: fert.fertilizerId,
+                            fertilizerId: randomFertilizer.fertilizerId,
                             applicationFrequency: "Monthly",
                             applicationMethod: ["Soil drench", "Foliar spray"],
-                            applicationSeason: "Spring",
+                            applicationSeason: season,
                             applicationTime: "Morning",
                             benefits: ["Improves growth", "Boosts yield"],
                             dosageAmount: 10.5,
@@ -78,11 +85,11 @@ async function seedPlantFertilizerSchedules() {
                         }
                     });
                     console.log(
-                        `✅ Schedule for '${fert.name}' & size '${size.name}' created`
+                        `✅ Schedule for '${randomFertilizer.name}' & size '${size.plantSize}' created for ${season}`
                     );
                 } else {
                     console.log(
-                        `⚠️  Schedule for '${fert.name}' & size '${size.name}' already exists`
+                        `⚠️ Schedule for '${randomFertilizer.name}' & size '${size.plantSize}' already exists for ${season}`
                     );
                 }
             }
