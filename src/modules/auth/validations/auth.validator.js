@@ -103,6 +103,7 @@ const registerUserValidation = {
         phoneNumber: Joi.string()
             .pattern(/^[6-9]\d{9}$/)
             .required()
+            .default(9999999999)
             .messages({
                 "string.base": "📞 Phone number must be a string of digits.",
                 "string.empty":
@@ -162,7 +163,7 @@ const loginUserValidation = {
             .trim()
             .min(8)
             .max(16)
-            .pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]+$/) 
+            .pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]+$/)
             .required()
             .messages({
                 "string.base": "🔐 Password must be a string.",
@@ -254,8 +255,14 @@ const changePasswordValidation = {
 /** -------------------------- Customer quick Sign In Auth Flow ------------------- */
 const sendOtpValidation = {
     payload: Joi.object({
-        phoneNumber: Joi.string().length(10).pattern(/^[0-9]+$/).required()
-            .description("A 10-digit Indian mobile number without the country code.")
+        phoneNumber: Joi.string()
+            .length(10)
+            .pattern(/^[6-9]\d{9}$/)
+            .required()
+            .description(
+                "A 10-digit Indian mobile number without the country code."
+            )
+            .default(9999999999)
             .messages({
                 "string.length": "Phone number must be exactly 10 digits.",
                 "string.pattern.base": "Phone number must only contain digits.",
@@ -266,14 +273,25 @@ const sendOtpValidation = {
 
 const verifyOtpValidation = {
     payload: Joi.object({
-        phoneNumber: Joi.string().length(10).pattern(/^[0-9]+$/).required(),
-        otp: Joi.string().length(6).required().description("The 6-digit OTP sent to the user.")
+        phoneNumber: Joi.string()
+            .length(10)
+            .pattern(/^[6-9]\d{9}$/)
+            .required()
+            .default(9999999999),
+        otp: Joi.string()
+            .length(6)
+            .required()
+            .description("The 6-digit OTP sent to the user.")
     })
 };
 
 const quickRegisterValidation = {
     payload: Joi.object({
-        phoneNumber: Joi.string().length(10).pattern(/^[0-9]+$/).required(),
+        phoneNumber: Joi.string()
+            .length(10)
+            .pattern(/^[6-9]\d{9}$/)
+            .default(9999999999)
+            .required(),
         email: Joi.string().email().required(),
         firstName: Joi.string().required(),
         lastName: Joi.string().required()
