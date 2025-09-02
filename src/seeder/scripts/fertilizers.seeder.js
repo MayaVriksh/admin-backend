@@ -33,14 +33,76 @@ async function seedFertilizers() {
     console.log("✅ Fertilizer seeding completed.");
 }
 
-if (require.main === module) {
-    seedFertilizers()
-        .catch((error) => {
-            console.error("❌ Seeding failed:", error);
-        })
-        .finally(() => {
-            prisma.$disconnect();
-        });
+// Seeder for PlantFertilizerSchedule
+async function seedPlantFertilizerSchedules() {
+    console.log("🌱 Seeding PlantFertilizerSchedules...");
+
+    try {
+        const fertilizers = await prisma.fertilizers.findMany();
+        const plantSizes = await prisma.plantSizeProfile.findMany();
+
+        if (!fertilizers.length || !plantSizes.length) {
+            console.log(
+                "⚠️  Missing fertilizers or plant sizes. Seed them first."
+            );
+            return;
+        }
+
+        for (const size of plantSizes) {
+            for (const fert of fertilizers) {
+                const existingSchedule =
+                    await prisma.plantFertilizerSchedule.findFirst({
+                        where: {
+                            plantSizeId: size.plantSizeId,
+                            fertilizerId: fert.fertilizerId,
+                            applicationSeason: "Spring"
+                        }
+                    });
+
+                if (!existingSchedule) {
+                    await prisma.plantFertilizerSchedule.create({
+                        data: {
+                            fertilizerScheduleId: uuidv4(),
+                            plantSizeId: size.plantSizeId,
+                            fertilizerId: fert.fertilizerId,
+                            applicationFrequency: "Monthly",
+                            applicationMethod: ["Soil drench", "Foliar spray"],
+                            applicationSeason: "Spring",
+                            applicationTime: "Morning",
+                            benefits: ["Improves growth", "Boosts yield"],
+                            dosageAmount: 10.5,
+                            safetyNotes: [
+                                "Wear gloves",
+                                "Keep away from children"
+                            ]
+                        }
+                    });
+                    console.log(
+                        `✅ Schedule for '${fert.name}' & size '${size.name}' created`
+                    );
+                } else {
+                    console.log(
+                        `⚠️  Schedule for '${fert.name}' & size '${size.name}' already exists`
+                    );
+                }
+            }
+        }
+    } catch (error) {
+        console.error(
+            "❌ Error seeding PlantFertilizerSchedules:",
+            error.message
+        );
+    }
+
+    console.log("✅ PlantFertilizerSchedule seeding completed.");
 }
 
-module.exports = seedFertilizers;
+if (require.main === module) {
+    (async () => {
+        await seedFertilizers();
+        await seedPlantFertilizerSchedules();
+        prisma.$disconnect();
+    })();
+}
+
+module.exports = { seedFertilizers, seedPlantFertilizerSchedules };

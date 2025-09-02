@@ -107,30 +107,36 @@ async function seedPlants() {
 
                         for (let i = 0; i < variantsForPlant.length; i++) {
                             const variant = variantsForPlant[i];
-                            const color = colors[i % colors.length];
 
-                            const variantId = await generateCustomId(
-                                tx,
-                                PRODUCT_TYPES.PLANT_VARIANT
-                            );
+                            const numColors = Math.min(4, colors.length);
+                            for (let j = 0; j < numColors; j++) {
+                                const color = colors[(i + j) % colors.length];
 
-                            await tx.plantVariants.create({
-                                data: {
-                                    variantId,
-                                    plantId: createdPlant.plantId,
-                                    plantSizeId: sizeIdMap[variant.plantSizeId],
-                                    colorId: color.id,
-                                    sku: variant.sku,
-                                    mrp: variant.mrp,
-                                    isProductActive: variant.isProductActive,
-                                    createdAt: variant.createdAt,
-                                    updatedAt: variant.updatedAt
-                                }
-                            });
+                                const variantId = await generateCustomId(
+                                    tx,
+                                    PRODUCT_TYPES.PLANT_VARIANT
+                                );
 
-                            console.log(
-                                `   🌿 Variant ${variant.sku} added for '${plant.name}'`
-                            );
+                                await tx.plantVariants.create({
+                                    data: {
+                                        variantId,
+                                        plantId: createdPlant.plantId,
+                                        plantSizeId:
+                                            sizeIdMap[variant.plantSizeId],
+                                        colorId: color.id,
+                                        sku: `${variant.sku}-${color.name.toUpperCase()}`,
+                                        mrp: variant.mrp,
+                                        isProductActive:
+                                            variant.isProductActive,
+                                        createdAt: variant.createdAt,
+                                        updatedAt: variant.updatedAt
+                                    }
+                                });
+
+                                console.log(
+                                    `   🌿 Variant ${variant.sku} with color ${color.name} added for '${plant.name}'`
+                                );
+                            }
                         }
 
                         console.log(
