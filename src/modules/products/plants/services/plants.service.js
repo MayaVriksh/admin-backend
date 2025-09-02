@@ -25,7 +25,7 @@ class PlantService {
                 order,
                 plantCategory
             }),
-            PlantRepository.countAll(plantCategory)
+            PlantRepository.countByNameOrVariant({ plantCategory })
         ]);
 
         return {
@@ -80,7 +80,7 @@ class PlantService {
                 order,
                 plantCategory
             }),
-            PlantRepository.countByNameOrVariant(search, plantCategory)
+            PlantRepository.countByNameOrVariant({ search, plantCategory })
         ]);
 
         if (!plants || plants.length === 0) {

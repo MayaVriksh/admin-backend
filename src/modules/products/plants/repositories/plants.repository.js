@@ -5,36 +5,57 @@ class PlantRepository {
     // Reusable select schema
     static baseSelect(productCard) {
         return {
-            // Identity & Basics
             plantId: true,
-            name: true,
-            scientificName: true,
-            description: true,
-            plantSeries: true,
-            placeOfOrigin: true,
 
-            // Cultural / Spiritual Context
-            associatedDeity: true,
-            godAligned: true,
-            spiritualUseCase: true,
+            ...(productCard
+                ? {
+                      name: true,
+                      scientificName: true,
+                      description: true,
 
-            // Commercial Attributes
-            isProductActive: true,
-            isFeatured: true,
-            bestForEmotion: true,
-            bestGiftFor: true,
+                      isProductActive: true,
+                      isFeatured: true,
 
-            // Characteristics / Impact
-            auraType: true,
-            biodiversityBooster: true,
-            carbonAbsorber: true,
-            funFacts: true,
+                      biodiversityBooster: true,
+                      carbonAbsorber: true,
 
-            // Care / Practical Info
-            soil: true,
-            repotting: true,
-            maintenance: true,
-            insideBox: true,
+                      maintenance: true,
+
+                      bestForEmotion: true,
+                      bestGiftFor: true
+                  }
+                : {
+                      name: true,
+                      scientificName: true,
+                      description: true,
+
+                      isProductActive: true,
+                      isFeatured: true,
+
+                      plantClass: true,
+                      plantSeries: true,
+                      placeOfOrigin: true,
+
+                      auraType: true,
+                      biodiversityBooster: true,
+                      carbonAbsorber: true,
+
+                      minimumTemperature: true,
+                      maximumTemperature: true,
+                      soil: true,
+                      repotting: true,
+                      maintenance: true,
+                      insideBox: true,
+
+                      benefits: true,
+                      bestForEmotion: true,
+                      bestGiftFor: true,
+                      funFacts: true,
+
+                      spiritualUseCase: true,
+                      associatedDeity: true,
+                      godAligned: true
+                  }),
 
             // Categories
             plantCategories: {
@@ -47,7 +68,7 @@ class PlantRepository {
             },
 
             // Size Profiles & Variants
-            PlantSizeProfile: {
+            plantSizeProfile: {
                 ...(productCard ? { take: 1 } : {}),
                 select: {
                     plantSizeId: true,
@@ -168,6 +189,8 @@ class PlantRepository {
         });
     }
 
+    // ###########  Will be done later
+
     // // Get selling price by varinat ID
     // static async findSellingPriceById(plantId, variantId) {
     //     return prisma.plantWarehouseInventory.findFirst({
@@ -205,7 +228,7 @@ class PlantRepository {
                         OR: [
                             { name: { contains: search, mode: "insensitive" } },
                             {
-                                PlantSizeProfile: {
+                                plantSizeProfile: {
                                     some: {
                                         PlantVariants: {
                                             some: {
@@ -244,7 +267,7 @@ class PlantRepository {
     }
 
     // Count all (for pagination)
-    static async countByNameOrVariant(search, plantCategory) {
+    static async countByNameOrVariant({ search, plantCategory }) {
         return prisma.plants.count({
             where: {
                 AND: [
@@ -252,7 +275,7 @@ class PlantRepository {
                         OR: [
                             { name: { contains: search, mode: "insensitive" } },
                             {
-                                PlantSizeProfile: {
+                                plantSizeProfile: {
                                     some: {
                                         PlantVariants: {
                                             some: {
@@ -301,7 +324,12 @@ class PlantRepository {
             where: plantCategory
                 ? {
                       plantCategories: {
-                          name: { equals: plantCategory, mode: "insensitive" }
+                          some: {
+                              name: {
+                                  equals: plantCategory,
+                                  mode: "insensitive"
+                              }
+                          }
                       }
                   }
                 : {},
