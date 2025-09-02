@@ -28,6 +28,7 @@
         "seed:fertilizers": "node src/seeder/scripts/fertilizers.seeder.js",
         "seed:purchase_order": "node src/seeder/scripts/purchaseOrder.seeder.js",
         "seed:warehouse_inventory": "node src/seeder/scripts/warehouseInventory.seeder.js",
+        "seed:plant_category": "node src/seeder/scripts/plantCategory.seeder.js",
         "send_grid_email": "node src/utils/sendgrid.js",
         "nodemailer_email": "node src/utils/email.util.js",
         "postinstall": "prisma generate --no-engine"

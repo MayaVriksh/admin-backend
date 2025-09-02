@@ -16,14 +16,17 @@ const plants = [
         biodiversityBooster: true,
         carbonAbsorber: true,
         funFacts: ["Removes toxins", "Improves humidity"],
-        godAligned: ["Ganesh"],
+        minimumTemperature: 18,
+        maximumTemperature: 28,
+        benefits: ["Purifies air", "Improves humidity", "Adds positive energy"],
+        associatedDeity: ["Vishnu", "Lakshmi"],
+        godAligned: ["Positive Energy", "Stress Relief"],
         insideBox: ["Pot", "Soil", "Fertilizer"],
         plantClass: "Palm",
         plantSeries: "Indoor Air Purifier",
         repotting: "Every 2 years",
         soil: "Well-draining",
         spiritualUseCase: ["Meditation", "Calmness"],
-        associatedDeity: ["Ganesh"],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -42,14 +45,17 @@ const plants = [
         biodiversityBooster: false,
         carbonAbsorber: true,
         funFacts: ["Can survive low light", "Air purifier"],
-        godAligned: [],
+        minimumTemperature: 15,
+        maximumTemperature: 30,
+        benefits: ["Removes toxins", "Improves focus", "Protection"],
+        associatedDeity: ["Shiva"],
+        godAligned: ["Protection", "Focus"],
         insideBox: ["Pot", "Soil"],
         plantClass: "Succulent",
         plantSeries: "Indoor Easy Plants",
         repotting: "Every 3 years",
         soil: "Sandy Loam",
         spiritualUseCase: ["Focus", "Protection"],
-        associatedDeity: [],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -68,14 +74,17 @@ const plants = [
         biodiversityBooster: false,
         carbonAbsorber: true,
         funFacts: ["Tolerates neglect", "Air purifier"],
-        godAligned: ["Lakshmi"],
+        minimumTemperature: 18,
+        maximumTemperature: 28,
+        benefits: ["Tolerates neglect", "Air purifier", "Promotes good luck"],
+        associatedDeity: ["Lakshmi"],
+        godAligned: ["Good Luck", "Calmness"],
         insideBox: ["Pot", "Soil"],
         plantClass: "Perennial",
         plantSeries: "Indoor Easy Plants",
         repotting: "Every 2 years",
         soil: "Well-draining",
         spiritualUseCase: ["Good Luck"],
-        associatedDeity: ["Lakshmi"],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -94,14 +103,17 @@ const plants = [
         biodiversityBooster: true,
         carbonAbsorber: true,
         funFacts: ["Removes mold spores", "Flowering plant"],
-        godAligned: ["Saraswati"],
+        minimumTemperature: 16,
+        maximumTemperature: 28,
+        benefits: ["Removes mold spores", "Brings calmness", "Purity"],
+        associatedDeity: ["Saraswati"],
+        godAligned: ["Purity", "Calmness"],
         insideBox: ["Pot", "Soil", "Fertilizer"],
         plantClass: "Flowering",
         plantSeries: "Indoor Flowering Plants",
         repotting: "Every 2 years",
         soil: "Loamy",
         spiritualUseCase: ["Calmness", "Purity"],
-        associatedDeity: ["Saraswati"],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -120,14 +132,17 @@ const plants = [
         biodiversityBooster: false,
         carbonAbsorber: true,
         funFacts: ["Brings luck", "Low maintenance"],
-        godAligned: ["Lakshmi"],
+        minimumTemperature: 18,
+        maximumTemperature: 30,
+        benefits: ["Brings luck", "Promotes prosperity", "Low maintenance"],
+        associatedDeity: ["Lakshmi", "Kubera"],
+        godAligned: ["Prosperity", "Positivity"],
         insideBox: ["Pot", "Soil"],
         plantClass: "Vine",
         plantSeries: "Indoor Easy Plants",
         repotting: "Every 2 years",
         soil: "Well-draining",
         spiritualUseCase: ["Prosperity"],
-        associatedDeity: ["Lakshmi"],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -146,14 +161,17 @@ const plants = [
         biodiversityBooster: false,
         carbonAbsorber: true,
         funFacts: ["Easy to shape", "Air purifier"],
-        godAligned: ["Ganesh"],
+        minimumTemperature: 16,
+        maximumTemperature: 28,
+        benefits: ["Air purifier", "Aesthetic appeal", "Focus and balance"],
+        associatedDeity: ["Ganesh"],
+        godAligned: ["Meditation", "Balance"],
         insideBox: ["Pot", "Soil"],
         plantClass: "Bonsai",
         plantSeries: "Indoor Bonsai",
         repotting: "Every 2 years",
         soil: "Loamy",
         spiritualUseCase: ["Meditation", "Balance"],
-        associatedDeity: ["Ganesh"],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -172,14 +190,17 @@ const plants = [
         biodiversityBooster: false,
         carbonAbsorber: true,
         funFacts: ["Air purifier", "Low maintenance"],
-        godAligned: [],
+        minimumTemperature: 15,
+        maximumTemperature: 30,
+        benefits: ["Air purifier", "Low maintenance", "Enhances focus"],
+        associatedDeity: [],
+        godAligned: ["Focus", "Concentration"],
         insideBox: ["Pot", "Soil"],
         plantClass: "Dracaena",
         plantSeries: "Indoor Easy Plants",
         repotting: "Every 3 years",
         soil: "Sandy Loam",
         spiritualUseCase: ["Focus"],
-        associatedDeity: [],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -198,14 +219,17 @@ const plants = [
         biodiversityBooster: false,
         carbonAbsorber: true,
         funFacts: ["Medicinal gel", "Air purifier"],
-        godAligned: ["Dhanvantari"],
+        minimumTemperature: 15,
+        maximumTemperature: 30,
+        benefits: ["Medicinal gel", "Air purification", "Promotes healing"],
+        associatedDeity: ["Dhanvantari"],
+        godAligned: ["Healing", "Health"],
         insideBox: ["Pot", "Soil"],
         plantClass: "Succulent",
         plantSeries: "Indoor Easy Plants",
         repotting: "Every 2 years",
         soil: "Sandy Loam",
         spiritualUseCase: ["Healing"],
-        associatedDeity: ["Dhanvantari"],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -224,14 +248,17 @@ const plants = [
         biodiversityBooster: false,
         carbonAbsorber: true,
         funFacts: ["Air purifier", "Fast-growing"],
-        godAligned: [],
+        minimumTemperature: 15,
+        maximumTemperature: 28,
+        benefits: ["Air purifier", "Fast-growing", "Boosts energy"],
+        associatedDeity: [],
+        godAligned: ["Energy", "Focus"],
         insideBox: ["Pot", "Soil"],
         plantClass: "Perennial",
         plantSeries: "Indoor Easy Plants",
         repotting: "Every 3 years",
         soil: "Loamy",
         spiritualUseCase: ["Energy"],
-        associatedDeity: [],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -250,14 +277,17 @@ const plants = [
         biodiversityBooster: false,
         carbonAbsorber: true,
         funFacts: ["Brings luck", "Easy care"],
-        godAligned: ["Lakshmi"],
+        minimumTemperature: 18,
+        maximumTemperature: 28,
+        benefits: ["Brings luck", "Easy care", "Promotes prosperity"],
+        associatedDeity: ["Lakshmi"],
+        godAligned: ["Prosperity", "Positivity"],
         insideBox: ["Pot", "Water beads"],
         plantClass: "Dracaena",
         plantSeries: "Indoor Easy Plants",
         repotting: "Every 2 years",
         soil: "Water/Gravel",
         spiritualUseCase: ["Prosperity"],
-        associatedDeity: ["Lakshmi"],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -276,14 +306,21 @@ const plants = [
         biodiversityBooster: false,
         carbonAbsorber: false,
         funFacts: ["Flowering plant", "Air purifier"],
-        godAligned: ["Lakshmi"],
+        minimumTemperature: 16,
+        maximumTemperature: 28,
+        benefits: [
+            "Air purifier",
+            "Elegant decoration",
+            "Promotes calmness and joy"
+        ],
+        associatedDeity: ["Lakshmi"],
+        godAligned: ["Beauty", "Calmness"],
         insideBox: ["Pot", "Soil"],
         plantClass: "Flowering",
         plantSeries: "Indoor Flowering Plants",
         repotting: "Every 2 years",
         soil: "Loamy",
         spiritualUseCase: ["Beauty", "Calmness"],
-        associatedDeity: ["Lakshmi"],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -302,14 +339,17 @@ const plants = [
         biodiversityBooster: false,
         carbonAbsorber: false,
         funFacts: ["Edible fruits", "Fragrant flowers"],
-        godAligned: [],
+        minimumTemperature: 18,
+        maximumTemperature: 32,
+        benefits: ["Edible fruits", "Fragrant flowers", "Fresh air"],
+        associatedDeity: [],
+        godAligned: ["Energy", "Freshness"],
         insideBox: ["Pot", "Soil"],
         plantClass: "Fruit",
         plantSeries: "Indoor Fruit Plants",
         repotting: "Every 2 years",
         soil: "Loamy",
         spiritualUseCase: ["Energy"],
-        associatedDeity: [],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -328,14 +368,21 @@ const plants = [
         biodiversityBooster: false,
         carbonAbsorber: false,
         funFacts: ["Aromatic", "Medicinal herb"],
-        godAligned: [],
+        minimumTemperature: 15,
+        maximumTemperature: 28,
+        benefits: [
+            "Aromatic herb",
+            "Medicinal properties",
+            "Enhances relaxation"
+        ],
+        associatedDeity: [],
+        godAligned: ["Relaxation", "Focus"],
         insideBox: ["Pot", "Soil"],
         plantClass: "Herb",
         plantSeries: "Indoor Herb Plants",
         repotting: "Every year",
         soil: "Well-draining",
         spiritualUseCase: ["Relaxation"],
-        associatedDeity: [],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -354,14 +401,21 @@ const plants = [
         biodiversityBooster: false,
         carbonAbsorber: false,
         funFacts: ["Flowering plant", "Fragrant"],
-        godAligned: ["Parvati"],
+        minimumTemperature: 16,
+        maximumTemperature: 28,
+        benefits: [
+            "Flowering plant",
+            "Fragrant",
+            "Promotes happiness and love"
+        ],
+        associatedDeity: ["Parvati"],
+        godAligned: ["Love", "Happiness"],
         insideBox: ["Pot", "Soil", "Fertilizer"],
         plantClass: "Flowering",
         plantSeries: "Indoor Flowering Plants",
         repotting: "Every 2 years",
         soil: "Loamy",
         spiritualUseCase: ["Love", "Happiness"],
-        associatedDeity: ["Parvati"],
         createdAt: new Date(),
         updatedAt: new Date()
     },
@@ -380,14 +434,89 @@ const plants = [
         biodiversityBooster: false,
         carbonAbsorber: false,
         funFacts: ["Fragrant flowers", "Fast-growing"],
-        godAligned: ["Saraswati"],
+        minimumTemperature: 18,
+        maximumTemperature: 30,
+        benefits: [
+            "Fragrant flowers",
+            "Fast-growing",
+            "Promotes calmness and purity"
+        ],
+        associatedDeity: ["Saraswati"],
+        godAligned: ["Purity", "Calmness"],
         insideBox: ["Pot", "Soil"],
         plantClass: "Climber",
         plantSeries: "Indoor Flowering Plants",
         repotting: "Every year",
         soil: "Loamy",
         spiritualUseCase: ["Purity"],
-        associatedDeity: ["Saraswati"],
+        createdAt: new Date(),
+        updatedAt: new Date()
+    },
+    {
+        plantId: uuid(),
+        name: "Jade Plant",
+        description:
+            "Popular succulent with thick, fleshy leaves, symbolizing good luck and prosperity.",
+        scientificName: "Crassula ovata",
+        isProductActive: true,
+        isFeatured: true,
+        maintenance: "Low",
+        placeOfOrigin: "South Africa",
+        auraType: "Prosperity",
+        bestForEmotion: ["Positivity", "Wealth"],
+        bestGiftFor: ["Home", "Office"],
+        biodiversityBooster: false,
+        carbonAbsorber: true,
+        funFacts: ["Can live for decades", "Symbol of wealth"],
+        insideBox: ["Pot", "Soil", "Fertilizer"],
+        plantClass: "Succulent",
+        plantSeries: "Indoor Easy Plants",
+        repotting: "Every 2 years",
+        soil: "Well-draining",
+        spiritualUseCase: ["Wealth", "Good Fortune"],
+        minimumTemperature: 15,
+        maximumTemperature: 30,
+        benefits: [
+            "Air purification",
+            "Boosts positivity",
+            "Attracts prosperity"
+        ],
+        associatedDeity: ["Lakshmi"],
+        godAligned: ["Prosperity"],
+        createdAt: new Date(),
+        updatedAt: new Date()
+    },
+    {
+        plantId: uuid(),
+        name: "Tulsi",
+        description:
+            "Sacred herb known for its medicinal and spiritual significance.",
+        scientificName: "Ocimum sanctum",
+        isProductActive: true,
+        isFeatured: true,
+        maintenance: "Medium",
+        placeOfOrigin: "India",
+        auraType: "Purity",
+        bestForEmotion: ["Calmness", "Health"],
+        bestGiftFor: ["Home", "Temple"],
+        biodiversityBooster: false,
+        carbonAbsorber: true,
+        funFacts: ["Used in Ayurveda", "Boosts immunity"],
+        insideBox: ["Pot", "Soil"],
+        plantClass: "Herb",
+        plantSeries: "Indoor Herb Plants",
+        repotting: "Every year",
+        soil: "Loamy",
+        spiritualUseCase: ["Purity", "Protection"],
+        minimumTemperature: 20,
+        maximumTemperature: 35,
+        benefits: [
+            "Air purification",
+            "Immunity booster",
+            "Spiritual purification"
+        ],
+        associatedDeity: ["Vishnu"],
+        godAligned: ["Purity", "Protection"],
         createdAt: new Date(),
         updatedAt: new Date()
     }
@@ -408,6 +537,7 @@ function addSizeProfiles(plant, sizes) {
 }
 
 addSizeProfiles(plants[0], [
+    // Areca Palm
     { plantSize: "SMALL", height: 30, weight: 0.5 },
     { plantSize: "MEDIUM", height: 50, weight: 1.2 },
     { plantSize: "LARGE", height: 70, weight: 1.9 },
@@ -416,6 +546,7 @@ addSizeProfiles(plants[0], [
 ]);
 
 addSizeProfiles(plants[1], [
+    // Snake Plant
     { plantSize: "SMALL", height: 20, weight: 0.4 },
     { plantSize: "MEDIUM", height: 30, weight: 0.7 },
     { plantSize: "LARGE", height: 40, weight: 1.0 },
@@ -424,6 +555,7 @@ addSizeProfiles(plants[1], [
 ]);
 
 addSizeProfiles(plants[2], [
+    // ZZ Plant
     { plantSize: "SMALL", height: 25, weight: 0.5 },
     { plantSize: "MEDIUM", height: 35, weight: 0.9 },
     { plantSize: "LARGE", height: 45, weight: 1.3 },
@@ -432,6 +564,7 @@ addSizeProfiles(plants[2], [
 ]);
 
 addSizeProfiles(plants[3], [
+    // Peace Lily
     { plantSize: "SMALL", height: 20, weight: 0.4 },
     { plantSize: "MEDIUM", height: 32, weight: 0.9 },
     { plantSize: "LARGE", height: 44, weight: 1.4 },
@@ -440,11 +573,120 @@ addSizeProfiles(plants[3], [
 ]);
 
 addSizeProfiles(plants[4], [
+    // Money Plant
     { plantSize: "SMALL", height: 15, weight: 0.2 },
     { plantSize: "MEDIUM", height: 23, weight: 0.45 },
     { plantSize: "LARGE", height: 31, weight: 0.7 },
     { plantSize: "EXTRA_LARGE", height: 39, weight: 0.95 },
     { plantSize: "EXTRA_SMALL", height: 47, weight: 1.2 }
+]);
+
+addSizeProfiles(plants[5], [
+    // Ficus Bonsai
+    { plantSize: "SMALL", height: 25, weight: 0.3 },
+    { plantSize: "MEDIUM", height: 35, weight: 0.6 },
+    { plantSize: "LARGE", height: 45, weight: 0.9 },
+    { plantSize: "EXTRA_LARGE", height: 55, weight: 1.2 },
+    { plantSize: "EXTRA_SMALL", height: 65, weight: 1.5 }
+]);
+
+addSizeProfiles(plants[6], [
+    // Dracaena Marginata
+    { plantSize: "SMALL", height: 40, weight: 0.8 },
+    { plantSize: "MEDIUM", height: 60, weight: 1.4 },
+    { plantSize: "LARGE", height: 80, weight: 2.0 },
+    { plantSize: "EXTRA_LARGE", height: 100, weight: 2.6 },
+    { plantSize: "EXTRA_SMALL", height: 120, weight: 3.2 }
+]);
+
+addSizeProfiles(plants[7], [
+    // Aloe Vera
+    { plantSize: "SMALL", height: 15, weight: 0.2 },
+    { plantSize: "MEDIUM", height: 25, weight: 0.5 },
+    { plantSize: "LARGE", height: 35, weight: 0.8 },
+    { plantSize: "EXTRA_LARGE", height: 45, weight: 1.1 },
+    { plantSize: "EXTRA_SMALL", height: 55, weight: 1.4 }
+]);
+
+addSizeProfiles(plants[8], [
+    // Spider Plant
+    { plantSize: "SMALL", height: 20, weight: 0.3 },
+    { plantSize: "MEDIUM", height: 30, weight: 0.5 },
+    { plantSize: "LARGE", height: 40, weight: 0.7 },
+    { plantSize: "EXTRA_LARGE", height: 50, weight: 0.9 },
+    { plantSize: "EXTRA_SMALL", height: 60, weight: 1.1 }
+]);
+
+addSizeProfiles(plants[9], [
+    // Lucky Bamboo
+    { plantSize: "SMALL", height: 15, weight: 0.2 },
+    { plantSize: "MEDIUM", height: 25, weight: 0.4 },
+    { plantSize: "LARGE", height: 35, weight: 0.6 },
+    { plantSize: "EXTRA_LARGE", height: 45, weight: 0.8 },
+    { plantSize: "EXTRA_SMALL", height: 55, weight: 1.0 }
+]);
+
+addSizeProfiles(plants[10], [
+    // Orchid
+    { plantSize: "SMALL", height: 20, weight: 0.25 },
+    { plantSize: "MEDIUM", height: 30, weight: 0.5 },
+    { plantSize: "LARGE", height: 40, weight: 0.75 },
+    { plantSize: "EXTRA_LARGE", height: 50, weight: 1.0 },
+    { plantSize: "EXTRA_SMALL", height: 60, weight: 1.25 }
+]);
+
+addSizeProfiles(plants[11], [
+    // Citrus Tree
+    { plantSize: "SMALL", height: 25, weight: 1.0 },
+    { plantSize: "MEDIUM", height: 45, weight: 1.8 },
+    { plantSize: "LARGE", height: 65, weight: 2.6 },
+    { plantSize: "EXTRA_LARGE", height: 85, weight: 3.4 },
+    { plantSize: "EXTRA_SMALL", height: 105, weight: 4.2 }
+]);
+
+addSizeProfiles(plants[12], [
+    // Peppermint
+    { plantSize: "SMALL", height: 15, weight: 0.1 },
+    { plantSize: "MEDIUM", height: 25, weight: 0.2 },
+    { plantSize: "LARGE", height: 35, weight: 0.3 },
+    { plantSize: "EXTRA_LARGE", height: 45, weight: 0.4 },
+    { plantSize: "EXTRA_SMALL", height: 55, weight: 0.5 }
+]);
+
+addSizeProfiles(plants[13], [
+    // Mini Rose
+    { plantSize: "SMALL", height: 20, weight: 0.2 },
+    { plantSize: "MEDIUM", height: 30, weight: 0.4 },
+    { plantSize: "LARGE", height: 40, weight: 0.6 },
+    { plantSize: "EXTRA_LARGE", height: 50, weight: 0.8 },
+    { plantSize: "EXTRA_SMALL", height: 60, weight: 1.0 }
+]);
+
+addSizeProfiles(plants[14], [
+    // Jasmine
+    { plantSize: "SMALL", height: 25, weight: 0.3 },
+    { plantSize: "MEDIUM", height: 35, weight: 0.5 },
+    { plantSize: "LARGE", height: 45, weight: 0.7 },
+    { plantSize: "EXTRA_LARGE", height: 55, weight: 0.9 },
+    { plantSize: "EXTRA_SMALL", height: 65, weight: 1.1 }
+]);
+
+addSizeProfiles(plants[15], [
+    // Jade Plant
+    { plantSize: "SMALL", height: 20, weight: 0.4 },
+    { plantSize: "MEDIUM", height: 35, weight: 0.7 },
+    { plantSize: "LARGE", height: 50, weight: 1.0 },
+    { plantSize: "EXTRA_LARGE", height: 65, weight: 1.3 },
+    { plantSize: "EXTRA_SMALL", height: 80, weight: 1.6 }
+]);
+
+addSizeProfiles(plants[16], [
+    // Tulsi
+    { plantSize: "SMALL", height: 15, weight: 0.2 },
+    { plantSize: "MEDIUM", height: 25, weight: 0.4 },
+    { plantSize: "LARGE", height: 35, weight: 0.6 },
+    { plantSize: "EXTRA_LARGE", height: 45, weight: 0.8 },
+    { plantSize: "EXTRA_SMALL", height: 55, weight: 1.0 }
 ]);
 
 const plantVariants = [];
@@ -483,6 +725,8 @@ addVariants(plants[11], "CITRUS", 599); // Citrus Tree
 addVariants(plants[12], "PEPPERMINT", 149); // Peppermint Plant
 addVariants(plants[13], "ROSE", 349); // Mini Rose
 addVariants(plants[14], "JASMINE", 279); // Jasmine
+addVariants(plants[15], "JADE", 499); // Jade Plant
+addVariants(plants[16], "TULSI", 179); // Tulsi
 
 const mediaUrls = [
     "https://res.cloudinary.com/dwdu18hzs/image/upload/v1756724481/Gemini_Generated_Image_11rm3m11rm3m11rm_fnxgte.png",

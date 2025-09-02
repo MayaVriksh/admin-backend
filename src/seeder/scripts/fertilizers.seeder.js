@@ -1,5 +1,6 @@
 const { prisma } = require("../../config/prisma.config");
 const generateFertilizers = require("../data/fertilizers.data");
+const { v4: uuidv4 } = require("uuid");
 
 async function seedFertilizers() {
     console.log("🌱 Seeding Fertilizers...");
@@ -33,14 +34,82 @@ async function seedFertilizers() {
     console.log("✅ Fertilizer seeding completed.");
 }
 
-if (require.main === module) {
-    seedFertilizers()
-        .catch((error) => {
-            console.error("❌ Seeding failed:", error);
-        })
-        .finally(() => {
-            prisma.$disconnect();
-        });
+// Seeder for PlantFertilizerSchedule
+async function seedPlantFertilizerSchedules() {
+    console.log("🌱 Seeding PlantFertilizerSchedules...");
+
+    try {
+        const fertilizers = await prisma.fertilizers.findMany();
+        const plantSizes = await prisma.plantSizeProfile.findMany();
+
+        if (!fertilizers.length || !plantSizes.length) {
+            console.log(
+                "⚠️  Missing fertilizers or plant sizes. Seed them first."
+            );
+            return;
+        }
+        const seasons = ["Spring", "Summer", "Autumn", "Winter"];
+
+        for (const size of plantSizes) {
+            for (const season of seasons) {
+                // Pick a random fertilizer
+                const randomFertilizer =
+                    fertilizers[Math.floor(Math.random() * fertilizers.length)];
+
+                // Check if schedule already exists
+                const existingSchedule =
+                    await prisma.plantFertilizerSchedule.findFirst({
+                        where: {
+                            plantSizeId: size.plantSizeId,
+                            fertilizerId: randomFertilizer.fertilizerId,
+                            applicationSeason: season
+                        }
+                    });
+
+                if (!existingSchedule) {
+                    await prisma.plantFertilizerSchedule.create({
+                        data: {
+                            fertilizerScheduleId: uuidv4(),
+                            plantSizeId: size.plantSizeId,
+                            fertilizerId: randomFertilizer.fertilizerId,
+                            applicationFrequency: "Monthly",
+                            applicationMethod: ["Soil drench", "Foliar spray"],
+                            applicationSeason: season,
+                            applicationTime: "Morning",
+                            benefits: ["Improves growth", "Boosts yield"],
+                            dosageAmount: 10.5,
+                            safetyNotes: [
+                                "Wear gloves",
+                                "Keep away from children"
+                            ]
+                        }
+                    });
+                    console.log(
+                        `✅ Schedule for '${randomFertilizer.name}' & size '${size.plantSize}' created for ${season}`
+                    );
+                } else {
+                    console.log(
+                        `⚠️ Schedule for '${randomFertilizer.name}' & size '${size.plantSize}' already exists for ${season}`
+                    );
+                }
+            }
+        }
+    } catch (error) {
+        console.error(
+            "❌ Error seeding PlantFertilizerSchedules:",
+            error.message
+        );
+    }
+
+    console.log("✅ PlantFertilizerSchedule seeding completed.");
 }
 
-module.exports = seedFertilizers;
+if (require.main === module) {
+    (async () => {
+        await seedFertilizers();
+        await seedPlantFertilizerSchedules();
+        prisma.$disconnect();
+    })();
+}
+
+module.exports = { seedFertilizers, seedPlantFertilizerSchedules };

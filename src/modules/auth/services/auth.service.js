@@ -27,6 +27,7 @@ const {
 const verifyEmailTemplate = require("../../../email-templates/auth/verifyEmail.template.js");
 const welcomeTemplate = require("../../../email-templates/users/welcome.template.js");
 
+
 const generateEmailOtp = async (email, userId = null) => {
     console.log("In AuthService: Generating Email OTP");
 
@@ -364,7 +365,7 @@ const _createUserProfile = (user) => {
  * @returns {Promise<object|null>} The user object or null if not found.
  */
 const _getAuthenticatedUser = async (whereClause, includePassword = false) => {
-    // --- THIS IS THE FIX ---
+
     // Start with a base selection of all non-sensitive fields.
     const selectClause = {
         userId: true,
@@ -575,6 +576,140 @@ const changePassword = async (userId, oldPassword, newPassword) => {
     };
 };
 
+// This helper function should be moved to a shared utility or base auth service for reusability
+const _generateCustomerSession = (user) => {
+    console.log(user)
+    const isVerified = user.phoneVerified;
+    const userProfile = {
+        userId: user.userId,
+        firstName: user.fullName[FIRST_NAME],
+        lastName: user.fullName[LAST_NAME],
+        email: user.email,
+        role: user.role.role,
+        isVerified: isVerified
+    };
+    const accessTokenPayload = {
+        userId: user.userId,
+        username: user.fullName[FIRST_NAME],
+        role: user.role.role,
+        isVerified: isVerified
+    };
+    const accessToken = generateAccessToken(accessTokenPayload);
+    const refreshToken = generateRefreshToken({ userId: user.userId });
+    return { userProfile, accessToken, refreshToken };
+};
+
+const sendOtpToCustomer = async (phoneNumber) => {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const hashedOtp = await bcrypt.hash(otp, 10);
+    console.log(otp);
+    console.log(phoneNumber);
+    console.log(hashedOtp);
+    console.log(expiresAt);
+
+    await prisma.phoneVerification.create({
+        data: { id: uuidv4(), phoneNumber, otp: hashedOtp, expiresAt }
+    });
+    // In a real application, you would integrate an SMS gateway here to send the OTP
+    console.log(`[For Testing] OTP for ${phoneNumber} is: ${otp}`);
+
+    return { success: true, code: 200, message: `OTP sent to ${phoneNumber}.` };
+};
+
+const verifyOtpAndCheckUser = async (phoneNumber, otp) => {
+    console.log(phoneNumber)
+    const verificationRecord = await prisma.phoneVerification.findFirst({
+        where: { phoneNumber },
+        orderBy: { createdAt: 'desc' }
+    });
+    console.log(verificationRecord)
+    // --- Edge Case Handling ---
+    if (!verificationRecord) throw { code: 400, message: "No OTP was sent to this number. Please request one first." };
+    if (verificationRecord.verified) throw { code: 400, message: "This OTP has already been used." };
+    if (verificationRecord.expiresAt < new Date()) throw { code: 400, message: "The OTP has expired. Please request a new one." };
+    
+    const isMatch = await bcrypt.compare(otp, verificationRecord.otp);
+    if (!isMatch) throw { code: 400, message: "The OTP you entered is incorrect." };
+
+    console.log(isMatch)
+    await prisma.phoneVerification.update({
+        where: { id: verificationRecord.id },
+        data: { verified: true, verifiedAt: new Date() }
+    });
+
+    console.log(isMatch)
+    const user = await prisma.user.findUnique({
+        where: { phoneNumber },
+        include: { role: true, customer: true }
+    });
+    console.log(user)
+    if (user) {
+        if (!user.isActive) throw { code: 403, message: "Your account has been deactivated. Please contact support." };
+        
+        // User exists: Log them in and return the session
+        const session = _generateCustomerSession(user);
+        return {
+            success: true, code: 200, message: "OTP verified. Welcome back!",
+            data: { userExists: true, ...session }
+        };
+    } else {
+        // User does not exist: Signal the frontend to show the registration form
+        return {
+            success: true, code: 200,
+            data: { userExists: false, message: "Phone number verified. Please complete your registration." }
+        };
+    }
+};
+
+const quickRegisterCustomer = async (payload) => {
+    const { phoneNumber, email, firstName, lastName } = payload;
+    
+    // --- Crucial Pre-Checks for Existing Data ---
+    const phoneExists = await prisma.user.findUnique({ where: { phoneNumber } });
+    if (phoneExists) throw { code: 409, message: "This phone number is already registered to another account." };
+    
+    const emailExists = await prisma.user.findUnique({ where: { email } });
+    if (emailExists) throw { code: 409, message: "This email address is already registered. Please log in or use a different email." };
+
+    const randomPassword = require('crypto').randomBytes(16).toString('hex');
+    const hashedPassword = await bcrypt.hash(randomPassword, 10);
+    const customerRole = await prisma.role.findUnique({ where: { role: ROLES.CUSTOMER } });
+    if (!customerRole) throw { code: 500, message: "Customer role not configured in the system." };
+
+    const newUser = await prisma.$transaction(async (tx) => {
+        const user = await tx.user.create({
+            data: {
+                userId: await generateCustomId(tx, ROLES.USER),
+                roleId: customerRole.roleId,
+                email,
+                phoneNumber,
+                password: hashedPassword,
+                fullName: { [FIRST_NAME]: firstName, [LAST_NAME]: lastName },
+                phoneVerified: true,
+                emailVerified: true,
+            }
+        });
+        await tx.customer.create({
+            data: {
+                customerId: await generateCustomId(tx, ROLES.CUSTOMER),
+                userId: user.userId,
+            }
+        });
+        return await tx.user.findUnique({ where: { userId: user.userId }, include: { role: true, customer: true }});
+    });
+
+    // Automatically log the newly created user in
+    const session = _generateCustomerSession(newUser);
+    return {
+        success: true, code: 201, message: "Registration successful. Welcome to MayaVriksh!",
+        data: { ...session }
+    };
+};
+
+// module.exports = {  };
+
+
 module.exports = {
     generateEmailOtp,
     verifyEmailOtp,
@@ -583,5 +718,8 @@ module.exports = {
     refreshUserToken,
     deactivateUser,
     reactivateUserProfile,
-    changePassword
+    changePassword,
+    sendOtpToCustomer,
+    verifyOtpAndCheckUser,
+    quickRegisterCustomer
 };

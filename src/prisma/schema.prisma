@@ -728,52 +728,67 @@ model PlantCategory {
 model Plants {
   plantId String @id
 
-  name                String
-  description         String
-  scientificName      String?
-  isProductActive     Boolean  @default(true)
-  isFeatured          Boolean
+  name           String
+  scientificName String?
+  description    String
+
+  isProductActive Boolean @default(true)
+  isFeatured      Boolean
+
+  plantClass    String?
+  plantSeries   String?
+  placeOfOrigin String?
+
   auraType            String?
-  bestForEmotion      String[] @default([])
-  bestGiftFor         String[] @default([])
   biodiversityBooster Boolean?
   carbonAbsorber      Boolean?
-  funFacts            String[] @default([])
-  godAligned          String[] @default([]) // energetic or spiritual alignment of the plant
-  insideBox           String[] @default([])
-  plantClass          String?
-  maintenance         String? // Easy || Medium || Hard
-  plantSeries         String?
-  placeOfOrigin       String?
-  repotting           String?
-  soil                String?
-  spiritualUseCase    String[] @default([])
-  associatedDeity     String[] @default([]) // e.g., “Lakshmi” or “Ganesh”
+
+  minimumTemperature Int? // Minimum suitable temperature in °C
+  maximumTemperature Int? // Maximum suitable temperature in °C
+  soil               String?
+  repotting          String?
+  maintenance        String?
+  insideBox          String[] @default([])
+
+  benefits         String[] @default([])
+  spiritualUseCase String[] @default([])
+  bestForEmotion   String[] @default([])
+  bestGiftFor      String[] @default([])
+  funFacts         String[] @default([])
+
+  associatedDeity String[] @default([])
+  godAligned      String[] @default([])
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  plantCategories         PlantCategory[]           @relation(name: "ProductCategories")
+  // --- Core product structure ---
+  plantCategories  PlantCategory[]    @relation(name: "ProductCategories")
+  plantSizeProfile PlantSizeProfile[] @relation(name: "PlantsToPlantSizeProfile")
+  variants         PlantVariants[]    @relation(name: "ProductToVariant")
+
+  // --- Inventory & supply chain ---
   plantWarehouseInventory PlantWarehouseInventory[] @relation(name: "PlantToWarehouseInventory")
-  variants                PlantVariants[]           @relation(name: "ProductToVariant")
-  // SupplierToMayaVrikshInventory SupplierToMayaVrikshInventory[] @relation(name: "ProductToSupplierMayaVrikshInventory")
-  returns                 ReturnsRefunds[]          @relation(name: "ProductToReturn")
-  exchanges               ReturnsRefunds[]          @relation(name: "ProductToExchange")
+  plantSupplierInventory  PlantSupplierInventory[]  @relation(name: "ProductToSupplierInventory")
+  purchaseOrderItems      PurchaseOrderItems[]      @relation(name: "PlantToPurchaseOrder")
   restockEvents           PlantRestockEventLog[]    @relation(name: "PlantToRestockEvent")
-  promotionProducts       PromotionProduct[]        @relation(name: "PromotionProductToPlant")
-  Review                  Review[]                  @relation(name: "PlantToReview")
-  PlantSupplierInventory  PlantSupplierInventory[]  @relation(name: "ProductToSupplierInventory")
-  PlantStockAuditLog      PlantStockAuditLog[]      @relation(name: "ProductToStockAudit")
-  PlantDamagedProduct     PlantDamagedProduct[]     @relation(name: "PlantToPlantDamagedProduct")
-  PlantSalesAnalytics     PlantSalesAnalytics[]     @relation(name: "PlantToAnalytics")
-  NotifyMeSubscription    NotifyMeSubscription[]    @relation(name: "NotifyMeSubscriptionToPlants")
-  PlantOrderItem          PlantOrderItem[]          @relation(name: "PlantOrderItemToPlant")
-  PlantCheckoutLater      PlantCheckoutLater[]      @relation(name: "PlantCheckoutLaterToPlant")
-  PlantCartItem           PlantCartItem[]           @relation(name: "PlantCartItemToPlant")
-  PurchaseOrderItems      PurchaseOrderItems[]      @relation(name: "PlantToPurchaseOrder")
-  WarehouseCartItem       WarehouseCartItem[]       @relation(name: "PlantToWarehouseCartItem")
-  PlantSizeProfile        PlantSizeProfile[]        @relation(name: "PlantsToPlantSizeProfile")
+  plantDamagedProducts    PlantDamagedProduct[]     @relation(name: "PlantToPlantDamagedProduct")
+  plantStockAuditLogs     PlantStockAuditLog[]      @relation(name: "ProductToStockAudit")
+
+  // --- Commerce & customer interaction ---
+  plantCartItems        PlantCartItem[]        @relation(name: "PlantCartItemToPlant")
+  plantCheckoutLater    PlantCheckoutLater[]   @relation(name: "PlantCheckoutLaterToPlant")
+  plantOrderItems       PlantOrderItem[]       @relation(name: "PlantOrderItemToPlant")
+  promotionProducts     PromotionProduct[]     @relation(name: "PromotionProductToPlant")
+  notifyMeSubscriptions NotifyMeSubscription[] @relation(name: "NotifyMeSubscriptionToPlants")
+  returns               ReturnsRefunds[]       @relation(name: "ProductToReturn")
+  exchanges             ReturnsRefunds[]       @relation(name: "ProductToExchange")
+  warehouseCartItems    WarehouseCartItem[]    @relation(name: "PlantToWarehouseCartItem")
+
+  // --- Analytics & reviews ---
+  plantSalesAnalytics PlantSalesAnalytics[] @relation(name: "PlantToAnalytics")
+  reviews             Review[]              @relation(name: "PlantToReview")
 
   @@index([name])
   @@index([isFeatured])
@@ -914,12 +929,12 @@ model PlantFertilizerSchedule {
   fertilizerId         String
 
   applicationFrequency String
-  applicationMethod    String
+  applicationMethod    String[] @default([])
   applicationSeason    String
   applicationTime      String
-  benefits             String?
+  benefits             String[] @default([])
   dosageAmount         Decimal
-  safetyNotes          String?
+  safetyNotes          String[] @default([])
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
