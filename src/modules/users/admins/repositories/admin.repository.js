@@ -47,22 +47,20 @@ const findPurchaseOrdersByAdmin = async ({
 
     const whereClause = {
         // Exclude historical orders (DELIVERED && COMPLETELY PAID Purchase Orders)
-        NOT: {
-            OR: [
-                {
-                    status: {
-                        in: [ORDER_STATUSES.REJECTED, ORDER_STATUSES.CANCELLED]
-                    }
-                },
-                {
-                    AND: [
-                        { status: ORDER_STATUSES.DELIVERED },
-                        { paymentPercentage: 100 },
-                        { pendingAmount: 0 }
-                    ]
+        NOT: [
+            {
+                status: {
+                    in: [ORDER_STATUSES.REJECTED, ORDER_STATUSES.CANCELLED]
                 }
-            ]
-        },
+            },
+            {
+                AND: [
+                    { status: ORDER_STATUSES.DELIVERED },
+                    { paymentPercentage: 100 },
+                    { pendingAmount: 0 }
+                ]
+            }
+        ],
         // Add the active filter if given
         ...statusFiltersForActivePurchaseOrders[
             orderStatus || ORDER_STATUSES.ALL_ORDERS
@@ -112,7 +110,7 @@ const findPurchaseOrdersByAdmin = async ({
                         productType: true,
                         unitsRequested: true,
                         unitCostPrice: true,
-                        isAccepted: true,
+                        status: true,
                         // Include Plant details if the item is a Plant
                         plant: {
                             select: { name: true }
@@ -371,13 +369,13 @@ const findHistoricalPurchaseOrders = async ({
                     }
                 },
                 PurchaseOrderItems: {
-                    where: { isAccepted: true },
+                    where: { status: ORDER_STATUSES.APPROVED },
                     select: {
                         id: true,
                         productType: true,
                         unitsRequested: true,
                         unitCostPrice: true,
-                        isAccepted: true,
+                        status: true,
                         plant: { select: { name: true } },
                         plantVariant: {
                             select: {

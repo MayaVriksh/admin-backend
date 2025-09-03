@@ -364,7 +364,9 @@ const listSupplierOrders = async ({
 
         // Determine the generic properties based on the productType
         // --- Object 3: For the "Order Items Modal" ---
-        const orderItems = order.PurchaseOrderItems.map((item) => {
+        const orderItems = order.PurchaseOrderItems.filter(
+            (item) => item.status !== ORDER_STATUSES.CANCELLED
+        ).map((item) => {
             const isPlant = item.productType === "PLANT";
             const productVariantName = isPlant
                 ? item.plant?.name
@@ -383,7 +385,7 @@ const listSupplierOrders = async ({
                 ? item.plantVariant?.plantVariantImages[0]?.mediaUrl
                 : item.potVariant?.images[0]?.mediaUrl;
             const productVariantType = item.productType;
-            const isAccepted = item.isAccepted;
+            const isAccepted = item.status;
             // Return the new, simplified item object
             return {
                 id: item.id,
@@ -399,12 +401,11 @@ const listSupplierOrders = async ({
                 isAccepted
             };
         });
+
+        console.log("Supplier-service.js --> listSupplierOrders: ");
+
         // Return the order with the transformed items array
-        console.log(
-            "Supplier-service.js --> listSupplierOrders: ",
-            paymentHistory,
-            orderItems
-        );
+
         return {
             // All top-level fields from the PurchaseOrder
             id: order.id,
@@ -495,7 +496,7 @@ const uploadQcMediaForOrder = async ({ userId, orderId, uploadedMedia }) => {
         isPrimary: media.isPrimary || false,
         uploadedBy: ROLES.ROLES.SUPPLIER
     }));
-    
+
     // 3. Save the URLs and public IDs to the database via the repository.
     await supplierRepository.addMediaToPurchaseOrder(
         orderId,
@@ -632,6 +633,8 @@ const getOrderRequestByOrderId = async ({ userId, orderId }) => {
             message: "Supplier profile not found for this user."
         };
     }
+
+    // console.log("Order id for po request: ", orderId);
 
     // Now, find the purchase order, ensuring it matches BOTH the orderId AND the supplierId.
     // This is a critical security check to prevent suppliers from viewing each other's orders.

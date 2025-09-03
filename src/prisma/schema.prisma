@@ -52,6 +52,19 @@ enum NotificationCategory {
   SECURITY
 }
 
+enum OrderStatus {
+  APPROVED
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+  PROCESSING
+  REJECTED
+  UNDER_REVIEW
+}
+
 // ---------------------- User & Role Management ----------------------
 
 model User {
@@ -1886,19 +1899,22 @@ model WarehouseCartItem {
 }
 
 model PurchaseOrderItems {
-  id              String   @id
+  id              String  @id
   purchaseOrderId String
   productType     String // Plant || Pot
   plantId         String?
   plantVariantId  String?
   potCategoryId   String?
   potVariantId    String?
-  unitsRequested  Int
-  unitCostPrice   Decimal?
-  totalCost       Decimal? // Needed for Plant Inventory, to update total CP
-  isAccepted      Boolean  @default(false) // Items whose isAccepted isFalse, their total cost will not be fetched from UI and stored in DB, only true ones are added & stored
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+
+  unitsRequested Int
+  unitCostPrice  Decimal?
+  totalCost      Decimal? // Needed for Plant Inventory, to update total CP
+
+  status OrderStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   purchaseOrder       PurchaseOrder        @relation(name: "PurchaseOrderToPurchaseOrderItem", fields: [purchaseOrderId], references: [id])
   plant               Plants?              @relation(name: "PlantToPurchaseOrder", fields: [plantId], references: [plantId])
@@ -1917,9 +1933,9 @@ model PurchaseOrder {
   deliveryCharges   Decimal? // optional
   totalCost         Decimal? // units * negotiated price + delivery charge
   pendingAmount     Decimal?
-  paymentPercentage Int      @default(0)
-  status            String   @default("PENDING")
-  isAccepted        Boolean  @default(false)
+  paymentPercentage Int         @default(0)
+  status            OrderStatus @default(PENDING)
+  isAccepted        Boolean     @default(false)
   invoiceUrl        String? // uploaded by warehouse manager only
 
   expectedDateOfArrival DateTime

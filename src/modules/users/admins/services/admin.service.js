@@ -96,7 +96,7 @@ const getOrderRequestByOrderId = async ({ userId, orderId }) => {
                     unitsRequested: true,
                     unitCostPrice: true,
                     plant: { select: { name: true } },
-                    isAccepted: true
+                    status: true
                 }
             },
             payments: {
@@ -177,7 +177,9 @@ const listSupplierOrders = async ({
 
         // Determine the generic properties based on the productType
         // --- Object 3: For the "Order Items Modal" ---
-        const orderItems = order.PurchaseOrderItems.map((item) => {
+        const orderItems = order.PurchaseOrderItems.filter(
+            (item) => item.status !== ORDER_STATUSES.CANCELLED
+        ).map((item) => {
             const isPlant = item.productType === PRODUCT_TYPES.PLANT;
             const productVariantName = isPlant
                 ? item.plant?.name
@@ -196,7 +198,7 @@ const listSupplierOrders = async ({
                 ? item.plantVariant?.plantVariantImages[0]?.mediaUrl
                 : item.potVariant?.images[0]?.mediaUrl;
             const productVariantType = item.productType;
-            const isAccepted = item.isAccepted;
+            const isAccepted = item.status;
             // Return the new, simplified item object
             return {
                 id: item.id,
