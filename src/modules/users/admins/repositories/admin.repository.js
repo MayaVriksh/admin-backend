@@ -520,13 +520,7 @@ const updateWarehouseInventory = async (productType, where, data, tx) => {
             ? tx.plantWarehouseInventory
             : tx.potWarehouseInventory;
 
-    const existingInventory = await model.findUnique({ where });
-
-    if (existingInventory) {
-        return await model.update({ where, data });
-    } else {
-        return await model.create({ data });
-    }
+    return await model.update({ where, data });
 };
 
 /**
