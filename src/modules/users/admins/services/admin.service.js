@@ -177,9 +177,7 @@ const listSupplierOrders = async ({
 
         // Determine the generic properties based on the productType
         // --- Object 3: For the "Order Items Modal" ---
-        const orderItems = order.PurchaseOrderItems.filter(
-            (item) => item.status !== ORDER_STATUSES.CANCELLED
-        ).map((item) => {
+        const orderItems = order.PurchaseOrderItems.map((item) => {
             const isPlant = item.productType === PRODUCT_TYPES.PLANT;
             const productVariantName = isPlant
                 ? item.plant?.name
