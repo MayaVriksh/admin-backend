@@ -31,8 +31,8 @@ const generateEmailOtp = async (email, userId = null) => {
     console.log("In AuthService: Generating Email OTP");
 
     // Check if email already exists in User table
-    const existingUser = await prisma.user.findUnique({
-        where: { email }
+    const existingUser = await prisma.user.findFirst({
+        where: { email, ...(userId ? { id: { not: userId } } : {}) }
     });
 
     if (existingUser) {
