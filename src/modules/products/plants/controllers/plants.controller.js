@@ -30,6 +30,47 @@ class PlantController {
         }
     }
 
+    // Get all plant variants
+    static async getAllPlantVariants(req, h) {
+        try {
+            const {
+                page,
+                limit,
+                skip,
+                size,
+                color,
+                minPrice,
+                maxPrice,
+                plantCategory
+            } = req.query;
+
+            const result = await PlantService.getAllPlantVariants({
+                page,
+                limit,
+                skip,
+                size,
+                color,
+                minPrice,
+                maxPrice,
+                plantCategory
+            });
+
+            return h
+                .response({
+                    success: result.success || RESPONSE_FLAGS.SUCCESS,
+                    message: SUCCESS_MESSAGES.PLANTS.FETCHED,
+                    data: result.data
+                })
+                .code(result.code || RESPONSE_CODES.SUCCESS);
+        } catch (err) {
+            return ResponseHandler.handleError(
+                h,
+                err,
+                "Get All Plant Variants Error:"
+            );
+        }
+    }
+
     // Get a single plant by ID
     static async getPlantById(req, h) {
         try {

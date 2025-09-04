@@ -825,6 +825,11 @@ model PlantSizeProfile {
   @@unique([plantId, plantSize]) // Ensures "Small Peace Lily" is defined only once
 }
 
+// plant --> plant size profile --> plant variants
+// plant --> plant variants
+// plant size profile --> PlantCareGuidelines + PlantFertilizerSchedule
+// peace-lily-small-white
+
 model PlantVariants {
   variantId   String @id
   plantId     String

@@ -35,6 +35,72 @@ const getAllPlantsValidation = {
     })
 };
 
+// Validation: Get all plant variants
+const getAllPlantVariantsValidation = {
+    query: Joi.object({
+        page: Joi.number()
+            .integer()
+            .min(1)
+            .default(1)
+            .label("Page Number")
+            .description("Page number for pagination (starts from 1)"),
+
+        limit: Joi.number()
+            .integer()
+            .min(1)
+            .max(100)
+            .default(10)
+            .label("Page Limit")
+            .description("Number of records per page"),
+
+        skip: Joi.number()
+            .integer()
+            .min(0)
+            .optional()
+            .label("Skip Count")
+            .description("Number of records to skip (alternative to page)"),
+
+        size: Joi.string()
+            .trim()
+            .valid("EXTRA_SMALL", "SMALL", "MEDIUM", "LARGE", "EXTRA_LARGE")
+            .optional()
+            .label("Plant Size")
+            .description("Filter variants by size"),
+
+        color: Joi.string()
+            .trim()
+            .min(2)
+            .max(30)
+            .optional()
+            .label("Plant Color")
+            .description("Filter variants by color"),
+
+        minPrice: Joi.number()
+            .min(0)
+            .optional()
+            .label("Minimum Price")
+            .description(
+                "Filter variants with selling price greater than or equal to this value"
+            ),
+
+        maxPrice: Joi.number()
+            .min(0)
+            .optional()
+            .label("Maximum Price")
+            .description(
+                "Filter variants with selling price less than or equal to this value"
+            ),
+
+        plantCategory: Joi.string()
+            .trim()
+            .min(2)
+            .max(50)
+            .optional()
+            .label("Plant Category")
+            .description("Filter variants by plant category name")
+    })
+};
+
 // Validation: Get plant by ID
 const getPlantByIdValidation = {
     params: Joi.object({
@@ -61,6 +127,7 @@ const getPlantByNameValidation = {
 
 module.exports = {
     getAllPlantsValidation,
+    getAllPlantVariantsValidation,
     getPlantByIdValidation,
     getPlantByNameValidation
 };
