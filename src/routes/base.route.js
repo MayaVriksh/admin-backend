@@ -11,8 +11,8 @@ module.exports = {
     register: async (server, _) => {
         server.route([
             ...testRoute,
-            ...plantRoutes,
-            ...customerRoutes
+            ...plantRoutes
+            // ...customerRoutes
             // ...authRoutes,
             // ...notificationRoutes,
             // ...supplierRoutes,
