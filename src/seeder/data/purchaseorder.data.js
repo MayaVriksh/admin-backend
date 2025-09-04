@@ -174,14 +174,19 @@ function generatePurchaseOrderData(
                     };
                 }
                 item.totalCost = item.unitCostPrice * item.unitsRequested;
-                item.isAccepted = Math.random() > 0.2;
+                item.status =
+                    Math.random() > 0.46
+                        ? ORDER_STATUSES.APPROVED
+                        : Math.random() > 0.46
+                          ? ORDER_STATUSES.CANCELLED
+                          : ORDER_STATUSES.REJECTED;
                 item.createdAt = new Date();
                 item.updatedAt = new Date();
                 items.push(item);
             }
 
             const totalItemCost = items
-                .filter((item) => item.isAccepted)
+                .filter((item) => item.status === ORDER_STATUSES.APPROVED)
                 .reduce((sum, item) => sum + item.totalCost, 0);
             const totalCost = totalItemCost + deliveryCharge;
 
