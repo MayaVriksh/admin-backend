@@ -10,11 +10,11 @@ class ResponseHandler {
 
         return h
             .response({
-                success: RESPONSE_FLAGS.FAILURE,
+                success: err.success || RESPONSE_FLAGS.FAILURE,
                 error:
                     err.message || ERROR_MESSAGES.COMMON.INTERNAL_SERVER_ERROR
             })
-            .code(err.statusCode || RESPONSE_CODES.INTERNAL_SERVER_ERROR);
+            .code(err.code || RESPONSE_CODES.INTERNAL_SERVER_ERROR);
     }
 }
 

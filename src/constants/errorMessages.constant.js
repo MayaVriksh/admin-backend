@@ -308,13 +308,13 @@ const ERROR_MESSAGES = {
 
     PLANTS: {
         ALREADY_EXISTS:
-            "🌱 A plant with this name or scientific name already exists.",
-        NOT_FOUND: "🌾 Plant not found.",
-        NOT_FOUND: "❌ Plant not found.",
-        ALREADY_EXISTS:
-            "🚫 Plant with this name or scientific name already exists.",
-        VARIANTS_NOT_FOUND: "❌ Plant variants not found.",
-        MEDIA_UPLOAD_FAILED: "⚠️ Failed to upload plant variant media."
+            "🌱 Oops! A plant with this name (or scientific name) is already growing in our garden.",
+        NOT_FOUND:
+            "🌾 We couldn’t find the plant you’re looking for. Maybe it hasn’t sprouted yet?",
+        VARIANTS_NOT_FOUND:
+            "🍃 No plant variants found. Try exploring other sizes or colors.",
+        MEDIA_UPLOAD_FAILED:
+            "🌻 Uh-oh! Something went wrong while uploading the plant images. Please try again."
     }
 };
 

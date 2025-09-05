@@ -317,19 +317,20 @@ const SUCCESS_MESSAGES = {
     },
 
     PLANTS: {
-        CREATED: "🌱 Plant added to the collection successfully.",
-        FETCHED: "🌼 Plant(s) retrieved successfully.",
-        UPDATED: "🌳 Plant updated successfully.",
-        DELETED: "🍀 Plant removed from the collection gracefully.",
+        CREATED:
+            "🌱 Your plant has been planted in the collection successfully!",
+        FETCHED: "🌼 Plant(s) fetched successfully — blooming nicely.",
+        UPDATED: "🌳 Plant details nurtured and updated successfully.",
+        DELETED: "🍂 Plant removed from the collection peacefully.",
 
         VARIANTS_CREATED:
-            "🌸 Plant with variants and media planted successfully.",
+            "🌸 Plant with its variants and images has been planted successfully.",
         VARIANTS_FETCHED:
-            "🌼 Plant with variants and media is thriving and ready.",
+            "🌼 Plant with variants and images retrieved — it’s thriving!",
         VARIANTS_UPDATED:
-            "🌺 Plant with variants and media refreshed successfully.",
+            "🌺 Plant with variants and images refreshed successfully.",
         VARIANTS_DELETED:
-            "🗑️ Plant with variants and media has been gently removed."
+            "🗑️ Plant with variants and images has been gently uprooted."
     }
 };
 
