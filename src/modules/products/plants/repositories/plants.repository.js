@@ -298,7 +298,7 @@ class PlantRepository {
                                       plantCategories: {
                                           some: {
                                               name: {
-                                                  equals: plantCategory,
+                                                  contains: plantCategory,
                                                   mode: "insensitive"
                                               }
                                           }
@@ -357,7 +357,7 @@ class PlantRepository {
                                       plantCategories: {
                                           some: {
                                               name: {
-                                                  equals: plantCategory,
+                                                  contains: plantCategory,
                                                   mode: "insensitive"
                                               }
                                           }
@@ -401,7 +401,7 @@ class PlantRepository {
                                       plantCategories: {
                                           some: {
                                               name: {
-                                                  equals: plantCategory,
+                                                  contains: plantCategory,
                                                   mode: "insensitive"
                                               }
                                           }
@@ -428,7 +428,7 @@ class PlantRepository {
                                       plantCategories: {
                                           some: {
                                               name: {
-                                                  equals: plantCategory,
+                                                  contains: plantCategory,
                                                   mode: "insensitive"
                                               }
                                           }
@@ -461,7 +461,15 @@ class PlantRepository {
             where: {
                 AND: [
                     ...(size
-                        ? [{ plantVariant: { size: { equals: size } } }]
+                        ? [
+                              {
+                                  plantVariant: {
+                                      size: {
+                                          plantSize: { equals: size }
+                                      }
+                                  }
+                              }
+                          ]
                         : []),
                     ...(color
                         ? [
@@ -469,7 +477,7 @@ class PlantRepository {
                                   plantVariant: {
                                       color: {
                                           name: {
-                                              equals: color,
+                                              contains: color,
                                               mode: "insensitive"
                                           }
                                       }
@@ -502,7 +510,7 @@ class PlantRepository {
                                       plantCategories: {
                                           some: {
                                               name: {
-                                                  equals: plantCategory,
+                                                  contains: plantCategory,
                                                   mode: "insensitive"
                                               }
                                           }
@@ -529,7 +537,15 @@ class PlantRepository {
             where: {
                 AND: [
                     ...(size
-                        ? [{ plantVariant: { size: { equals: size } } }]
+                        ? [
+                              {
+                                  plantVariant: {
+                                      size: {
+                                          plantSize: { equals: size }
+                                      }
+                                  }
+                              }
+                          ]
                         : []),
                     ...(color
                         ? [
@@ -537,7 +553,7 @@ class PlantRepository {
                                   plantVariant: {
                                       color: {
                                           name: {
-                                              equals: color,
+                                              contains: color,
                                               mode: "insensitive"
                                           }
                                       }
@@ -570,7 +586,7 @@ class PlantRepository {
                                       plantCategories: {
                                           some: {
                                               name: {
-                                                  equals: plantCategory,
+                                                  contains: plantCategory,
                                                   mode: "insensitive"
                                               }
                                           }
