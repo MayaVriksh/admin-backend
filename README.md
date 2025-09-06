@@ -3,6 +3,16 @@
 A scalable and well-documented backend API for the Mayavriksh platform, built with **Hapi.js**, **Prisma ORM**, **Swagger for API documentation** and **MySQL** as the database.
 
 ---
+## Cloning Instructions
+
+### Clone repo with submodules
+git clone --recurse-submodules <repo-url>
+
+### If you already cloned without submodules
+git submodule update --init --recursive
+
+### Pull latest changes in submodules
+git submodule update --remote --merge
 
 ## 🛠 Tech Stack
 
