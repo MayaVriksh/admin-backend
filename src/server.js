@@ -2,7 +2,7 @@
  * Entry point: starts the server and handles process-level events.
  */
 
-require("dotenv").config();
+require("dotenv").config({ path: ".env.local" });
 const createServer = require("./app");
 
 const startServer = async () => {

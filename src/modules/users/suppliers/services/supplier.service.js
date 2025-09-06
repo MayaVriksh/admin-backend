@@ -594,7 +594,7 @@ const reviewPurchaseOrder = async ({ userId, orderId, reviewData }) => {
                         PurchaseOrderItems: {
                             select: {
                                 id: true,
-                                isAccepted: true, // This will be the new true/false value
+                                status:ORDER_STATUSES.APPROVED, 
                                 productType: true
                                 // Add any other item fields your 'View Items' modal needs
                             }

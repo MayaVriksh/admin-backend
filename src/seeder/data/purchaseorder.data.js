@@ -152,7 +152,7 @@ function generatePurchaseOrderData(
                     item = {
                         id: uuidv4(),
                         productType: PRODUCT_TYPES.PLANT,
-                        plantId: plant.plantId,
+                        plantId: variant.plantId,
                         plantVariantId: variant.variantId,
                         potCategoryId: null,
                         potVariantId: null,
@@ -167,7 +167,7 @@ function generatePurchaseOrderData(
                         productType: PRODUCT_TYPES.POT,
                         plantId: null,
                         plantVariantId: null,
-                        potCategoryId: category.categoryId,
+                        potCategoryId: variant.categoryId,
                         potVariantId: variant.potVariantId,
                         unitsRequested: 3 + j,
                         unitCostPrice: 60 + j * 4

@@ -1,130 +1,142 @@
 const { prisma } = require("../../config/prisma.config");
 const { v4: uuidv4 } = require("uuid");
 
+/**
+ * Seed Plant Warehouse Inventory
+ */
 async function seedPlantWarehouseInventory() {
-    const warehouses = await prisma.warehouse.findMany();
-    const plants = await prisma.plants.findMany();
-    const plantVariants = await prisma.plantVariants.findMany();
+    await prisma.plantWarehouseInventory.deleteMany();
+    await prisma.potWarehouseInventory.deleteMany();
 
-    if (!warehouses.length) throw new Error("❌ No warehouses found.");
-    if (!plants.length) {
-        console.warn("⚠️ No plants found.");
-        return;
-    }
+    const warehouse = await prisma.warehouse.findFirst({
+        where: {
+            supplier: {
+                some: {
+                    contactPerson: {
+                        is: {
+                            email: "restaurant@gmail.com"
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    if (!warehouse) throw new Error("❌ No warehouses found.");
+
+    const plantVariants = await prisma.plantVariants.findMany();
     if (!plantVariants.length) {
         console.warn("⚠️ No plant variants found.");
         return;
     }
 
-    for (const warehouse of warehouses) {
-        const tasks = plantVariants.map(async (variant) => {
-            const plant = plants.find((p) => p.plantId === variant.plantId);
-            if (!plant) return;
-
-            const existing = await prisma.plantWarehouseInventory.findUnique({
-                where: {
-                    plantId_variantId_warehouseId: {
-                        plantId: plant.plantId,
-                        variantId: variant.variantId,
-                        warehouseId: warehouse.warehouseId
-                    }
-                }
-            });
-
-            if (existing) {
-                console.log(
-                    `⚠️ Plant Inventory exists for Plant '${plant.name}', Variant '${variant.variantName}', Warehouse '${warehouse.name}'`
-                );
-                return;
-            }
-
-            await prisma.plantWarehouseInventory.create({
-                data: {
-                    id: uuidv4(),
-                    plantId: plant.plantId,
+    for (const variant of plantVariants) {
+        const existing = await prisma.plantWarehouseInventory.findUnique({
+            where: {
+                plantId_variantId_warehouseId: {
+                    plantId: variant.plantId,
                     variantId: variant.variantId,
-                    warehouseId: warehouse.warehouseId,
-                    stockIn: 0,
-                    stockOut: 0,
-                    stockLossCount: 0,
-                    latestQuantityAdded: 0,
-                    currentStock: 0,
-                    reservedUnit: 0,
-                    totalCost: 0.0,
-                    trueCostPrice: 0.0
+                    warehouseId: warehouse.warehouseId
                 }
-            });
+            }
         });
 
-        await Promise.all(tasks);
+        if (existing) {
+            console.log(
+                `⚠️ Plant Inventory exists for PlantId '${variant.plantId}', Variant '${variant.variantName}', Warehouse '${warehouse.name}'`
+            );
+            continue;
+        }
+
+        await prisma.plantWarehouseInventory.create({
+            data: {
+                id: uuidv4(),
+                plantId: variant.plantId,
+                variantId: variant.variantId,
+                warehouseId: warehouse.warehouseId,
+                stockIn: 50, // dummy: total added
+                stockOut: 20, // dummy: sold/used
+                stockLossCount: 5, // dummy: lost/damaged
+                latestQuantityAdded: 10, // dummy: last purchase
+                currentStock: 25, // dummy: available now
+                reservedUnit: 3, // dummy: reserved for orders
+                totalCost: 1250.75, // dummy: total purchase cost
+                trueCostPrice: 50.03 // dummy: cost per unit
+            }
+        });
     }
 
     console.log("✅ Plant warehouse inventory seeded.");
 }
 
+/**
+ * Seed Pot Warehouse Inventory
+ */
 async function seedPotWarehouseInventory() {
-    const warehouses = await prisma.warehouse.findMany();
-    const potCategories = await prisma.potCategory.findMany();
-    const potVariants = await prisma.potVariants.findMany();
+    const warehouse = await prisma.warehouse.findFirst({
+        where: {
+            supplier: {
+                some: {
+                    contactPerson: {
+                        is: {
+                            email: "restaurant@gmail.com"
+                        }
+                    }
+                }
+            }
+        }
+    });
 
-    if (!warehouses.length) throw new Error("❌ No warehouses found.");
-    if (!potCategories.length) {
-        console.warn("⚠️ No pot categories found.");
-        return;
-    }
+    if (!warehouse) throw new Error("❌ No warehouses found.");
+
+    const potVariants = await prisma.potVariants.findMany();
     if (!potVariants.length) {
         console.warn("⚠️ No pot variants found.");
         return;
     }
 
-    for (const warehouse of warehouses) {
-        const tasks = potVariants.map(async (variant) => {
-            const category = potCategories.find(
-                (c) => c.categoryId === variant.categoryId
-            );
-            if (!category) return;
-
-            const existing = await prisma.potWarehouseInventory.findUnique({
-                where: {
-                    potCategoryId_potVariantId_warehouseId: {
-                        potCategoryId: category.categoryId,
-                        potVariantId: variant.potVariantId,
-                        warehouseId: warehouse.warehouseId
-                    }
-                }
-            });
-
-            if (existing) {
-                console.log(
-                    `⚠️ Pot Inventory exists for Category '${category.name}', Variant '${variant.potName}', Warehouse '${warehouse.name}'`
-                );
-                return;
-            }
-
-            await prisma.potWarehouseInventory.create({
-                data: {
-                    id: uuidv4(),
-                    potCategoryId: category.categoryId,
+    for (const variant of potVariants) {
+        const existing = await prisma.potWarehouseInventory.findUnique({
+            where: {
+                potCategoryId_potVariantId_warehouseId: {
+                    potCategoryId: variant.categoryId,
                     potVariantId: variant.potVariantId,
-                    warehouseId: warehouse.warehouseId,
-                    stockIn: 0,
-                    stockOut: 0,
-                    stockLossCount: 0,
-                    latestQuantityAdded: 0,
-                    currentStock: 0,
-                    reservedUnit: 0,
-                    totalCost: 0.0,
-                    trueCostPrice: 0.0
+                    warehouseId: warehouse.warehouseId
                 }
-            });
+            }
         });
 
-        await Promise.all(tasks);
+        if (existing) {
+            console.log(
+                `⚠️ Pot Inventory exists for CategoryId '${variant.categoryId}', Variant '${variant.potName}', Warehouse '${warehouse.name}'`
+            );
+            continue;
+        }
+
+        await prisma.potWarehouseInventory.create({
+            data: {
+                id: uuidv4(),
+                potCategoryId: variant.categoryId,
+                potVariantId: variant.potVariantId,
+                warehouseId: warehouse.warehouseId,
+                stockIn: 80, // dummy: total added
+                stockOut: 30, // dummy: sold/used
+                stockLossCount: 2, // dummy: lost/damaged
+                latestQuantityAdded: 15, // dummy: last purchase
+                currentStock: 33, // dummy: available now
+                reservedUnit: 6, // dummy: reserved for orders
+                totalCost: 2200.5, // dummy: total purchase cost
+                trueCostPrice: 66.67 // dummy: cost per unit
+            }
+        });
     }
 
     console.log("✅ Pot warehouse inventory seeded.");
 }
 
+/**
+ * Seed both Plant + Pot Warehouse Inventories
+ */
 async function seedWarehouseInventory() {
     try {
         console.log("📦 Seeding Warehouse Inventories...");

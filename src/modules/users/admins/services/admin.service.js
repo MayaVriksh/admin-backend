@@ -277,7 +277,7 @@ const recordPaymentForOrder = async ({
     paidByUserId,
     paymentDetails, // Contains amount (optional), remarks, paymentMethod, transactionId
     receiptFile,
-    remarks,
+    remarks
 }) => {
     let uploadedReceipt = null; // To hold upload data for potential rollback
 
@@ -286,7 +286,12 @@ const recordPaymentForOrder = async ({
         // Before any writes or file uploads, fetch the authoritative state from the DB.
         const order = await prisma.purchaseOrder.findUnique({
             where: { id: orderId },
-            select: { totalCost: true, pendingAmount: true, status: true, isAccepted: true }
+            select: {
+                totalCost: true,
+                pendingAmount: true,
+                status: true,
+                isAccepted: true
+            }
         });
 
         const checkUserActive = await prisma.User.findUnique({
@@ -304,7 +309,11 @@ const recordPaymentForOrder = async ({
             throw { code: 404, message: "Purchase Order not found." };
         }
         if (!order.isAccepted || order.status === "PENDING") {
-            throw { code: 400, message: "Payment cannot be made until the supplier has accepted the order." };
+            throw {
+                code: 400,
+                message:
+                    "Payment cannot be made until the supplier has accepted the order."
+            };
         }
         const currentPending = order.pendingAmount ?? order.totalCost;
         if (currentPending <= 0) {
@@ -313,9 +322,10 @@ const recordPaymentForOrder = async ({
 
         // --- STEP 3: SECURELY DETERMINE & VALIDATE PAYMENT AMOUNT ---
         // Never trust the amount sent from the client for a "Full Payment".
-        const amountToPay = remarks === 'FULL_PAYMENT' 
-            ? currentPending 
-            : Number(paymentDetails.amount);
+        const amountToPay =
+            remarks === "FULL_PAYMENT"
+                ? currentPending
+                : Number(paymentDetails.amount);
 
         // This is the CRITICAL overpayment check.
         if (amountToPay > currentPending) {
@@ -332,30 +342,39 @@ const recordPaymentForOrder = async ({
                 folder: `admins/receipts/PCOD_${orderId}`,
                 publicIdPrefix: `receipt_${Date.now()}`
             });
-            if (!uploadResult.success) throw new Error("Receipt upload failed.");
+            if (!uploadResult.success)
+                throw new Error("Receipt upload failed.");
             uploadedReceipt = uploadResult.data; // Save for DB and potential rollback
         }
 
         // --- STEP 5: EXECUTE ALL DATABASE WRITES IN A SINGLE ATOMIC TRANSACTION ---
         const updatedOrder = await prisma.$transaction(async (tx) => {
             // A. Count previous installments to generate the correct new remark.
-            const existingInstallmentCount = await tx.purchaseOrderPayment.count({
-                where: { orderId: orderId, remarks: { startsWith: 'INSTALLMENT' } }
-            });
-            
-            const finalRemarks = remarks === 'INSTALLMENT'
-                ? `INSTALLMENT_${existingInstallmentCount + 1}`
-                : 'COMPLETED';
+            const existingInstallmentCount =
+                await tx.purchaseOrderPayment.count({
+                    where: {
+                        orderId: orderId,
+                        remarks: { startsWith: "INSTALLMENT" }
+                    }
+                });
 
+            const finalRemarks =
+                remarks === "INSTALLMENT"
+                    ? `INSTALLMENT_${existingInstallmentCount + 1}`
+                    : "COMPLETED";
 
             // C. Securely calculate the new financial state for the Purchase Order.
             const newPendingAmount = currentPending - amountToPay;
             const totalPaid = Number(order.totalCost) - newPendingAmount;
-            const newPaymentPercentage = Math.min(100, Math.round((totalPaid / Number(order.totalCost)) * 100));
-            const newPaymentStatus = newPendingAmount <= 0 ? "PAID" : "PARTIALLY_PAID";
-            console.log(currentPending)
-            console.log(amountToPay)
-            console.log(newPendingAmount)
+            const newPaymentPercentage = Math.min(
+                100,
+                Math.round((totalPaid / Number(order.totalCost)) * 100)
+            );
+            const newPaymentStatus =
+                newPendingAmount <= 0 ? "PAID" : "PARTIALLY_PAID";
+            console.log(currentPending);
+            console.log(amountToPay);
+            console.log(newPendingAmount);
 
             // B. Create the new payment record.
             await tx.purchaseOrderPayment.create({
@@ -379,7 +398,7 @@ const recordPaymentForOrder = async ({
                 where: { id: orderId },
                 data: {
                     pendingAmount: newPendingAmount,
-                    paymentPercentage: newPaymentPercentage,
+                    paymentPercentage: newPaymentPercentage
                 }
             });
         });
@@ -390,7 +409,6 @@ const recordPaymentForOrder = async ({
             message: "Payment recorded successfully.",
             data: updatedOrder
         };
-
     } catch (err) {
         // If any step fails and a file was uploaded, delete it from Cloudinary.
         if (uploadedReceipt?.publicId) {
@@ -631,18 +649,42 @@ const restockInventory = async ({
         async (tx) => {
             // Step 1: Fetch trusted Purchase Order and accepted items from the DB.
             const order = await tx.purchaseOrder.findFirst({
-                where: { id: orderId, status: "DELIVERED" },
-                include: { PurchaseOrderItems: { where: { isAccepted: true } } }
+                where: { id: orderId },
+                include: {
+                    PurchaseOrderItems: {
+                        where: { status: ORDER_STATUSES.APPROVED }
+                    }
+                }
             });
 
             if (!order)
                 throw { code: 404, message: "Purchase Order not found." };
-            if (order.status !== "DELIVERED")
+            if (order.status !== ORDER_STATUSES.DELIVERED)
                 throw {
                     code: 400,
                     message: "Order must be in 'DELIVERED' status."
                 };
             console.log("Check Passed");
+
+            // ################# This function is used temporarily for finding the warehouse linked with "restaurant@gmail.com"
+            // ################# This will be removed in future and warehouse ID will be taken from the order details itself.
+
+            const warehouses = await prisma.warehouse.findFirst({
+                where: {
+                    supplier: {
+                        some: {
+                            contactPerson: {
+                                is: {
+                                    email: "restaurant@gmail.com"
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // ################ Later this will be changed to "order.warehouseId"
+            const warehouseId = warehouses.warehouseId;
 
             // Step 2: Loop through each item submitted by the manager.
             for (const receivedItem of payload.items) {
@@ -679,6 +721,7 @@ const restockInventory = async ({
                     //     publicId = uploadResult.data.publicId;
                     // }
                 }
+
                 const damageData = {
                     damageId: uuidv4(),
                     purchaseOrderId: originalItem.purchaseOrderId,
@@ -686,7 +729,7 @@ const restockInventory = async ({
                     plantVariantId: originalItem?.plantVariantId,
                     potCategoryId: originalItem?.potCategoryId,
                     potVariantId: originalItem?.potVariantId,
-                    warehouseId: order.warehouseId,
+                    warehouseId,
                     purchaseOrderItemId: originalItem.id,
                     handledById: handledById,
                     handledBy: handledBy,
@@ -728,7 +771,8 @@ const restockInventory = async ({
 
                 // Only update inventory if there's something to add
                 if (usableUnits > 0) {
-                    const { warehouseId } = order;
+                    // console.log("Warehouse id: ", warehouses.warehouseId);
+
                     const {
                         productType,
                         unitCostPrice,
@@ -841,8 +885,7 @@ const restockInventory = async ({
                                       potVariant: {
                                           connect: { id: potVariantId }
                                       }
-                                  }),
-                            warehouse: { connect: { warehouseId } }
+                                  })
                         };
                     }
 
@@ -941,21 +984,27 @@ const addItemToWarehouseCart = async (payload) => {
         prisma.supplier.findUnique({
             where: { supplierId: payload.supplierId },
             select: { supplierId: true }
-        }),
+        })
     ]);
 
     // --- Step 2: Handle Edge Cases with Clear Error Messages ---
-    
+
     // Edge Case: The specified warehouse doesn't exist.
     if (!warehouse) {
-        throw { code: 404, message: `Validation failed: Warehouse with ID '${payload.warehouseId}' not found.` };
+        throw {
+            code: 404,
+            message: `Validation failed: Warehouse with ID '${payload.warehouseId}' not found.`
+        };
     }
 
     // Edge Case: The specified supplier doesn't exist.
     if (!supplier) {
-        throw { code: 404, message: `Validation failed: Supplier with ID '${payload.supplierId}' not found.` };
+        throw {
+            code: 404,
+            message: `Validation failed: Supplier with ID '${payload.supplierId}' not found.`
+        };
     }
-    
+
     // (Future Enhancement: You could add a check here to ensure the selected supplier is authorized to supply this specific variant.)
 
     // --- Step 3: Proceed with the Database Write Operation ---
@@ -979,7 +1028,8 @@ const addItemToWarehouseCart = async (payload) => {
 const getWarehouseCart = async (warehouseId) => {
     // 1. Fetch the flat list of all cart items for the warehouse from the repository.
     // This query is efficient and includes the supplier and variant details.
-    const flatCartItems = await adminRepo.findCartItemsByWarehouseId(warehouseId);
+    const flatCartItems =
+        await adminRepo.findCartItemsByWarehouseId(warehouseId);
 
     if (!flatCartItems || flatCartItems.length === 0) {
         return {
@@ -992,10 +1042,10 @@ const getWarehouseCart = async (warehouseId) => {
     // --- 2.Transform the data on the backend ---
     let grandTotal = 0;
     console.log(flatCartItems);
-    
+
     const groupedBySupplier = flatCartItems.reduce((acc, item) => {
         const supplierName = item.supplier.nurseryName;
-        
+
         // If this is the first time we've seen this supplier, create an entry, and an Array of Cart Items for that Supplier.
         if (!acc[supplierName]) {
             acc[supplierName] = {
@@ -1005,10 +1055,11 @@ const getWarehouseCart = async (warehouseId) => {
                 subtotal: 0
             };
         }
-        console.log()
-        const itemTotal = Number(item.unitsRequested) * Number(item.unitCostPrice);
+        console.log();
+        const itemTotal =
+            Number(item.unitsRequested) * Number(item.unitCostPrice);
 
-        const isPlant = item.productType === 'PLANT';
+        const isPlant = item.productType === "PLANT";
         const variant = isPlant ? item.plantVariant : item.potVariant; // variant object from DB
 
         // Defensive extraction: Prisma returns `plants` in the select, not `plant`.
@@ -1023,25 +1074,25 @@ const getWarehouseCart = async (warehouseId) => {
                 itemTotalCost: itemTotal,
                 variantId: isPlant ? item.plantVariantId : item.potVariantId,
                 sku: null,
-                name: 'Unknown variant',
+                name: "Unknown variant",
                 imageUrl: null
             });
             acc[supplierName].subtotal += itemTotal;
             return acc;
         }
 
-        const plantName = variant.plants?.name ?? variant.plant?.name ?? '';
-        const plantSize = variant.size?.plantSize ?? variant.size ?? '';
-        const colorName = variant.color?.name ?? '';
-        const potName = variant.potName ?? '';
+        const plantName = variant.plants?.name ?? variant.plant?.name ?? "";
+        const plantSize = variant.size?.plantSize ?? variant.size ?? "";
+        const colorName = variant.color?.name ?? "";
+        const potName = variant.potName ?? "";
 
         const name = isPlant
-            ? `${plantName}${plantSize ? ' - ' + plantSize : ''}${colorName ? ', ' + colorName : ''}`
-            : `${potName}${plantSize ? ' - ' + plantSize : ''}${colorName ? ', ' + colorName : ''}`;
+            ? `${plantName}${plantSize ? " - " + plantSize : ""}${colorName ? ", " + colorName : ""}`
+            : `${potName}${plantSize ? " - " + plantSize : ""}${colorName ? ", " + colorName : ""}`;
 
         const imageUrl = isPlant
-            ? variant.plantVariantImages?.[0]?.mediaUrl ?? null
-            : variant.images?.[0]?.mediaUrl ?? null;
+            ? (variant.plantVariantImages?.[0]?.mediaUrl ?? null)
+            : (variant.images?.[0]?.mediaUrl ?? null);
 
         // Add the transformed item to this supplier's group.
         acc[supplierName].items.push({
@@ -1058,13 +1109,13 @@ const getWarehouseCart = async (warehouseId) => {
 
         // Update the subtotal for this suppliers Total Items.
         acc[supplierName].subtotal += itemTotal;
-        
+
         return acc;
     }, {});
 
     // 3. Convert the grouped object into an array and calculate the grand total.
     const supplierCarts = Object.values(groupedBySupplier);
-    supplierCarts.forEach(cart => {
+    supplierCarts.forEach((cart) => {
         grandTotal += cart.subtotal;
     });
 
@@ -1083,7 +1134,8 @@ const getWarehouseCart = async (warehouseId) => {
 
 const createPurchaseOrderFromCart = async (payload) => {
     // The payload from the client is simple and secure
-    const { warehouseId, supplierId, expectedDateOfArrival, deliveryCharges } = payload;
+    const { warehouseId, supplierId, expectedDateOfArrival, deliveryCharges } =
+        payload;
 
     return await prisma.$transaction(async (tx) => {
         // Step 1: Fetch the trusted cart items for this specific warehouse AND supplier.
@@ -1093,22 +1145,26 @@ const createPurchaseOrderFromCart = async (payload) => {
                 supplierId: supplierId // The crucial filter
             }
         });
-        console.log("trustedCartItems",trustedCartItems);
-        
+        console.log("trustedCartItems", trustedCartItems);
+
         // --- Edge Case Handling ---
         if (trustedCartItems.length === 0) {
-            throw { code: 400, message: `The cart for this warehouse has no items for the selected supplier.` };
+            throw {
+                code: 400,
+                message: `The cart for this warehouse has no items for the selected supplier.`
+            };
         }
 
         // Step 2: Securely calculate all costs on the backend using only trusted data.
         let itemsTotalCost = 0;
-        const processedItems = trustedCartItems.map(item => {
-            const totalItemCost = Number(item.unitsRequested) * Number(item.unitCostPrice);
+        const processedItems = trustedCartItems.map((item) => {
+            const totalItemCost =
+                Number(item.unitsRequested) * Number(item.unitCostPrice);
             itemsTotalCost += totalItemCost;
             return { ...item, totalCost: totalItemCost };
         });
 
-        console.log("processedItems",processedItems);
+        console.log("processedItems", processedItems);
         const finalTotalCost = itemsTotalCost + (deliveryCharges || 0);
 
         // Step 3: Prepare the data for the main PurchaseOrder.
@@ -1120,13 +1176,17 @@ const createPurchaseOrderFromCart = async (payload) => {
             deliveryCharges,
             totalCost: finalTotalCost,
             pendingAmount: finalTotalCost,
-            status: 'PENDING'
+            status: "PENDING"
         };
 
-        console.log("orderData",orderData);
+        console.log("orderData", orderData);
 
         // Step 4: Call the repository to create the order and its items.
-        const newPurchaseOrder = await adminRepo.createOrderAndItems(orderData, processedItems, tx);
+        const newPurchaseOrder = await adminRepo.createOrderAndItems(
+            orderData,
+            processedItems,
+            tx
+        );
 
         // Step 5: Clear ONLY the items for this specific supplier from the cart.
         await tx.warehouseCartItem.deleteMany({
@@ -1158,6 +1218,5 @@ module.exports = {
     restockInventory,
     addItemToWarehouseCart,
     getWarehouseCart,
-    createPurchaseOrderFromCart,
-
+    createPurchaseOrderFromCart
 };
