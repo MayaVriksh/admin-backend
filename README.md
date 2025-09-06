@@ -69,9 +69,16 @@ Quick access to the official docs for all major technologies used in this projec
 4. **Install dependencies**
 
     ```
-    npm install
+    For Installing Bun in Mac:
+    curl -fsSL https://bun.sh/install | bash
+    For Windows:
+    npm install -g bun
     ```
-
+    ```
+    For running Bun:
+    bun i
+    bun --watch src/server.ts
+    ```
     > ℹ️ This will also automatically run `prisma generate` due to the `postinstall` script in `package.json`.
 
 5. **Set up your `.env` file**
