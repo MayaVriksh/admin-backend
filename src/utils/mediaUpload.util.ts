@@ -1,6 +1,7 @@
-import fssync, { promises as fs } from 'fs';
+import * as fssync from 'fs';
+import { promises as fs } from 'fs';
 import mime from 'mime-types';
-import path from 'path';
+import * as path from 'path';
 import * as ERROR_MESSAGES from '../constants/errorMessages.constant';
 import { RESPONSE_FLAGS } from '../constants/responseCodes.constant';
 import { getCloudinaryTransformation } from '../utils/file.utils';
@@ -64,13 +65,17 @@ const uploadBufferToCloudinary = async (
             try {
                 await fs.unlink(tempPath);
             } catch (cleanupErr) {
-                console.warn("Temp file cleanup failed:", cleanupErr.message);
+                console.warn(
+                    "Temp file cleanup failed:",
+                    (cleanupErr instanceof Error ? cleanupErr.message : String(cleanupErr))
+                );
             }
         }
 
+        const e: any = err;
         return {
             success: RESPONSE_FLAGS.FAILURE,
-            error: `${ERROR_MESSAGES.CLOUDINARY.UPLOAD_FAILED} (${error.message})`
+            error: `${ERROR_MESSAGES.CLOUDINARY.UPLOAD_FAILED} (${e.message})`
         };
     }
 };
