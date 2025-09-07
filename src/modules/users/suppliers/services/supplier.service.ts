@@ -1,4 +1,4 @@
-import util from 'util';
+import * as util from 'util';
 import { v4 as uuidv4 } from 'uuid';
 import { prisma } from '../../../../config/prisma.config';
 import { SUPPLIER } from '../../../../constants/emailSubjects.constants';
@@ -11,6 +11,7 @@ import SUCCESS_MESSAGES from '../../../../constants/successMessages.constant';
 import supplierProfileSubmittedTemplate from '../../../../email-templates/supplier/supplierProfileSubmitted.template';
 import { sendEmail } from '../../../../utils/email.util';
 import * as supplierRepository from '../repositories/supplier.repository';
+import { orderEvents } from '../../../../events/order.events';
 
 const showSupplierProfile = async (userId) => {
     const profile = await prisma.supplier.findUnique({
@@ -191,7 +192,7 @@ const completeSupplierProfile = async (
         "j6362254@gmail.com",
         SUPPLIER.APPLICATION_RECEIVED,
         supplierProfileSubmittedTemplate({
-            contactName: supplierDetails?.contactPerson?.fullName[FIRST_NAME],
+            contactName: supplierDetails?.contactPerson?.fullName?.[FIRST_NAME] ?? "",
             nurseryName: supplierDetails?.nurseryName
         })
     );
@@ -332,11 +333,11 @@ const listSupplierOrders = async ({
         // --- Object 2: For the "View Payments Modal" ---
         let runningTotalPaid = 0;
         const paymentHistory = order.payments.map((payment) => {
-            runningTotalPaid += payment.amount;
+            runningTotalPaid += payment.amount.toNumber();
             return {
                 paidAmount: payment.amount,
                 pendingAmountAfterPayment:
-                    (order.totalCost || 0) - runningTotalPaid,
+                    Number(order.totalCost || 0) - runningTotalPaid,
                 paymentMethod: payment.paymentMethod,
                 paymentStatus: payment.status,
                 receiptUrl: payment.receiptUrl,
@@ -643,7 +644,7 @@ const getOrderRequestByOrderId = async ({ userId, orderId }) => {
                     unitsRequested: true,
                     unitCostPrice: true,
                     plant: { select: { name: true } },
-                    isAccepted: true
+                    status: true
                 }
             },
             payments: {
@@ -702,11 +703,11 @@ const getSupplierOrderHistory = async ({
         let runningTotalPaid = 0;
         // ... transform payment history ...
         const paymentHistory = order.payments.map((payment) => {
-            runningTotalPaid += payment.amount;
+            runningTotalPaid += Number(payment.amount);
             return {
                 paidAmount: payment.amount,
                 pendingAmountAfterPayment:
-                    (order.totalCost || 0) - runningTotalPaid,
+                    Number(order.totalCost || 0) - runningTotalPaid,
                 paymentMethod: payment.paymentMethod,
                 paymentStatus: payment.status,
                 receiptUrl: payment.receiptUrl,
@@ -736,7 +737,7 @@ const getSupplierOrderHistory = async ({
                 ? item.plantVariant?.plantVariantImages[0]?.mediaUrl
                 : item.potVariant?.images[0]?.mediaUrl;
             const productVariantType = item.productType;
-            const isAccepted = item.isAccepted;
+            const isAccepted = item.status;
             // Return the new, simplified item object
             return {
                 id: item.id,
@@ -760,9 +761,9 @@ const getSupplierOrderHistory = async ({
                 name: order.supplier?.nurseryName ?? "N/A",
                 gstin: order.supplier?.gstin ?? "N/A",
                 address:
-                    order.supplier?.user?.address ?? "Address not available",
+                    order.supplier?.contactPerson?.address ?? "Address not available",
                 phoneNumber:
-                    order.supplier?.user?.phoneNumber ??
+                    order.supplier?.contactPerson?.phoneNumber ??
                     "phoneNumber not available"
             },
             warehouse: {
@@ -866,7 +867,15 @@ const searchWarehousesByName = async (search) => {
 };
 
 export {
-    completeSupplierProfile, getOrderRequestByOrderId, getSupplierOrderHistory, listAllWarehouses,
-    listSupplierOrders, reviewPurchaseOrder, showSupplierProfile, updateSupplierProfile, uploadQcMediaForOrder
+    completeSupplierProfile,
+    getOrderRequestByOrderId,
+    getSupplierOrderHistory,
+    listAllWarehouses,
+    listSupplierOrders,
+    reviewPurchaseOrder,
+    showSupplierProfile,
+    updateSupplierProfile,
+    uploadQcMediaForOrder,
+    searchWarehousesByName
 };
 

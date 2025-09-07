@@ -9,7 +9,7 @@ require("dotenv").config();
 // =============================
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST || "smtp.gmail.com",
-    port: parseInt(process.env.EMAIL_PORT, 10) || 465,
+    port: parseInt(process.env.EMAIL_PORT || '465', 10) || 465,
     secure: process.env.EMAIL_SECURE === "true", // SSL for 465
     auth: {
         user: process.env.EMAIL_USER, // Gmail address
@@ -51,7 +51,7 @@ const sendEmail = async (to, subject, html, retries = 2) => {
                     success: RESPONSE_FLAGS.FAILURE,
                     code: RESPONSE_CODES.INTERNAL_SERVER_ERROR,
                     message: ERROR_MESSAGES.EMAIL.SEND_FAILED,
-                    details: error.message
+                    details: (error as any)?.message
                 };
             }
 
@@ -64,13 +64,16 @@ const sendEmail = async (to, subject, html, retries = 2) => {
 // =============================
 // Optional Queue for Batch Emails
 // =============================
-const emailQueue = [];
-const queueEmail = (emailOptions) => emailQueue.push(emailOptions);
+const emailQueue: any[] = [];
+const queueEmail = (emailOptions: any) => emailQueue.push(emailOptions);
 
 const processQueue = async () => {
     while (emailQueue.length > 0) {
         const email = emailQueue.shift();
-        await sendEmail(email);
+        // email is expected to be an object: { to, subject, html }
+        if (email && typeof email === 'object') {
+            await sendEmail(email.to, email.subject, email.html);
+        }
     }
 };
 

@@ -1,5 +1,5 @@
 import { promises as fs } from 'fs';
-import path from 'path';
+import * as path from 'path';
 import cloudinary from '../config/cloudinary.config';
 import * as ERROR_MESSAGES from '../constants/errorMessages.constant';
 import SUCCESS_MESSAGES from '../constants/successMessages.constant';
@@ -25,7 +25,7 @@ const uploadToCloudinary = async (
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
-            const options = {
+            const options: any = {
                 folder,
                 use_filename: true,
                 unique_filename: false
@@ -53,9 +53,10 @@ const uploadToCloudinary = async (
             try {
                 await fs.unlink(localFilePath);
             } catch (unlinkError) {
+                const ue: any = unlinkError;
                 console.warn(
                     `File uploaded but failed to delete local file "${fileName}":`,
-                    unlinkError.message
+                    ue?.message
                 );
             }
 
@@ -71,15 +72,17 @@ const uploadToCloudinary = async (
             };
         } catch (error) {
             if (attempt === MAX_RETRIES) {
+                const e: any = error;
                 return {
                     success: false,
-                    error: `${ERROR_MESSAGES.CLOUDINARY.UPLOAD_FAILED} (${error.message})`
+                    error: `${ERROR_MESSAGES.CLOUDINARY.UPLOAD_FAILED} (${e?.message})`
                 };
             }
 
+            const e: any = error;
             console.warn(
                 `Upload attempt ${attempt} failed. Retrying...`,
-                error.message
+                e?.message
             );
         }
     }
@@ -107,12 +110,13 @@ const deleteFromCloudinary = async (publicId, resourceType = "image") => {
                 ? SUCCESS_MESSAGES.CLOUDINARY.DELETE_SUCCESS
                 : ERROR_MESSAGES.CLOUDINARY.DELETE_FAILED
         };
-    } catch (error) {
-        return {
-            success: false,
-            error: `${ERROR_MESSAGES.CLOUDINARY.DELETE_FAILED} (${error.message})`
-        };
-    }
+        } catch (error) {
+            const e: any = error;
+            return {
+                success: false,
+                error: `${ERROR_MESSAGES.CLOUDINARY.DELETE_FAILED} (${e?.message})`
+            };
+        }
 };
 
 export {

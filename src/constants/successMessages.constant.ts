@@ -247,18 +247,6 @@ export default  {
             "Your password has been reset with care 🌼 You’re ready to log in again!"
     },
 
-    NOTIFICATIONS: {
-        NOTIFICATION_SENT: "Your update has been delivered with a breeze 🍃",
-        NEWSLETTER_SUBSCRIBED:
-            "You’ve subscribed to fresh updates 🌻 Expect some sunshine in your inbox!"
-    },
-
-    CART: {
-        CART_ITEM_ADDED: "Added to your cart with care 🛒🌿",
-        CART_ITEM_REMOVED:
-            "Removed from your cart 🍂 Safe travels, little leaf!"
-    },
-
     WISHLIST: {
         WISHLIST_ITEM_ADDED:
             "Added to your wishlist 🌟 One step closer to blooming joy!",
@@ -298,6 +286,8 @@ export default  {
     NOTIFICATIONS: {
         FETCHED:
             "Your notifications have bloomed 🌸 Here are the latest updates!",
+        NEWSLETTER_SUBSCRIBED:
+            "You’ve subscribed to fresh updates 🌻 Expect some sunshine in your inbox!",
         NOTIFICATION_SENT:
             "The notification has been delivered with a gentle breeze 🍃",
         NOTIFICATION_READ:

@@ -1,9 +1,9 @@
-import EventEmitter from 'events';
+const EventEmitter = require('events');
 import { prisma } from '../config/prisma.config'; // Adjust path as needed
 import { sendEmail } from '../utils/email.util';
 
-class OrderEventEmitter extends EventEmitter {}
-export const orderEvents = new OrderEventEmitter();
+class OrderEventEmitter extends EventEmitter.EventEmitter {}
+export const orderEvents = new EventEmitter.EventEmitter();
 
 // --- Listen for the 'order.reviewed' event ---
 orderEvents.on("order.reviewed", async ({ orderId, newTotalCost }) => {
@@ -53,12 +53,8 @@ orderEvents.on("order.reviewed", async ({ orderId, newTotalCost }) => {
             <p>The Maya Vriksh Team</p>
         `;
 
-        // 3. Send the email
-        await sendEmail({
-            to: recipientEmail,
-            subject: subject,
-            html: htmlBody
-        });
+    // 3. Send the email
+    await sendEmail(recipientEmail, subject, htmlBody);
     } catch (error) {
         console.error(
             `Failed to process 'order.reviewed' event for order ${orderId}:`,

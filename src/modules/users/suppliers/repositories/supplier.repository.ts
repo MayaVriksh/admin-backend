@@ -262,13 +262,13 @@ const updateOrderAfterReview = async ({
     // Mark rejected items as not accepted
     await tx.purchaseOrderItems.updateMany({
         where: { id: { in: rejectedItemIds }, purchaseOrderId: orderId },
-        data: { isAccepted: false }
+        data: { status: ORDER_STATUSES.REJECTED }
     });
 
     // Mark all other items as accepted. Can be removed, as in DB they all will be marked as accepted by default
     await tx.purchaseOrderItems.updateMany({
         where: { id: { notIn: rejectedItemIds }, purchaseOrderId: orderId },
-        data: { isAccepted: true }
+        data: { status: ORDER_STATUSES.APPROVED }
     });
 
     // Update the parent order's total cost and status
@@ -291,7 +291,7 @@ const rejectEntireOrder = async (orderId, tx) => {
     // Update all items to be not accepted.
     await tx.purchaseOrderItems.updateMany({
         where: { purchaseOrderId: orderId },
-        data: { isAccepted: false }
+        data: { status: ORDER_STATUSES.REJECTED }
     });
     // Update the parent order status.
     return await tx.purchaseOrder.update({

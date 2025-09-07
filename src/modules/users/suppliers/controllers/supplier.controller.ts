@@ -5,13 +5,13 @@ import uploadMedia from '../../../../utils/uploadMedia';
 import * as SupplierService from '../services/supplier.service';
 
 // Profile
-const showSupplierProfile = async (req, h) => {
+const showSupplierProfile = async (req: any, h: any): Promise<any> => {
     try {
         // const { userId } = req.auth;
         // <--  : Get userId from `req.pre.credentials`.
         // This data comes directly from the verified JWT payload, with no extra DB call.
         const { userId } = req.pre.credentials;
-        const result = await SupplierService.showSupplierProfile(userId);
+        const result: any = await SupplierService.showSupplierProfile(userId);
         return h
             .response({
                 success: result.success,
@@ -31,7 +31,7 @@ const showSupplierProfile = async (req, h) => {
     }
 };
 
-const completeSupplierProfile = async (req, h) => {
+const completeSupplierProfile = async (req: any, h: any): Promise<any> => {
     try {
         // const { userId } = req.auth;
         const { userId } = req.pre.credentials;
@@ -50,18 +50,6 @@ const completeSupplierProfile = async (req, h) => {
             nurseryImagesType: typeof nurseryImages,
             nurseryImagesLength: nurseryImages?.length
         });
-        const {
-            nurseryName,
-            streetAddress,
-            landmark,
-            city,
-            state,
-            country,
-            pinCode,
-            gstin,
-            businessCategory,
-            warehouseId
-        } = profileFields;
         const requiredKeys = [
             "nurseryName",
             "streetAddress",
@@ -72,7 +60,13 @@ const completeSupplierProfile = async (req, h) => {
             "pinCode",
             "gstin",
             "businessCategory",
-            "warehouseId"
+            "warehouseId",
+            "tradeLicenseImage",
+            "nurseryImages",
+            "phoneNumber",
+            "latitude",
+            "longitude"
+
         ];
 
         const missingFields = requiredKeys.filter(
@@ -83,7 +77,7 @@ const completeSupplierProfile = async (req, h) => {
         );
         // console.log("missingFields: ", missingFields);
 
-        const missingUploads = [];
+        const missingUploads: string[] = [];
         if (!tradeLicenseImage) missingUploads.push("tradeLicenseImage");
         if (!nurseryImages || nurseryImages.length === 0)
             missingUploads.push("nurseryImages");
@@ -102,7 +96,7 @@ const completeSupplierProfile = async (req, h) => {
         }
 
         // Trade License Upload
-        const licenseUpload = await uploadMedia({
+    const licenseUpload: any = await uploadMedia({
             files: tradeLicenseImage,
             folder: "suppliers/trade_licenses",
             publicIdPrefix: "trade_license"
@@ -118,7 +112,7 @@ const completeSupplierProfile = async (req, h) => {
         }
 
         // Nursery Images Upload
-        const nurseryUpload = await uploadMedia({
+    const nurseryUpload: any = await uploadMedia({
             files: nurseryImages,
             folder: "suppliers/nursery_assets",
             publicIdPrefix: "nursery"
@@ -134,7 +128,7 @@ const completeSupplierProfile = async (req, h) => {
         }
 
         // Profile Image Upload
-        const profileUpload = await uploadMedia({
+    const profileUpload: any = await uploadMedia({
             files: profileImageUrl,
             folder: "suppliers/profile_images",
             publicIdPrefix: "profile"
@@ -172,14 +166,20 @@ const completeSupplierProfile = async (req, h) => {
             })
             .code(RESPONSE_CODES.SUCCESS);
     } catch (error) {
-        console.error("Supplier Profile Completion Error:", error.message);
-        if (error && error.success === RESPONSE_FLAGS.FAILURE && error.code) {
+        console.error(
+            "Supplier Profile Completion Error:",
+            typeof error === "object" && error !== null && "message" in error
+                ? (error as { message?: unknown }).message
+                : error
+        );
+        const e: any = error;
+        if (e && e.success === RESPONSE_FLAGS.FAILURE && e.code) {
             return h
                 .response({
                     success: RESPONSE_FLAGS.FAILURE,
-                    message: error.message
+                    message: e.message
                 })
-                .code(error.code)
+                .code(e.code)
                 .takeover();
         }
 
@@ -192,22 +192,23 @@ const completeSupplierProfile = async (req, h) => {
     }
 };
 
-const listWarehouses = async (req, h) => {
+const listWarehouses = async (_req: any, h: any): Promise<any> => {
     try {
-        const result = await SupplierService.listAllWarehouses();
+        const result: any = await SupplierService.listAllWarehouses();
         return h.response(result).code(result.code);
     } catch (error) {
-        console.error("List Warehouses Error:", error);
+        const e: any = error;
+        console.error("List Warehouses Error:", e?.message || e);
         return h
             .response({
                 success: false,
-                message: error.message || "Failed to retrieve warehouses."
+                message: e?.message || "Failed to retrieve warehouses."
             })
-            .code(error.code || 500);
+            .code(e?.code || 500);
     }
 };
 
-const updateSupplierProfile = async (req, h) => {
+const updateSupplierProfile = async (req: any, h: any): Promise<any> => {
     try {
         // const { userId } = req.auth;
         const { userId } = req.pre.credentials;
@@ -217,7 +218,7 @@ const updateSupplierProfile = async (req, h) => {
         console.log("Profile image header: ", profileImageUrl?.hapi?.headers);
 
         // Profile Image Upload
-        let profileUpload = null;
+    let profileUpload: any = null;
         if (profileImageUrl) {
             profileUpload = await uploadMedia({
                 files: profileImageUrl,
@@ -238,7 +239,7 @@ const updateSupplierProfile = async (req, h) => {
         console.log("profileUpload: ", profileUpload);
 
         // update supplier profile
-        const result = await SupplierService.updateSupplierProfile(
+        const result: any = await SupplierService.updateSupplierProfile(
             userId,
             updateData,
             profileUpload?.data
@@ -251,14 +252,15 @@ const updateSupplierProfile = async (req, h) => {
             })
             .code(result.code);
     } catch (error) {
-        console.error("Update Profile Error:", error);
-        if (error && error.success === RESPONSE_FLAGS.FAILURE && error.code) {
+        const e: any = error;
+        console.error("Update Profile Error:", e?.message || e);
+        if (e && e.success === RESPONSE_FLAGS.FAILURE && e.code) {
             return h
                 .response({
                     success: RESPONSE_FLAGS.FAILURE,
-                    message: error.message
+                    message: e.message
                 })
-                .code(error.code)
+                .code(e.code)
                 .takeover();
         }
 
@@ -272,13 +274,13 @@ const updateSupplierProfile = async (req, h) => {
 };
 
 // Supplier Orders
-const listSupplierOrders = async (req, h) => {
+const listSupplierOrders = async (req: any, h: any): Promise<any> => {
     try {
         const { userId } = req.pre.credentials;
         const { page, limit, orderStatus, search, sortBy, order } = req.query;
 
         // 1. Call the service. The service does all the complex work.
-        const result = await SupplierService.listSupplierOrders({
+    const result: any = await SupplierService.listSupplierOrders({
             userId,
             page,
             limit,
@@ -291,22 +293,20 @@ const listSupplierOrders = async (req, h) => {
         //    The controller should not try to access 'purchaseOrderDetails' itself.
         return h.response(result).code(result.code);
     } catch (error) {
-        console.error(
-            "Error in listSupplierOrders controllersssss:",
-            error.message
-        );
+        const e: any = error;
+        console.error("Error in listSupplierOrders:", e?.message || e);
         return h
             .response({
                 success: false,
                 message: "An error occurred while fetching order requests.",
-                error: error.message
+                error: e?.message
             })
-            .code(500)
+            .code(e?.code || 500)
             .takeover();
     }
 };
 
-const uploadQcMedia = async (req, h) => {
+const uploadQcMedia = async (req: any, h: any): Promise<any> => {
     try {
         const { userId } = req.pre.credentials;
         const { orderId } = req.params;
@@ -323,7 +323,7 @@ const uploadQcMedia = async (req, h) => {
                 })
                 .code(400);
         }
-        const uploadResult = await uploadMedia({
+    const uploadResult: any = await uploadMedia({
             files: qcMedia,
             folder: `suppliers/QC_${orderId}`,
             publicIdPrefix: `qc_${Date.now()}`
@@ -336,101 +336,103 @@ const uploadQcMedia = async (req, h) => {
         }
         console.log("xx", uploadResult);
         // 2. Controller calls the simplified service with the upload results.
-        const result = await SupplierService.uploadQcMediaForOrder({
+    const result: any = await SupplierService.uploadQcMediaForOrder({
             userId,
             orderId,
             uploadedMedia: uploadResult.data
         });
 
-        return h.response(result).code(result.code);
+    return h.response(result).code(result.code);
     } catch (error) {
-        console.error("QC Media Upload Controller Error:", error);
+        const e: any = error;
+        console.error("QC Media Upload Controller Error:", e?.message || e);
         return h
             .response({
                 success: false,
-                message: error.message || "Failed to upload QC media."
+                message: e?.message || "Failed to upload QC media."
             })
-            .code(error.code || 500);
+            .code(e?.code || 500);
     }
 };
 
 // Add this new function to your supplier controller file
 
-const reviewPurchaseOrder = async (req, h) => {
+const reviewPurchaseOrder = async (req: any, h: any): Promise<any> => {
     try {
         const { userId } = req.pre.credentials;
         const { orderId } = req.params;
         // The payload now contains the status and the array of rejected IDs
         const reviewData = req.payload;
 
-        const result = await SupplierService.reviewPurchaseOrder({
+    const result: any = await SupplierService.reviewPurchaseOrder({
             userId,
             orderId,
             reviewData
         });
         return h.response(result).code(result.code);
     } catch (error) {
-        console.error("Review Purchase Order Controller Error:", error.message);
+        const e: any = error;
+        console.error("Review Purchase Order Controller Error:", e?.message || e);
 
         // Return a standardized error response to the client.
         return h
             .response({
                 success: false,
-                message:
-                    error.message ||
-                    "An error occurred while reviewing the order."
+                message: e?.message || "An error occurred while reviewing the order."
             })
-            .code(error.code || 500) // Use the error's status code or default to 500
+            .code(e?.code || 500)
             .takeover();
     }
 };
 
-const getOrderRequestByOrderId = async (req, h) => {
+const getOrderRequestByOrderId = async (req: any, h: any): Promise<any> => {
     try {
         const { userId } = req.pre.credentials;
         const { orderId } = req.params; // Get the orderId from the URL parameter
 
-        const result = await SupplierService.getOrderRequestByOrderId({
+    const result: any = await SupplierService.getOrderRequestByOrderId({
             userId,
             orderId
         });
         return h.response(result).code(result.code);
     } catch (error) {
-        console.error("Error in getOrderRequestByOrderId controller:", error);
+        const e: any = error;
+        console.error("Error in getOrderRequestByOrderId controller:", e?.message || e);
         return h
             .response({
                 success: false,
-                message: error.message || "Failed to retrieve order request."
+                message: e?.message || "Failed to retrieve order request."
             })
-            .code(error.code || 500);
+            .code(e?.code || 500);
     }
 };
 
-const rejectPurchaseOrder = async (req, h) => {
+const rejectPurchaseOrder = async (req: any, h: any): Promise<any> => {
     try {
         const { userId } = req.pre.credentials;
         const { orderId } = req.params;
 
-        const result = await SupplierService.rejectEntireOrder({
+        // Use the generic reviewPurchaseOrder service with REJECTED status
+        const result: any = await SupplierService.reviewPurchaseOrder({
             userId,
-            orderId
+            orderId,
+            reviewData: { status: 'REJECTED', rejectedOrderItemsIdArr: [] }
         });
 
         return h.response(result).code(result.code);
     } catch (error) {
-        console.error("Reject Purchase Order Controller Error:", error);
+        const e: any = error;
+        console.error("Reject Purchase Order Controller Error:", e?.message || e);
         return h
             .response({
                 success: false,
-                message:
-                    error.message ||
-                    "An error occurred while rejecting the order."
+                message: e?.message || "An error occurred while rejecting the order."
             })
-            .code(error.code || 500);
+            .code(e?.code || 500);
     }
 };
 
-const getSupplierOrderHistory = async (req, h) => {
+const getSupplierOrderHistory = async (req: any, h: any): Promise<any> => {
     try {
         const { userId } = req.pre.credentials;
         const {
@@ -442,7 +444,7 @@ const getSupplierOrderHistory = async (req, h) => {
             order
         } = req.query;
         console.log(limit);
-        const result = await SupplierService.getSupplierOrderHistory({
+    const result: any = await SupplierService.getSupplierOrderHistory({
             userId,
             page,
             limit,
@@ -455,25 +457,21 @@ const getSupplierOrderHistory = async (req, h) => {
         return h.response(result).code(result.code);
     } catch (error) {
         // Log the full error for server-side debugging
-        console.error(
-            "Error in getSupplierOrderHistory controller:",
-            error.message
-        );
+        const e: any = error;
+        console.error("Error in getSupplierOrderHistory controller:", e?.message || e);
 
         // Return a standardized JSON error response to the client
         return h
             .response({
                 success: false,
-                message:
-                    error.message ||
-                    "An error occurred while fetching order history."
+                message: e?.message || "An error occurred while fetching order history."
             })
-            .code(error.code || 500) // Use the error's specific code or default to 500
-            .takeover(); // Tell Hapi to stop and send this response immediately
+            .code(e?.code || 500)
+            .takeover();
     }
 };
 
-const searchWarehouses = async (req, h) => {
+const searchWarehouses = async (req: any, h: any): Promise<any> => {
     try {
         const { search } = req.query;
 
@@ -488,20 +486,29 @@ const searchWarehouses = async (req, h) => {
             })
             .code(result.code);
     } catch (error) {
-        console.error("Warehouse Search Error:", error);
+        const e: any = error;
+        console.error("Warehouse Search Error:", e?.message || e);
 
         return h
             .response({
-                success: error.success || RESPONSE_FLAGS.FAILURE,
-                message:
-                    error.message ||
-                    ERROR_MESSAGES.WAREHOUSES.WAREHOUSE_NOT_FOUND
+                success: e?.success || RESPONSE_FLAGS.FAILURE,
+                message: e?.message || ERROR_MESSAGES.WAREHOUSES.WAREHOUSE_NOT_FOUND
             })
-            .code(error.code || RESPONSE_CODES.INTERNAL_SERVER_ERROR);
+            .code(e?.code || RESPONSE_CODES.INTERNAL_SERVER_ERROR);
     }
 };
 
 export {
-    completeSupplierProfile, getOrderRequestByOrderId, getSupplierOrderHistory, listSupplierOrders, listWarehouses, rejectPurchaseOrder, reviewPurchaseOrder, showSupplierProfile, updateSupplierProfile, uploadQcMedia
+    completeSupplierProfile,
+    getOrderRequestByOrderId,
+    getSupplierOrderHistory,
+    listSupplierOrders,
+    listWarehouses,
+    rejectPurchaseOrder,
+    reviewPurchaseOrder,
+    showSupplierProfile,
+    updateSupplierProfile,
+    uploadQcMedia,
+    searchWarehouses
 };
 
