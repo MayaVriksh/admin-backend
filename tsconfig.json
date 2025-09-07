@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+
+    // Best practices
+    "strict": true,
+    "skipLibCheck": true,
+
+    // Some stricter flags
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    // Nodejs constumisation
+    "outDir": "./dist"
+  }
+}
