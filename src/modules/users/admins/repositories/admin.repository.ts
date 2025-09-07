@@ -478,13 +478,7 @@ const createDamageLog = async (productType, data, tx) => {
         mediaUrl: data.mediaUrl,
         publicId: data.publicId,
 
-        // Prisma needs these 'connect' blocks to link the records
-        plants: {
-            connect: { plantId: data.plantId }
-        },
-        plantVariant: {
-            connect: { variantId: data.plantVariantId }
-        },
+        // Always connect warehouse & orders
         warehouse: {
             connect: { warehouseId: data.warehouseId }
         },
@@ -495,6 +489,28 @@ const createDamageLog = async (productType, data, tx) => {
             connect: { id: data.purchaseOrderItemId }
         }
     };
+    
+    // Add plant-specific relations
+    if (productType === PRODUCT_TYPES.PLANT) {
+        Object.assign(createData, {
+            plants: {
+                connect: { plantId: data.plantId }
+            },
+            plantVariant: {
+                connect: { variantId: data.plantVariantId }
+            }
+        });
+    } else {
+        // Add pot-specific relations
+        Object.assign(createData, {
+            potCategory: {
+                connect: { categoryId: data.potCategoryId }
+            },
+            potVariant: {
+                connect: { potVariantId: data.potVariantId }
+            }
+        });
+    }
 
     return await model.create({
         data: createData
