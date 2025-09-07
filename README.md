@@ -3,6 +3,16 @@
 A scalable and well-documented backend API for the Mayavriksh platform, built with **Hapi.js**, **Prisma ORM**, **Swagger for API documentation** and **MySQL** as the database.
 
 ---
+## Cloning Instructions
+
+### Clone repo with submodules
+git clone --recurse-submodules <repo-url>
+
+### If you already cloned without submodules
+git submodule update --init --recursive
+
+### Pull latest changes in submodules
+git submodule update --remote --merge
 
 ## 🛠 Tech Stack
 
@@ -59,9 +69,16 @@ Quick access to the official docs for all major technologies used in this projec
 4. **Install dependencies**
 
     ```
-    npm install
+    For Installing Bun in Mac:
+    curl -fsSL https://bun.sh/install | bash
+    For Windows:
+    npm install -g bun
     ```
-
+    ```
+    For running Bun:
+    bun i
+    bun --watch src/server.ts
+    ```
     > ℹ️ This will also automatically run `prisma generate` due to the `postinstall` script in `package.json`.
 
 5. **Set up your `.env` file**

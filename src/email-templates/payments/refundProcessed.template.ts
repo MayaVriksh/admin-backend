@@ -1,0 +1,36 @@
+import { footerTemplate } from "../common/footer.template";
+import { headerTemplate } from "../common/header.template";
+import { stylesTemplate } from "../common/styles.template";
+
+export default function refundProcessedTemplate({ recipientName, amount, transactionId, refundId, dateTime }) {
+  return `
+  <!doctype html>
+  <html>
+    <head>
+      <title>Refund Processed - MayaVriksh</title>
+      ${stylesTemplate()}
+    </head>
+    <body>
+      <div class="wrapper">
+        <div class="container">
+          ${headerTemplate()}
+          <div class="body">
+            <h2>Refund Processed</h2>
+            <p>Hello ${recipientName},</p>
+            <p>Your refund has been successfully processed.</p>
+            <div class="details">
+              <p><strong>Refund Amount:</strong> ₹${amount}</p>
+              <p><strong>Transaction ID:</strong> ${transactionId}</p>
+              <p><strong>Refund ID:</strong> ${refundId}</p>
+              <p><strong>Date & Time:</strong> ${dateTime}</p>
+            </div>
+            <p>The refund may take 5–7 business days to reflect in your account depending on your bank or payment provider.</p>
+            <p class="closing">If you need help, contact us at <a href="mailto:support@mayavriksh.com">support@mayavriksh.com</a>.<br /><strong>Team MayaVriksh</strong></p>
+          </div>
+          ${footerTemplate()}
+        </div>
+      </div>
+    </body>
+  </html>
+  `;
+};
