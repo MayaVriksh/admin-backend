@@ -464,7 +464,6 @@ const createDamageLog = async (productType, data, tx) => {
             ? tx.plantDamagedProduct
             : tx.potDamagedProduct;
 
-    // --- THIS IS THE FIX ---
     // We must wrap the foreign keys in 'connect' objects to establish the relationships.
     const createData = {
         damageId: data.damageId,
@@ -519,7 +518,11 @@ const updateWarehouseInventory = async (productType, where, data, tx) => {
         productType === PRODUCT_TYPES.PLANT
             ? tx.plantWarehouseInventory
             : tx.potWarehouseInventory;
-
+    const xyz = await model.findUnique({where});
+    console.log("xyzzzz",xyz)
+    if(!model){
+        
+    }
     return await model.update({ where, data });
 };
 

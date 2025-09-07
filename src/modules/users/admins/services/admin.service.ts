@@ -227,7 +227,6 @@ const listSupplierOrders = async ({
     transformedOrders.forEach((order) => {
         console.log(`\n--- Details for Order ID: ${order.id} ---`);
 
-        // --- THIS IS THE FIX ---
         // Use util.inspect to print the entire object without truncation.
         // 'depth: null' tells it to show all nested levels.
         // 'colors: true' makes it much easier to read in the terminal.
@@ -581,7 +580,6 @@ const getSupplierOrderHistory = async ({
     transformedOrders.forEach((order) => {
         console.log(`\n--- Details for Order ID: ${order.id} ---`);
 
-        // --- THIS IS THE FIX ---
         // Use util.inspect to print the entire object without truncation.
         // 'depth: null' tells it to show all nested levels.
         // 'colors: true' makes it much easier to read in the terminal.
@@ -626,8 +624,8 @@ const restockInventory = async ({
         async (tx) => {
             // Step 1: Fetch trusted Purchase Order and accepted items from the DB.
             const order = await tx.purchaseOrder.findFirst({
-                where: { id: orderId, status: "DELIVERED" },
-                include: { PurchaseOrderItems: { where: { isAccepted: true } } }
+                where: { id: orderId },
+                include: { PurchaseOrderItems: { where: { status:ORDER_STATUSES.APPROVED } } }
             });
 
             if (!order)
@@ -656,10 +654,10 @@ const restockInventory = async ({
                     "https://res.cloudinary.com/dwdu18hzs/image/upload/suppliers/trade_licenses/trade_license_1751201462225.avif";
                 let publicId = "xyz";
                 // Step 3: Log Damaged Units, if any.
-                if (receivedItem.unitsDamaged > 0) {
-                    mediaUrl =
-                        "https://res.cloudinary.com/dwdu18hzs/image/upload/suppliers/trade_licenses/trade_license_1751201462225.avif";
-                    publicId = "xyz";
+                // if (receivedItem.unitsDamaged > 0) {
+                //     mediaUrl =
+                //         "https://res.cloudinary.com/dwdu18hzs/image/upload/suppliers/trade_licenses/trade_license_1751201462225.avif";
+                //     publicId = "xyz";
 
                     /** Need to implement the Damage Photo Upload below*/
                     // if (
@@ -673,7 +671,8 @@ const restockInventory = async ({
                     //     mediaUrl = uploadResult.data.url;
                     //     publicId = uploadResult.data.publicId;
                     // }
-                }
+                // }
+                
                 const damageData = {
                     damageId: uuidv4(),
                     purchaseOrderId: originalItem.purchaseOrderId,
@@ -697,7 +696,7 @@ const restockInventory = async ({
                     mediaUrl,
                     publicId
                 };
-
+                
                 if (originalItem.productType === PRODUCT_TYPES.PLANT) {
                     damageData.plantId = originalItem.plantId;
                     damageData.plantVariantId = originalItem.plantVariantId;
@@ -706,6 +705,7 @@ const restockInventory = async ({
                     damageData.potVariantId = originalItem.potVariantId;
                 }
 
+                console.log("damageData",damageData);
                 await adminRepo.createDamageLog(
                     originalItem.productType,
                     damageData,

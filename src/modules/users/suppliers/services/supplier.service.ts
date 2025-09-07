@@ -409,7 +409,6 @@ const listSupplierOrders = async ({
     transformedOrders.forEach((order) => {
         console.log(`\n--- Details for Order ID: ${order.id} ---`);
 
-        // --- THIS IS THE FIX ---
         // Use util.inspect to print the entire object without truncation.
         // 'depth: null' tells it to show all nested levels.
         // 'colors: true' makes it much easier to read in the terminal.
@@ -798,7 +797,6 @@ const getSupplierOrderHistory = async ({
     transformedOrders.forEach((order) => {
         console.log(`\n--- Details for Order ID: ${order.id} ---`);
 
-        // --- THIS IS THE FIX ---
         // Use util.inspect to print the entire object without truncation.
         // 'depth: null' tells it to show all nested levels.
         // 'colors: true' makes it much easier to read in the terminal.
