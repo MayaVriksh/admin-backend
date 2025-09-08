@@ -564,7 +564,7 @@ const reviewPurchaseOrder = async ({ userId, orderId, reviewData }) => {
                     newTotalCost,
                     tx
                 });
-                // --- Step 3 (NEW): Re-fetch and return the updated order's full state ---
+                // --- Step 3: Re-fetch and return the updated order's full state ---
                 // After the transaction is successful, fetch the final, authoritative state of the order.
                 const updatedOrder = await prisma.purchaseOrder.findUnique({
                     where: { id: orderId },
