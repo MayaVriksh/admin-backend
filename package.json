@@ -34,7 +34,7 @@
         "postinstall": "prisma generate --no-engine"
     },
     "prisma": {
-        "schema": "../orm/prisma/schema.prisma"
+        "schema": "./src/orm/prisma/schema.prisma"
     },
     "dependencies": {
         "@hapi/hapi": "^21.4.2",
