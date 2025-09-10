@@ -5,7 +5,7 @@ class PlantRepository {
     // Reusable select schema
     static baseSelect(productCard) {
         return {
-            id: true,
+            // id: true,
             plantId: true,
             variantId: true,
 
@@ -253,7 +253,7 @@ class PlantRepository {
     // Get inventory by ID
     static async findById(id) {
         return prisma.plantWarehouseInventory.findFirst({
-            where: { id },
+            where: { plantId:id },
             select: this.baseSelect()
         });
     }
