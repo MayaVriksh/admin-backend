@@ -16,10 +16,10 @@ logs/
 *.log
 
 # Prisma generated client
-generated/
-src/prisma/generated/
-src/prisma/migrations/
-.prisma/
+# generated/
+# src/prisma/generated/
+# src/prisma/migrations/
+# .prisma/
 
 # OS files
 .DS_Store

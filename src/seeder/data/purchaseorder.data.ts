@@ -167,8 +167,8 @@ function generatePurchaseOrderData(
                         productType: PRODUCT_TYPES.POT,
                         plantId: null,
                         plantVariantId: null,
-                        potCategoryId: variant.categoryId,
-                        potVariantId: variant.potVariantId,
+                        // potCategoryId: variant.categoryId,
+                        // potVariantId: variant.potVariantId,
                         unitsRequested: 3 + j,
                         unitCostPrice: 60 + j * 4
                     };

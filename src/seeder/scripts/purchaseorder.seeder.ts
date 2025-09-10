@@ -23,8 +23,8 @@ async function seedPurchaseOrders() {
     if (
         !plants.length ||
         !plantVariants.length ||
-        !potCategories.length ||
-        !potVariants.length ||
+        // !potCategories.length ||
+        // !potVariants.length ||
         !warehouses.length
     ) {
         throw new Error("❌ Required data missing in DB.");

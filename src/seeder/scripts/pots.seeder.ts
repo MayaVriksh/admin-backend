@@ -46,7 +46,6 @@ async function seedPots() {
                             categoryId,
                             name: pot.name,
                             description: pot.description,
-                            isActive: pot.isActive
                         }
                     });
 
