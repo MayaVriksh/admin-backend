@@ -138,26 +138,41 @@ const findPurchaseOrdersBySupplier = async (
                         },
                         potVariant: {
                             select: {
+                                potVariantId: true,
                                 potName: true,
-                                size: true,
                                 sku: true,
-                                // --- ADDED: Include the nested material name for pots ---
-                                material: {
-                                    select: {
-                                        name: true
-                                    }
-                                },
-                                color: {
+                                color: { // Color is still a direct relation
                                     select: {
                                         name: true,
                                         hexCode: true
                                     }
                                 },
-                                images: {
-                                    // This is the relation name for pot variant images
+                                images: { // Images are still a direct relation
                                     where: { isPrimary: true },
                                     take: 1,
                                     select: { mediaUrl: true }
+                                },
+                                // Now, we fetch the physical details through the new nested relations
+                                sizeMaterialOption: {
+                                    select: {
+                                        material: {
+                                            select: {
+                                                name: true
+                                            }
+                                        },
+                                        sizeProfile: {
+                                            select: {
+                                                size: true,
+                                                height: true,
+                                                weight: true,
+                                                category: {
+                                                    select: {
+                                                        name: true
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -443,26 +458,41 @@ const findHistoricalPurchaseOrders = async (
                         potCategory: { select: { name: true } },
                         potVariant: {
                             select: {
+                                potVariantId: true,
                                 potName: true,
-                                size: true,
                                 sku: true,
-                                // --- ADDED: Include the nested material name for pots ---
-                                material: {
-                                    select: {
-                                        name: true
-                                    }
-                                },
-                                color: {
+                                color: { // Color is still a direct relation
                                     select: {
                                         name: true,
                                         hexCode: true
                                     }
                                 },
-                                images: {
-                                    // This is the relation name for pot variant images
+                                images: { // Images are still a direct relation
                                     where: { isPrimary: true },
                                     take: 1,
                                     select: { mediaUrl: true }
+                                },
+                                // Now, we fetch the physical details through the new nested relations
+                                sizeMaterialOption: {
+                                    select: {
+                                        material: {
+                                            select: {
+                                                name: true
+                                            }
+                                        },
+                                        sizeProfile: {
+                                            select: {
+                                                size: true,
+                                                height: true,
+                                                weight: true,
+                                                category: {
+                                                    select: {
+                                                        name: true
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

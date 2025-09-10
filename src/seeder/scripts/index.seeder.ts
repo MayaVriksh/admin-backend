@@ -10,7 +10,7 @@ import seedPotMaterials from './potMaterials.seeder';
 import seedPots from './pots.seeder';
 import * as  seedFertilizers from './fertilizers.seeder';
 import seedPurchaseOrders from './purchaseorder.seeder';
-import { seedWarehouseInventory } from './warehouseInventory.seeder';
+import { seedPotWarehouseInventory } from './warehouseInventory.seeder';
 import * as seedPlantCategories from './plantCategory.seeder';
 import * as plantCareGuidelines from './plantCareGuidelines.seeder';
 async function runSeeder() {
@@ -34,8 +34,8 @@ async function runSeeder() {
         // await seedFertilizers.seedPlantFertilizerSchedules();
         // await seedPlantCategories.seedPlantCategories();
         // await seedPlantCategories.assignCategoriesToPlants();
-        await seedPurchaseOrders();
-        // await seedWarehouseInventory();
+        // await seedPurchaseOrders();
+        await seedPotWarehouseInventory();
 
         console.log("✅ All seeders executed successfully!");
     } catch (error) {

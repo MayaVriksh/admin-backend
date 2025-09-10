@@ -360,14 +360,14 @@ const listSupplierOrders = async ({
                 : item.potVariant?.potName;
             const productVariantSize = isPlant
                 ? item.plantVariant?.size?.plantSize
-                : item.potVariant?.size;
+                : item.potVariant?.sizeMaterialOption?.sizeProfile?.size;
             const sku = isPlant ? item.plantVariant?.sku : item.potVariant?.sku;
             const productVariantColor = isPlant
                 ? item.plantVariant?.color?.name
                 : item.potVariant?.color?.name;
             const productVariantMaterial = isPlant
                 ? "NaturalPlant"
-                : item.potVariant?.material?.name;
+                : item.potVariant?.sizeMaterialOption?.material?.name;
             const productVariantImage = isPlant
                 ? item.plantVariant?.plantVariantImages[0]?.mediaUrl
                 : item.potVariant?.images[0]?.mediaUrl;
@@ -725,14 +725,14 @@ const getSupplierOrderHistory = async ({
                 : item.potVariant?.potName;
             const productVariantSize = isPlant
                 ? item.plantVariant?.size?.plantSize
-                : item.potVariant?.size;
+                : item.potVariant?.sizeMaterialOption?.sizeProfile?.size;
             const sku = isPlant ? item.plantVariant?.sku : item.potVariant?.sku;
             const productVariantColor = isPlant
                 ? item.plantVariant?.color?.name
                 : item.potVariant?.color?.name;
             const productVariantMaterial = isPlant
                 ? null
-                : item.potVariant?.material?.name;
+                : item.potVariant?.sizeMaterialOption?.material?.name;
             const productVariantImage = isPlant
                 ? item.plantVariant?.plantVariantImages[0]?.mediaUrl
                 : item.potVariant?.images[0]?.mediaUrl;

@@ -8,7 +8,7 @@ import * as ROLES from '../../../../constants/roles.constant';
 import SUCCESS_MESSAGES from '../../../../constants/successMessages.constant';
 import uploadMedia from '../../../../utils/uploadMedia';
 import * as adminRepo from '../repositories/admin.repository';
-
+import * as ORDER_STATUS from '../../../../constants/orderStatus.constant';
 const showAdminProfile = async (userId) => {
     const profile = await prisma.admin.findUnique({
         where: { userId },
@@ -179,14 +179,14 @@ const listSupplierOrders = async ({
                 : item.potVariant?.potName;
             const productVariantSize = isPlant
                 ? item.plantVariant?.size?.plantSize
-                : item.potVariant?.size;
+                : item.potVariant?.sizeMaterialOption?.sizeProfile?.size;
             const sku = isPlant ? item.plantVariant?.sku : item.potVariant?.sku;
             const productVariantColor = isPlant
                 ? item.plantVariant?.color?.name
                 : item.potVariant?.color?.name;
             const productVariantMaterial = isPlant
                 ? null
-                : item.potVariant?.material?.name;
+                : item.potVariant?.sizeMaterialOption?.material?.name;
             const productVariantImage = isPlant
                 ? item.plantVariant?.plantVariantImages[0]?.mediaUrl
                 : item.potVariant?.images[0]?.mediaUrl;
@@ -516,19 +516,19 @@ const getSupplierOrderHistory = async ({
                 : item.potVariant?.potName;
             const productVariantSize = isPlant
                 ? item.plantVariant?.size?.plantSize
-                : item.potVariant?.size;
+                : item.potVariant?.sizeMaterialOption?.sizeProfile?.size;
             const sku = isPlant ? item.plantVariant?.sku : item.potVariant?.sku;
             const productVariantColor = isPlant
                 ? item.plantVariant?.color?.name
                 : item.potVariant?.color?.name;
             const productVariantMaterial = isPlant
                 ? null
-                : item.potVariant?.material?.name;
+                : item.potVariant?.sizeMaterialOption?.material?.name;
             const productVariantImage = isPlant
                 ? item.plantVariant?.plantVariantImages[0]?.mediaUrl
                 : item.potVariant?.images[0]?.mediaUrl;
             const productVariantType = item.productType;
-            const isAccepted = item.isAccepted;
+            const isAccepted = item.status;
             // Return the new, simplified item object
             return {
                 id: item.id,
@@ -625,7 +625,7 @@ const restockInventory = async ({
             // Step 1: Fetch trusted Purchase Order and accepted items from the DB.
             const order = await tx.purchaseOrder.findFirst({
                 where: { id: orderId },
-                include: { PurchaseOrderItems: { where: { status:ORDER_STATUSES.APPROVED } } }
+                include: { PurchaseOrderItems: { where: { status:ORDER_STATUS.APPROVED } } }
             });
 
             if (!order)
