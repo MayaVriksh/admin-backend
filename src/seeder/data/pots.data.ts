@@ -1,9 +1,17 @@
+/**
+ * NOTE:
+ * - We are not hardcoding colorId/materialId here.
+ * - Seeder will inject them dynamically from DB.
+ * - Each size → PotSizeProfile
+ * - Each material link → SizeMaterialOption
+ * - Each potName → PotVariant
+ */
+
 export default [
     {
         name: "Hanging",
         description:
             "Pots designed to be suspended, ideal for decorative plants.",
-        isActive: true,
         variants: [
             {
                 potName: "Classic Hanging",
@@ -60,7 +68,6 @@ export default [
     {
         name: "Balcony",
         description: "Space-efficient pots for balcony gardening.",
-        isActive: true,
         variants: [
             {
                 potName: "Urban Balcony",
@@ -117,7 +124,6 @@ export default [
     {
         name: "Self Watering",
         description: "Innovative pots with built-in watering systems.",
-        isActive: true,
         variants: [
             {
                 potName: "Aqua Mini",
@@ -174,7 +180,6 @@ export default [
     {
         name: "Table Top",
         description: "Compact, stylish pots perfect for tables and desks.",
-        isActive: true,
         variants: [
             {
                 potName: "Marble Finish",
@@ -231,7 +236,6 @@ export default [
     {
         name: "Decorative",
         description: "Aesthetic and artistic pots to enhance interiors.",
-        isActive: true,
         variants: [
             {
                 potName: "Vintage Charm",

@@ -1,17 +1,17 @@
-import { prisma } from '../../config/prisma.config';
-import tagGroupsWithTags from '../data/tags.data';
-import generateCustomId from '../../utils/generateCustomId';
+import { prisma } from "../../config/prisma.config";
+import tagGroupsWithTags from "../data/tags.data";
+import generateCustomId from "../../utils/generateCustomId";
 
 async function seedTags() {
     console.log("🌱 Seeding tag groups and tags...");
 
     try {
-        await prisma.$transaction(
-            async (tx) => {
-                for (const group of tagGroupsWithTags) {
+        for (const group of tagGroupsWithTags) {
+            await prisma.$transaction(
+                async (tx) => {
                     if (!group?.groupName || !Array.isArray(group.tags)) {
                         console.warn(`⚠️  Skipping invalid group data:`, group);
-                        continue;
+                        return;
                     }
 
                     const existingGroup = await tx.tagGroups.findFirst({
@@ -22,7 +22,7 @@ async function seedTags() {
                         console.log(
                             `⚠️  Tag group '${group.groupName}' already exists`
                         );
-                        continue;
+                        return;
                     }
 
                     const groupId = await generateCustomId(tx, "TAG_GROUP");
@@ -52,13 +52,12 @@ async function seedTags() {
                     console.log(
                         `🌿 Created group: ${createdGroup.groupName} with ${group.tags.length} tags.`
                     );
+                },
+                {
+                    timeout: 15000
                 }
-            },
-            {
-                maxWait: 20000,
-                // timeout: 15000
-            }
-        );
+            );
+        }
 
         console.log("✅ Tag seeding completed.");
     } catch (error) {
