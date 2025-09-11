@@ -28,7 +28,7 @@ const warehouses = [
     },
     {
         name: "Western Regional Depot",
-        capacityUnits: 30000,
+        capacityUnits: 15000,
         officeEmail: "westdepot@mayavriksh.com",
         officePhone: "+919134567890",
         officeAddress: {

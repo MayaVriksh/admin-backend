@@ -64,7 +64,6 @@ async function seedPotWarehouseInventory() {
           data: {
             id: uuid(),
             potVariantId: variant.potVariantId,
-            potCategoryId,
             warehouseId: warehouse.warehouseId,
             stockIn,
             stockOut,
@@ -72,8 +71,6 @@ async function seedPotWarehouseInventory() {
             latestQuantityAdded: stockIn,
             currentStock,
             reservedUnit,
-            sellingPrice,
-            profitMargin,
             trueCostPrice,
             totalCost,
             lastRestocked: new Date(),

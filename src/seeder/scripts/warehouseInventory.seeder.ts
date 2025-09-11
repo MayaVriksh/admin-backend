@@ -107,7 +107,7 @@ async function seedPotWarehouseInventory() {
 
         if (existing) {
             console.log(
-                `⚠️ Pot Inventory exists for CategoryId '${variant.categoryId}', Variant '${variant.potName}', Warehouse '${warehouse.name}'`
+                `⚠️ Pot Inventory exists for Variant '${variant.potName}', Warehouse '${warehouse.name}'`
             );
             continue;
         }
@@ -115,7 +115,6 @@ async function seedPotWarehouseInventory() {
         await prisma.potWarehouseInventory.create({
             data: {
                 id: uuidv4(),
-                potCategoryId: variant.categoryId,
                 potVariantId: variant.potVariantId,
                 warehouseId: warehouse.warehouseId,
                 stockIn: 80, // dummy: total added
