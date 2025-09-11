@@ -12,6 +12,7 @@ const seedFertilizers = require("./fertilizers.seeder");
 const seedPurchaseOrders = require("./purchaseorder.seeder");
 const { seedWarehouseInventory } = require("./warehouseInventory.seeder");
 const seedPlantCategories = require("./plantCategory.seeder");
+const seedNotifications = require("./notifications.seeder");
 
 async function runSeeder() {
     console.log("🌱 Starting full seeding...");
@@ -29,6 +30,7 @@ async function runSeeder() {
         await seedPots();
         await seedFertilizers.seedFertilizers();
         await seedFertilizers.seedPlantFertilizerSchedules();
+        await seedNotifications();
         await seedPurchaseOrders();
         await seedWarehouseInventory();
         await seedPlantCategories.seedPlantCategories();

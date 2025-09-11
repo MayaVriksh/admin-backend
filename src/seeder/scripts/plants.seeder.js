@@ -22,6 +22,10 @@ async function seedPlants() {
 
         for (const plant of plants) {
             try {
+                // --- Transaction 1: Seed plant + sizes ---
+                let createdPlant;
+                let sizeIdMap = {};
+
                 await prisma.$transaction(
                     async (tx) => {
                         const existingPlant = await tx.plants.findFirst({
@@ -40,7 +44,7 @@ async function seedPlants() {
                             PRODUCT_TYPES.PLANT
                         );
 
-                        const createdPlant = await tx.plants.create({
+                        createdPlant = await tx.plants.create({
                             data: {
                                 plantId,
                                 name: plant.name,
@@ -64,6 +68,9 @@ async function seedPlants() {
                                 repotting: plant.repotting,
                                 soil: plant.soil,
                                 spiritualUseCase: plant.spiritualUseCase,
+                                minimumTemperature: plant.minimumTemperature,
+                                maximumTemperature: plant.maximumTemperature,
+                                benefits: plant.benefits,
                                 createdAt: plant.createdAt,
                                 updatedAt: plant.updatedAt
                             }
@@ -71,11 +78,9 @@ async function seedPlants() {
 
                         console.log(`🌱 Created Plant '${plant.name}'`);
 
-                        // Size Profiles
                         const sizesForPlant = plantSizeProfiles.filter(
                             (s) => s.plantId === plant.plantId
                         );
-                        const sizeIdMap = {};
 
                         for (const sizeProfile of sizesForPlant) {
                             const plantSizeId = await generateCustomId(
@@ -99,8 +104,16 @@ async function seedPlants() {
                                 `   ➕ Size Profile (${sizeProfile.plantSize}) added for '${plant.name}'`
                             );
                         }
+                    },
+                    { timeout: 15000 }
+                );
 
-                        // Variants
+                // If plant wasn't created (duplicate), skip variants
+                if (!createdPlant) continue;
+
+                // --- Transaction 2: Insert variants ---
+                await prisma.$transaction(
+                    async (tx) => {
                         const variantsForPlant = plantVariants.filter(
                             (v) => v.plantId === plant.plantId
                         );
@@ -140,10 +153,10 @@ async function seedPlants() {
                         }
 
                         console.log(
-                            `✅ Plant '${plant.name}' seeded with ${sizesForPlant.length} sizes & ${variantsForPlant.length} variants`
+                            `✅ Plant '${plant.name}' seeded with variants`
                         );
                     },
-                    { timeout: 15000 } // max timeout
+                    { timeout: 15000 }
                 );
             } catch (error) {
                 console.error(
@@ -177,7 +190,7 @@ async function seedPlantVariantImages() {
                             plantVariantId: variant.variantId,
                             mediaUrl: mediaUrls[i],
                             isPrimary: i === 4,
-                            publicId: "Yo",
+                            publicId: "Yo Yo",
                             mediaType: "image",
                             resourceType: "image",
                             createdAt: new Date(),
