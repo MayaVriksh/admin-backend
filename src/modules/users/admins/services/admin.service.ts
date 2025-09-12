@@ -116,6 +116,7 @@ const listSupplierOrders = async ({
     page,
     limit,
     orderStatus,
+    search,
     supplierId,
     warehouseId,
     fromDate,
@@ -141,6 +142,7 @@ const listSupplierOrders = async ({
         page,
         limit,
         orderStatus,
+        search,
         supplierId,
         warehouseId,
         fromDate,
@@ -230,13 +232,13 @@ const listSupplierOrders = async ({
         // Use util.inspect to print the entire object without truncation.
         // 'depth: null' tells it to show all nested levels.
         // 'colors: true' makes it much easier to read in the terminal.
-        console.log(
-            util.inspect(order, {
-                showHidden: false,
-                depth: null,
-                colors: true
-            })
-        );
+        // console.log(
+        //     util.inspect(order, {
+        //         showHidden: false,
+        //         depth: null,
+        //         colors: true
+        //     })
+        // );
 
         console.log(`------------------------------------`);
     });
@@ -583,13 +585,13 @@ const getSupplierOrderHistory = async ({
         // Use util.inspect to print the entire object without truncation.
         // 'depth: null' tells it to show all nested levels.
         // 'colors: true' makes it much easier to read in the terminal.
-        console.log(
-            util.inspect(order, {
-                showHidden: false,
-                depth: null,
-                colors: true
-            })
-        );
+        // console.log(
+        //     util.inspect(order, {
+        //         showHidden: false,
+        //         depth: null,
+        //         colors: true
+        //     })
+        // );
 
         console.log(`------------------------------------`);
     });

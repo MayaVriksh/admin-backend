@@ -62,6 +62,13 @@ const orderRequestValidation = {
             .label("To Date")
             .description("End date (inclusive) in ISO format"),
 
+        // For searching
+        search: Joi.string()
+            .allow("")
+            .optional()
+            .description("A search term to filter orders by ID")
+            .trim(),
+            
         // Sorting
         sortBy: Joi.string()
             .valid("requestedAt", "totalCost", "status")
