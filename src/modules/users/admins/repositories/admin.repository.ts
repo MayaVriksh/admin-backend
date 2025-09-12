@@ -33,17 +33,17 @@ const findPurchaseOrdersByAdmin = async ({
     sortBy,
     order
 }) => {
-    console.log(
-        "findPurchaseOrdersByAdmin:",
-        page,
-        limit,
-        orderStatus,
-        supplierId,
-        warehouseId,
-        fromDate,
-        toDate,
-        order
-    );
+    // console.log(
+    //     "findPurchaseOrdersByAdmin:",
+    //     page,
+    //     limit,
+    //     orderStatus,
+    //     supplierId,
+    //     warehouseId,
+    //     fromDate,
+    //     toDate,
+    //     order
+    // );
 
     const whereClause = {
         // Exclude historical orders (DELIVERED && COMPLETELY PAID Purchase Orders)
@@ -270,7 +270,6 @@ const addMediaToPurchaseOrder = async (
     purchaseOrderId,
     mediaAssetsToCreate
 ) => {
-    console.log(purchaseOrderId);
     // Prepare the data for Prisma by adding the required IDs to each asset.
     const dataToCreate = mediaAssetsToCreate.map((asset) => ({
         id: uuidv4(),
@@ -283,7 +282,7 @@ const addMediaToPurchaseOrder = async (
         uploadedBy: asset.uploadedBy
     }));
 
-    console.log(dataToCreate);
+    // console.log(dataToCreate);
     // Use createMany for an efficient bulk-insert into the database.
     return await prisma.purchaseOrderMedia.createMany({
         data: dataToCreate

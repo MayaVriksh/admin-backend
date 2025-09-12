@@ -19,25 +19,25 @@ async function runSeeder() {
     console.log("🌱 Starting full seeding...");
 
     try {
-        await seedSerialTrackers();
-        await seedRoles();
-        await seedWarehouses();
-        await seedUsers();
-        await seedNotifications();
-        await seedTags();
-        await seedColors();
-        await seedPlants.seedPlants();
-        await seedPlants.seedPlantVariantImages();
-        await seedPotMaterials();
-        await seedPots();
-        await plantCareGuidelines.seedSunlightTypes();
-        await plantCareGuidelines.seedHumidityLevels();
-        await plantCareGuidelines.seedPlantCareGuidelines();
-        await seedFertilizers.seedFertilizers();
-        await seedFertilizers.seedPlantFertilizerSchedules();
-        await seedPlantCategories.seedPlantCategories();
-        await seedPlantCategories.assignCategoriesToPlants();
-        await seedPurchaseOrders();
+        // await seedSerialTrackers();
+        // await seedRoles();
+        // await seedWarehouses();
+        // await seedUsers();
+        // await seedNotifications();
+        // await seedTags();
+        // await seedColors();
+        // await seedPlants.seedPlants();
+        // await seedPlants.seedPlantVariantImages();
+        // await seedPotMaterials();
+        // await seedPots();
+        // await plantCareGuidelines.seedSunlightTypes();
+        // await plantCareGuidelines.seedHumidityLevels();
+        // await plantCareGuidelines.seedPlantCareGuidelines();
+        // await seedFertilizers.seedFertilizers();
+        // await seedFertilizers.seedPlantFertilizerSchedules();
+        // await seedPlantCategories.seedPlantCategories();
+        // await seedPlantCategories.assignCategoriesToPlants();
+        // await seedPurchaseOrders();
         await seedPotWarehouseInventory();
 
         console.log("✅ All seeders executed successfully!");

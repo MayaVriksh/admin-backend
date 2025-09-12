@@ -98,7 +98,8 @@ async function seedPotWarehouseInventory() {
     for (const variant of potVariants) {
         const existing = await prisma.potWarehouseInventory.findUnique({
             where: {
-                potVariantId_warehouseId: {
+                    potCategoryId_potVariantId_warehouseId: {
+                    potCategoryId: variant.categoryId,
                     potVariantId: variant.potVariantId,
                     warehouseId: warehouse.warehouseId
                 }
@@ -115,6 +116,7 @@ async function seedPotWarehouseInventory() {
         await prisma.potWarehouseInventory.create({
             data: {
                 id: uuidv4(),
+                potCategoryId: variant.categoryId,
                 potVariantId: variant.potVariantId,
                 warehouseId: warehouse.warehouseId,
                 stockIn: 80, // dummy: total added

@@ -1118,7 +1118,7 @@ const createPurchaseOrderFromCart = async (payload) => {
             status: 'PENDING'
         };
 
-        console.log("orderData",orderData);
+        // console.log("orderData",orderData);
 
         // Step 4: Call the repository to create the order and its items.
         const newPurchaseOrder = await adminRepo.createOrderAndItems(orderData, processedItems, tx);

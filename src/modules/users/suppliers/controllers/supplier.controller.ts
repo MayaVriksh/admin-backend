@@ -323,11 +323,12 @@ const uploadQcMedia = async (req: any, h: any): Promise<any> => {
                 })
                 .code(400);
         }
-    const uploadResult: any = await uploadMedia({
+    const uploadResult = await uploadMedia({
             files: qcMedia,
             folder: `suppliers/QC_${orderId}`,
             publicIdPrefix: `qc_${Date.now()}`
         });
+        console.log(uploadResult)
         if (!uploadResult.success) {
             return h
                 .response({ success: false, message: uploadResult.message })

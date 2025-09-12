@@ -413,13 +413,13 @@ const listSupplierOrders = async ({
         // Use util.inspect to print the entire object without truncation.
         // 'depth: null' tells it to show all nested levels.
         // 'colors: true' makes it much easier to read in the terminal.
-        console.log(
-            util.inspect(order, {
-                showHidden: false,
-                depth: null,
-                colors: true
-            })
-        );
+        // console.log(
+        //     util.inspect(order, {
+        //         showHidden: false,
+        //         depth: null,
+        //         colors: true
+        //     })
+        // );
 
         console.log(`------------------------------------`);
     });
@@ -482,6 +482,9 @@ const uploadQcMediaForOrder = async ({ userId, orderId, uploadedMedia }) => {
         isPrimary: media.isPrimary || false,
         uploadedBy: ROLES.ROLES.SUPPLIER
     }));
+console.log("Media to create: ", mediaAssetsToCreate);
+console.log("mediaArray",mediaArray);
+
 
     // 3. Save the URLs and public IDs to the database via the repository.
     await supplierRepository.addMediaToPurchaseOrder(
@@ -801,13 +804,13 @@ const getSupplierOrderHistory = async ({
         // Use util.inspect to print the entire object without truncation.
         // 'depth: null' tells it to show all nested levels.
         // 'colors: true' makes it much easier to read in the terminal.
-        console.log(
-            util.inspect(order, {
-                showHidden: false,
-                depth: null,
-                colors: true
-            })
-        );
+        // console.log(
+        //     util.inspect(order, {
+        //         showHidden: false,
+        //         depth: null,
+        //         colors: true
+        //     })
+        // );
 
         console.log(`------------------------------------`);
     });
