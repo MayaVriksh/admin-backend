@@ -102,7 +102,7 @@ const listHistoryValidation = {
             .default(10)
             .label("Page Limit")
             .description("Number of items per page (1–100)"),
-
+        search: Joi.string().allow("").optional().trim(),
         // Search by supplier ID
         supplierId: Joi.string()
             .trim()

@@ -314,6 +314,7 @@ const findHistoricalPurchaseOrders = async ({
     page,
     limit,
     orderStatus,
+    search,
     supplierId,
     warehouseId,
     fromDate,
@@ -335,7 +336,11 @@ const findHistoricalPurchaseOrders = async ({
                     gte: new Date(fromDate),
                     lte: new Date(toDate)
                 }
-            })
+            }
+        ),
+        ...(search && {
+            id: { contains: search, mode: "insensitive" }
+        })
     };
 
     const orderBy = {};
