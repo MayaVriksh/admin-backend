@@ -19,7 +19,7 @@ const createServer = async () => {
                 //     "http://localhost:8080",
                 //     "https://debanjan-five.vercel.app/",
                 // ],
-                origin: "*",
+                origin: ["*"],
                 headers: ["Authorization", "Content-Type", "If-None-Match"],
                 exposedHeaders: ["WWW-Authenticate", "Server-Authorization"],
                 additionalExposedHeaders: ["X-Custom-Header"],
