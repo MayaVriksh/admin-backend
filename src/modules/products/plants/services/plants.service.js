@@ -188,6 +188,8 @@ class PlantService {
         order = "asc",
         plantCategory
     }) {
+        // console.log({ page, limit, skip, sortBy, order, plantCategory });
+
         const offset = skip !== undefined ? skip : (page - 1) * limit;
 
         const [plants, total] = await Promise.all([
@@ -200,6 +202,8 @@ class PlantService {
             }),
             PlantRepository.countByNameOrVariant({ plantCategory })
         ]);
+
+        // console.log(plants);
 
         const transformedPlants = transformPlantsForCards(plants);
 
