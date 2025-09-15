@@ -14,11 +14,12 @@ const createServer = async () => {
         host: process.env.HOST || "localhost",
         routes: {
             cors: {
-                origin: [
-                    "https://mayavriksh-ecom-admin-ui.onrender.com",
-                    "http://localhost:8080",
-                    "https://debanjan-five.vercel.app/",
-                ],
+                // origin: [
+                //     "https://mayavriksh-ecom-admin-ui.onrender.com",
+                //     "http://localhost:8080",
+                //     "https://debanjan-five.vercel.app/",
+                // ],
+                origin: "*",
                 headers: ["Authorization", "Content-Type", "If-None-Match"],
                 exposedHeaders: ["WWW-Authenticate", "Server-Authorization"],
                 additionalExposedHeaders: ["X-Custom-Header"],
