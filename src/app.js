@@ -32,7 +32,7 @@ const createServer = async () => {
         }
     });
 
-    // Log all incoming requests to debug if POST reaches server
+    // Log all incoming requests to debug if POST reaches servers
     server.ext("onRequest", (request, h) => {
         console.log(
             `Incoming request: ${request.method.toUpperCase()} ${request.path}`
