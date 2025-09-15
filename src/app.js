@@ -16,7 +16,8 @@ const createServer = async () => {
             cors: {
                 origin: [
                     "https://mayavriksh-ecom-admin-ui.onrender.com",
-                    "http://localhost:8080"
+                    "http://localhost:8080",
+                    "https://debanjan-five.vercel.app/",
                 ],
                 headers: ["Authorization", "Content-Type", "If-None-Match"],
                 exposedHeaders: ["WWW-Authenticate", "Server-Authorization"],
