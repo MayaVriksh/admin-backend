@@ -328,7 +328,7 @@ export default [
         method: "POST",
         path: "/admin/warehouse-cart/add",
         options: {
-            tags: ["api", "Admin Inventory"],
+            tags: ["api", "Warehouse Inventory"],
             description: "Add or update an item in the warehouse purchase order cart.",
             notes: "This endpoint performs several crucial checks: 1. Verifies that the product variant exists. 2. Ensures the product is active and available for ordering. 3. Uses a database 'upsert' to atomically add the item or update its quantity if it's already in the cart.",
             pre: [
@@ -351,7 +351,7 @@ export default [
         method: "GET",
         path: "/admin/warehouse-cart/{warehouseId}",
         options: {
-            tags: ["api", "Admin", "Warehouse Cart"],
+            tags: ["api", "Warehouse Inventory"],
             description: "Get all items for a warehouse's cart, grouped by supplier, with calculated totals.",
             notes: "This endpoint fetches all cart items for a given warehouse, performs server-side grouping by supplier, and calculates subtotals and a grand total. The response is structured and ready for direct rendering in the UI.",
             pre: [
@@ -372,9 +372,9 @@ export default [
     },
     {
         method: "POST",
-        path: "/admin/purchase-orders/from-cart",
+        path: "/admin/purchase-orders/checkout-from-cart",
         options: {
-            tags: ["api", "Admin Inventory"],
+            tags: ["api", "Warehouse Inventory"],
             description: "Create a new Purchase Order from all items in a warehouse's cart.",
             notes: "This is a secure endpoint that ignores any client-side financial data. It fetches all items and prices for the given warehouseId directly from the database to build the order.",
             pre: [

@@ -868,6 +868,29 @@ const searchWarehousesByName = async (search) => {
         data: matchedWarehouses
     };
 };
+const findAllVerifiedSuppliers = async (search) => {
+    // Call the repository function to fetch the raw data from the database.
+    const suppliers = await supplierRepository.findAllVerified(search);
+
+    // It's a good practice to handle the case where no data is found.
+    if (!suppliers || suppliers.length === 0) {
+        return {
+            success: true,
+            code: 200,
+            message: "No verified suppliers found matching the criteria.",
+            data: [] // Always return an array to ensure a consistent data type for the frontend.
+        };
+    }
+
+    // Format the final, successful response.
+    return {
+        success: true,
+        code: 200,
+        message: "Verified suppliers retrieved successfully.",
+        data: suppliers
+    };
+};
+
 
 export {
     completeSupplierProfile,
@@ -879,6 +902,7 @@ export {
     showSupplierProfile,
     updateSupplierProfile,
     uploadQcMediaForOrder,
-    searchWarehousesByName
+    searchWarehousesByName,
+    findAllVerifiedSuppliers
 };
 

@@ -428,5 +428,23 @@ A rejected or cancelled order will have these characteristics:
                 }
             }
         }
+    },
+    {
+        method: "GET",
+        path: "/admin/suppliers/list",
+        options: {
+            tags: ["api", "Suppliers"],
+            description: "Get a list of all verified suppliers for dropdowns.",
+            notes: "Fetches a list of suppliers with their ID and nursery name. Only returns suppliers where `isVerified` is true. Supports searching by `nurseryName`.",
+            pre: [
+                verifyAccessTokenMiddleware,
+                requireRole([ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.WAREHOUSE_MANAGER])
+            ],
+            validate: {
+                ...SupplierValidator.listSuppliersValidation,
+                failAction: handleValidationFailure,
+            },
+            handler: SupplierController.listAllVerifiedSuppliers,
+        }
     }
 ];

@@ -307,8 +307,13 @@ const listOrdersResponseSchema = Joi.object({
     })
 }).label("ListOrdersResponse");
 
+const listSuppliersValidation = {
+    query: Joi.object({
+        search: Joi.string().allow('').optional().description("An optional search term to filter suppliers by nursery name.")
+    })
+};
 export {
     completeSupplierProfile, getOrderByIdResponseSchema, listHistoryValidation, listOrdersResponseSchema, orderIdParamValidation, orderRequestValidation,
-    reviewPurchaseOrderValidation, updateSupplierProfile
+    reviewPurchaseOrderValidation, updateSupplierProfile, listSuppliersValidation
 };
 

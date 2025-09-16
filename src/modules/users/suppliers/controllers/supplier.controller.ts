@@ -499,6 +499,18 @@ const searchWarehouses = async (req: any, h: any): Promise<any> => {
     }
 };
 
+const listAllVerifiedSuppliers = async (req, h) => {
+    try {
+        const { search } = req.query;
+        // The service layer is now also functional, so we call the exported function directly.
+        const result = await SupplierService.findAllVerifiedSuppliers(search);
+        return h.response(result).code(result.code);
+    } catch (error) {
+        console.error("List Verified Suppliers Controller Error:", error);
+        return h.response({ success: false, message: error.message }).code(error.code || 500);
+    }
+};
+
 export {
     completeSupplierProfile,
     getOrderRequestByOrderId,
@@ -510,6 +522,7 @@ export {
     showSupplierProfile,
     updateSupplierProfile,
     uploadQcMedia,
-    searchWarehouses
+    searchWarehouses,
+    listAllVerifiedSuppliers
 };
 

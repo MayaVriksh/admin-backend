@@ -520,9 +520,40 @@ const findHistoricalPurchaseOrders = async (
         })
     ]);
 };
+/**
+ * Fetches a list of all verified suppliers, optionally filtered by name.
+ * Selects only the ID and nursery name for efficiency.
+ * @param {string} [searchTerm] - Optional search term for the nursery name.
+ */
+const findAllVerified = async (searchTerm) => {
+    const where = {
+        isVerified: true, // Crucial business rule: only fetch verified suppliers
+        deletedAt: null
+    };
+
+    if (searchTerm) {
+        where.nurseryName = {
+            contains: searchTerm,
+            mode: "insensitive"
+        };
+    }
+
+    return await prisma.supplier.findMany({
+        where,
+        orderBy: {
+            nurseryName: 'asc'
+        },
+        // Optimize the payload by selecting only the fields needed for the dropdown
+        select: {
+            supplierId: true,
+            nurseryName: true
+        }
+    });
+};
 
 export {
     addMediaToPurchaseOrder,
-    checkPurchaseOrderExist, findHistoricalPurchaseOrders, findOrderItemsByIds, findPurchaseOrdersBySupplier, findSupplierByUserId, findSupplierDetailsForEmailByUserId, orderToReview, rejectEntireOrder, updateOrderAfterReview, updateOrderStatus
+    checkPurchaseOrderExist, findHistoricalPurchaseOrders, findOrderItemsByIds, findPurchaseOrdersBySupplier, findSupplierByUserId, findSupplierDetailsForEmailByUserId, orderToReview, rejectEntireOrder, updateOrderAfterReview, updateOrderStatus,
+    findAllVerified
 };
 
