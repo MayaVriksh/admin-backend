@@ -12,7 +12,9 @@ class InventoryService {
             inventoryId: restOfItem.id,
             currentStock: restOfItem.currentStock,
             sku: plantVariant.sku,
-            variantName: `${plants.name} - ${plantVariant.size.plantSize}, ${plantVariant.color.name}`
+            variantName: `${plants.name} - ${plantVariant.size.plantSize}, ${plantVariant.color.name}`,
+            plantId: plants.plantId,
+            variantId: plantVariant.variantId
         };
     }
 
