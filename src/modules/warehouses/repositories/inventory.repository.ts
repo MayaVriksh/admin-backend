@@ -44,10 +44,13 @@ class WarehouseInventoryRepository {
                     id: true,
                     currentStock: true,
                     plants: {
-                        select: { name: true }
+                        select: { 
+                            plantId: true,
+                            name: true }
                     },
                     plantVariant: {
                         select: {
+                            variantId: true,
                             sku: true,
                             size: { select: { plantSize: true } },
                             color: { select: { name: true } }
