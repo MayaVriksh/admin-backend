@@ -4,6 +4,7 @@ const {
     RESPONSE_CODES,
     RESPONSE_FLAGS
 } = require("../../../../constants/responseCodes.constant");
+const getPotData = require("../../../../constants/pots.constants");
 
 // Helper function to transfprm the response
 const transformPlantsForCards = (servicePlants) => {
@@ -346,6 +347,17 @@ class PlantService {
                 skip: offset,
                 plants
             }
+        };
+    }
+
+    // Get all compatible pots
+    static async getAllCompatiblePots() {
+        const potsData = getPotData();
+
+        return {
+            success: RESPONSE_FLAGS.SUCCESS,
+            code: RESPONSE_CODES.SUCCESS,
+            data: potsData
         };
     }
 }

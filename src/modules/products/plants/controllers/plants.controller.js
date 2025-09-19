@@ -122,6 +122,29 @@ class PlantController {
             );
         }
     }
+
+    // Get all compatible pots
+    static async getAllCompatiblePots(req, h) {
+        try {
+            const result = await PlantService.getAllCompatiblePots();
+
+            return h
+                .response({
+                    success: result.success || RESPONSE_FLAGS.SUCCESS,
+                    message:
+                        SUCCESS_MESSAGES.POTS?.FETCHED ||
+                        "Compatible pots fetched successfully",
+                    data: result.data
+                })
+                .code(result.code || RESPONSE_CODES.SUCCESS);
+        } catch (err) {
+            return ResponseHandler.handleError(
+                h,
+                err,
+                "Get All Compatible Pots Error:"
+            );
+        }
+    }
 }
 
 module.exports = PlantController;
