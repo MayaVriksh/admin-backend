@@ -120,31 +120,31 @@ module.exports = [
     },
 
     // Pots: Get all Compatible Pots
-    {
-        method: "GET",
-        path: "/compatible-pots",
-        options: {
-            tags: ["api", "Pots"],
-            description: "Get all compatible pots 🪴",
-            notes: "Fetch a list of compatible pots. The response includes pot type, size, available colors, variants, images, and selling price.",
-            handler: PlantController.getAllCompatiblePots,
-            plugins: {
-                "hapi-swagger": {
-                    responses: {
-                        200: {
-                            description:
-                                "🪴 Compatible pots retrieved successfully"
-                        },
-                        400: {
-                            description: "❌ Invalid request parameters"
-                        },
-                        500: {
-                            description:
-                                "💥 Server error while fetching compatible pots"
-                        }
-                    }
-                }
-            }
-        }
-    }
+    // {
+    //     method: "GET",
+    //     path: "/compatible-pots",
+    //     options: {
+    //         tags: ["api", "Pots"],
+    //         description: "Get all compatible pots 🪴",
+    //         notes: "Fetch a list of compatible pots. The response includes pot type, size, available colors, variants, images, and selling price.",
+    //         handler: PlantController.getAllCompatiblePots,
+    //         plugins: {
+    //             "hapi-swagger": {
+    //                 responses: {
+    //                     200: {
+    //                         description:
+    //                             "🪴 Compatible pots retrieved successfully"
+    //                     },
+    //                     400: {
+    //                         description: "❌ Invalid request parameters"
+    //                     },
+    //                     500: {
+    //                         description:
+    //                             "💥 Server error while fetching compatible pots"
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 ];

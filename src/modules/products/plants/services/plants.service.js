@@ -5,7 +5,7 @@ const {
     RESPONSE_FLAGS
 } = require("../../../../constants/responseCodes.constant");
 const getPotData = require("../../../../constants/pots.constants");
-
+const potData = require("../../../../constants/pot.constant");
 // Helper function to transfprm the response
 const transformPlantsForCards = (servicePlants) => {
     const sizeOrder = [
@@ -286,9 +286,12 @@ class PlantService {
     }
 
     // Get plant by ID
+    // Get plant by ID - THIS IS THE MODIFIED FUNCTION
     static async getPlantById(id) {
-        const plant = await PlantRepository.findById(id);
-        if (!plant) {
+        // Step 1: Fetch the core plant data from the database via the repository.
+        const plantFromDb = await PlantRepository.findById(id);
+        console.log("plantFromDb",plantFromDb);
+        if (!plantFromDb) {
             throw {
                 success: RESPONSE_FLAGS.FAILURE,
                 code: RESPONSE_CODES.NOT_FOUND,
@@ -296,10 +299,36 @@ class PlantService {
             };
         }
 
+        // --- THIS IS THE NEW LOGIC ---
+        // Step 2: Augment the database response with the static compatible pots data.
+        const allCompatiblePots = potData();
+
+        // Map over the size profiles fetched from the DB
+        const augmentedSizeProfiles = plantFromDb.plants.plantSizeProfile.map(sizeProfile => {
+            // For each size (e.g., "SMALL"), find the matching pot data from our constant
+            const compatiblePotsForSize = allCompatiblePots[sizeProfile.plantSize];
+            
+            return {
+                ...sizeProfile,
+                // Add the new `compatiblePots` key to the response object for this size
+                compatiblePots: compatiblePotsForSize ? [compatiblePotsForSize] : [] 
+            };
+        });
+
+        // Step 3: Construct the final response object with the augmented data.
+        const finalPlantData = {
+            ...plantFromDb,
+            plants: {
+                ...plantFromDb.plants,
+                plantSizeProfile: augmentedSizeProfiles
+            }
+        };
+        // --- END OF NEW LOGIC ---
+
         return {
             success: RESPONSE_FLAGS.SUCCESS,
             code: RESPONSE_CODES.SUCCESS,
-            data: plant
+            data: finalPlantData // Return the final, merged data
         };
     }
 

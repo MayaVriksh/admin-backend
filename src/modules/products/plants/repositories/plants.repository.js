@@ -64,26 +64,26 @@ class PlantRepository {
                         select: {
                             ...(productCard
                                 ? {
-                                      plantSize: true,
-                                      PlantVariants: {
-                                          select: {
-                                              color: {
-                                                  select: {
-                                                      id: true,
-                                                      name: true,
-                                                      hexCode: true
-                                                  }
-                                              },
-                                              plantVariantImages: {
-                                                  where: { isPrimary: true },
-                                                  select: {
-                                                      id: true,
-                                                      mediaUrl: true,
-                                                      mediaType: true
-                                                  }
-                                              }
-                                          }
-                                      }
+                                        plantSize: true,
+                                        PlantVariants: {
+                                            select: {
+                                                color: {
+                                                    select: {
+                                                        id: true,
+                                                        name: true,
+                                                        hexCode: true
+                                                    }
+                                                },
+                                                plantVariantImages: {
+                                                    where: { isPrimary: true },
+                                                    select: {
+                                                        id: true,
+                                                        mediaUrl: true,
+                                                        mediaType: true
+                                                    }
+                                                }
+                                            }
+                                        }
                                   }
                                 : {
                                       plantSizeId: true,
