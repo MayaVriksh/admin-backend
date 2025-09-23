@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MayaVriksh - Peace Lily</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tab-btn.active { 
+            border-color: #10b981; /* Emerald-500 */
+            color: #059669; /* Emerald-600 */
+            background-color: #ecfdf5; /* Emerald-50 */
+        }
+        .size-btn.active, .color-swatch.active, .pot-type-card.active {
+            border-color: #10b981;
+            box-shadow: 0 0 0 2px #a7f3d0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Left Column: Image Gallery -->
+            <div class="gallery-container">
+                <div class="mb-4">
+                    <img id="main-image" src="https://res.cloudinary.com/dwdu18hzs/image/upload/v1756724476/Gemini_Generated_Image_g8dcj4g8dcj4g8dc_a1js4a.png" alt="Peace Lily" class="w-full h-auto object-cover rounded-xl shadow-lg aspect-square">
+                </div>
+                <div id="thumbnail-container" class="grid grid-cols-5 gap-2">
+                    <!-- JS will populate this -->
+                </div>
+            </div>
+
+            <!-- Right Column: Product Details & Actions -->
+            <div class="details-container">
+                <h1 class="text-4xl font-bold mb-2">Peace Lily</h1>
+                <p class="text-lg text-gray-500 mb-4">Spathiphyllum wallisii</p>
+                
+                <div class="flex items-center mb-6">
+                    <!-- Star rating component -->
+                </div>
+
+                <div id="price-container" class="mb-6">
+                    <p class="text-4xl font-extrabold text-emerald-600">₹399 <span class="text-xl text-gray-400 font-medium line-through ml-2">₹599</span></p>
+                    <p id="pot-price-info" class="text-sm text-gray-500 h-5 mt-1"></p>
+                </div>
+
+                <!-- Size Selector -->
+                <div class="mb-6">
+                    <label class="block font-semibold mb-2">Choose Plant Size</label>
+                    <div id="size-selector" class="flex flex-wrap gap-3">
+                        <!-- JS will populate this -->
+                    </div>
+                </div>
+
+                <!-- Color Selector -->
+                <div class="mb-6">
+                    <label class="block font-semibold mb-2">Choose Plant Color</label>
+                    <div id="color-selector" class="flex flex-wrap gap-3">
+                        <!-- JS will populate this -->
+                    </div>
+                </div>
+
+                <!-- Compatible Pots Selector -->
+                <div id="pots-container" class="mb-6">
+                    <!-- JS will populate this -->
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center border rounded-lg p-2">
+                        <button class="px-3 text-lg font-bold text-gray-500 hover:text-black">-</button>
+                        <span class="px-4 font-bold text-lg">1</span>
+                        <button class="px-3 text-lg font-bold text-gray-500 hover:text-black">+</button>
+                    </div>
+                    <button class="w-full bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-emerald-700 transition">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Section: Detailed Info Tabs -->
+        <div class="mt-12">
+            <div class="border-b border-gray-200">
+                <nav id="details-tabs" class="-mb-px flex space-x-6" aria-label="Tabs">
+                    <!-- JS will populate this -->
+                </nav>
+            </div>
+            <div id="details-content" class="py-6">
+                <!-- JS will populate this -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA: This would come from your GET /api/plants/:id endpoint ---
+        const productData = {
+            "plant": { "name": "Peace Lily", "scientificName": "Spathiphyllum wallisii", "description": "An elegant indoor plant known for its air-purifying qualities.", "maintenance": "Easy", "repotting": "Every 1-2 years", "soil": "Well-draining mix", "insideBox": ["Live Plant", "Nursery Pot", "Care Guide"], "funFacts": ["The white 'flower' is a modified leaf.", "Removes toxins from the air."], "benefits": ["Air Purification", "Low Maintenance"], "spiritualUseCase": ["Promotes calm and peace."] },
+            "plantSizeProfile": [
+                {
+                    "plantSize": "SMALL", "height": "30", "weight": "0.5",
+                    "PlantVariants": [
+                        { "variantId": "PLVR-S-1", "color": { "id": "clr-white", "name": "Green/White", "hexCode": "#F0F0F0" }, "mrp": "399", "plantVariantImages": [{ "mediaUrl": "https://res.cloudinary.com/dwdu18hzs/image/upload/v1756724476/Gemini_Generated_Image_g8dcj4g8dcj4g8dc_a1js4a.png", isPrimary: true }] },
+                        { "variantId": "PLVR-S-2", "color": { "id": "clr-var", "name": "Variegated", "hexCode": "#90EE90" }, "mrp": "449", "plantVariantImages": [{ "mediaUrl": "https://res.cloudinary.com/dwdu18hzs/image/upload/v1756724474/Gemini_Generated_Image_7ckenr7ckenr7cke_cxjvil.png", isPrimary: true }] }
+                    ],
+                    "PlantCareGuidelines": [
+                        { "season": "Summer", "wateringFrequency": "Every 3-4 days", "waterAmountMl": "200", "sunlightType": { "typeName": "Bright Indirect" }, "humidityLevel": { "level": "Medium" } },
+                        { "season": "Winter", "wateringFrequency": "Every 7-10 days", "waterAmountMl": "150", "sunlightType": { "typeName": "Bright Indirect" }, "humidityLevel": { "level": "Low" } }
+                    ],
+                    "PlantFertilizerSchedule": [ { "season": "Summer", "fertilizer": { "name": "NPK 19-19-19" }, "applicationFrequency": "Monthly" } ],
+                    "compatiblePots": { /* The full compatible pots JSON object for SMALL */ }
+                },
+                {
+                    "plantSize": "MEDIUM", "height": "50", "weight": "1.2",
+                    "PlantVariants": [
+                        { "variantId": "PLVR-M-1", "color": { "id": "clr-white", "name": "Green/White", "hexCode": "#F0F0F0" }, "mrp": "699", "plantVariantImages": [{ "mediaUrl": "https://res.cloudinary.com/dwdu18hzs/image/upload/v1756724475/Gemini_Generated_Image_doqqbidoqqbidoqq_hdfhkb.png", isPrimary: true }] }
+                    ],
+                    "PlantCareGuidelines": [
+                         { "season": "Summer", "wateringFrequency": "Every 2-3 days", "waterAmountMl": "350", "sunlightType": { "typeName": "Bright Indirect" }, "humidityLevel": { "level": "Medium" } }
+                    ],
+                    "PlantFertilizerSchedule": [ { "season": "Summer", "fertilizer": { "name": "NPK 19-19-19" }, "applicationFrequency": "Every 3 weeks" } ],
+                    "compatiblePots": { /* The full compatible pots JSON object for MEDIUM */ }
+                }
+            ]
+        };
+
+        // --- STATE MANAGEMENT ---
+        let currentState = {
+            size: "SMALL",
+            colorId: "clr-white",
+            potVariantId: null,
+            tab: "Description",
+            season: "Summer"
+        };
+
+        // --- DOM ELEMENTS ---
+        const priceContainer = document.getElementById('price-container');
+        const potPriceInfo = document.getElementById('pot-price-info');
+        const sizeSelector = document.getElementById('size-selector');
+        const colorSelector = document.getElementById('color-selector');
+        const potsContainer = document.getElementById('pots-container');
+        const mainImage = document.getElementById('main-image');
+        const thumbnailContainer = document.getElementById('thumbnail-container');
+        const detailsTabs = document.getElementById('details-tabs');
+        const detailsContent = document.getElementById('details-content');
+
+        // --- RENDER FUNCTIONS ---
+        
+        function render() {
+            const sizeProfile = productData.plantSizeProfile.find(p => p.plantSize === currentState.size);
+            if (!sizeProfile) return;
+
+            renderSelectors(sizeProfile);
+            renderPrice(sizeProfile);
+            renderImages(sizeProfile);
+            renderDetails(sizeProfile);
+        }
+
+        function renderSelectors(sizeProfile) {
+            // Render Size Buttons
+            sizeSelector.innerHTML = productData.plantSizeProfile.map(profile => `
+                <button class="size-btn border-2 rounded-lg px-4 py-2 font-semibold transition ${profile.plantSize === currentState.size ? 'active' : ''}" onclick="handleSizeChange('${profile.plantSize}')">
+                    ${profile.plantSize.charAt(0) + profile.plantSize.slice(1).toLowerCase()}
+                </button>
+            `).join('');
+
+            // Render Color Swatches
+            colorSelector.innerHTML = sizeProfile.PlantVariants.map(variant => `
+                <button class="color-swatch h-10 w-10 rounded-full border-2 transition ${variant.color.id === currentState.colorId ? 'active' : ''}" style="background-color: ${variant.color.hexCode}" onclick="handleColorChange('${variant.color.id}')"></button>
+            `).join('');
+
+            // Render Compatible Pots (if data exists)
+            // This is a simplified version; a full implementation would use the detailed pot data.
+            potsContainer.innerHTML = `
+                <label class="block font-semibold mb-2">Choose Pot Type</label>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div class="pot-type-card border-2 rounded-lg p-3 text-center cursor-pointer ${!currentState.potVariantId ? 'active' : ''}" onclick="handlePotChange(null)">
+                        <p class="font-medium">No Pot</p><p class="text-sm text-gray-500">Free</p>
+                    </div>
+                    <div class="pot-type-card border-2 rounded-lg p-3 text-center cursor-pointer ${currentState.potVariantId === 'pot1' ? 'active' : ''}" onclick="handlePotChange('pot1')">
+                        <p class="font-medium">Ceramic</p><p class="text-sm text-gray-500">+₹100</p>
+                    </div>
+                     <div class="pot-type-card border-2 rounded-lg p-3 text-center cursor-pointer ${currentState.potVariantId === 'pot2' ? 'active' : ''}" onclick="handlePotChange('pot2')">
+                        <p class="font-medium">Plastic</p><p class="text-sm text-gray-500">+₹50</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPrice(sizeProfile) {
+            const plantVariant = sizeProfile.PlantVariants.find(v => v.color.id === currentState.colorId);
+            let basePrice = Number(plantVariant.mrp);
+            let potPrice = 0;
+            if(currentState.potVariantId === 'pot1') potPrice = 100;
+            if(currentState.potVariantId === 'pot2') potPrice = 50;
+            
+            const totalPrice = basePrice + potPrice;
+            priceContainer.querySelector('p').innerHTML = `₹${totalPrice.toLocaleString()} <span class="text-xl text-gray-400 font-medium line-through ml-2">₹${(totalPrice * 1.5).toFixed(0)}</span>`;
+            potPriceInfo.textContent = potPrice > 0 ? `(Plant: ₹${basePrice} + Pot: ₹${potPrice})` : '';
+        }
+
+        function renderImages(sizeProfile) {
+            const plantVariant = sizeProfile.PlantVariants.find(v => v.color.id === currentState.colorId);
+            mainImage.src = plantVariant.plantVariantImages[0].mediaUrl;
+            // In a real app, you'd populate more thumbnails here
+        }
+
+        function renderDetails(sizeProfile) {
+            const tabs = ["Description", "Care", "Features", "Spiritual"];
+            detailsTabs.innerHTML = tabs.map(tab => `
+                <a href="#" class="tab-btn py-3 px-1 border-b-2 font-semibold text-sm ${currentState.tab === tab ? 'active' : 'text-gray-500 hover:text-gray-700'}" onclick="handleTabChange('${tab}', event)">${tab}</a>
+            `).join('');
+            
+            let content = '';
+            if (currentState.tab === 'Description') {
+                content = `
+                    <div class="prose max-w-none">
+                        <p>${productData.plant.description}</p>
+                        <h3 class="font-bold mt-4">What's in the Box?</h3>
+                        <ul>${productData.plant.insideBox.map(i => `<li>${i}</li>`).join('')}</ul>
+                        <h3 class="font-bold mt-4">Fun Facts</h3>
+                        <ul>${productData.plant.funFacts.map(f => `<li>${f}</li>`).join('')}</ul>
+                    </div>
+                `;
+            } else if (currentState.tab === 'Care') {
+                const careGuideline = sizeProfile.PlantCareGuidelines.find(cg => cg.season === currentState.season);
+                const fertilizerSchedule = sizeProfile.PlantFertilizerSchedule.filter(fs => fs.season === currentState.season);
+                content = `
+                    <div class="flex items-center border-b pb-2 mb-4">
+                        ${sizeProfile.PlantCareGuidelines.map(cg => `<button class="px-3 py-1 text-sm rounded-full ${currentState.season === cg.season ? 'bg-emerald-100 text-emerald-700 font-semibold' : 'text-gray-600 hover:bg-gray-100'}" onclick="handleSeasonChange('${cg.season}')">${cg.season}</button>`).join('')}
+                    </div>
+                    ${careGuideline ? `
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div><strong class="text-gray-600">Watering:</strong> ${careGuideline.wateringFrequency}</div>
+                        <div><strong class="text-gray-600">Amount:</strong> ${careGuideline.waterAmountMl} ml</div>
+                        <div><strong class="text-gray-600">Sunlight:</strong> ${careGuideline.sunlightType.typeName}</div>
+                        <div><strong class="text-gray-600">Humidity:</strong> ${careGuideline.humidityLevel.level}</div>
+                    </div>
+                    <h4 class="font-semibold mt-6 mb-2">Fertilizer</h4>
+                    ${fertilizerSchedule.length > 0 ? `
+                        <ul class="list-disc pl-5 text-sm">
+                            ${fertilizerSchedule.map(f => `<li><strong>${f.fertilizer.name}:</strong> Apply ${f.applicationFrequency}.</li>`).join('')}
+                        </ul>
+                    ` : '<p class="text-sm text-gray-500">No fertilizer needed in this season.</p>'}
+                    ` : '<p class="text-sm text-gray-500">No care guidelines available for this season.</p>'}
+                `;
+            } else {
+                 content = `<p class="text-gray-500">Content for ${currentState.tab} goes here.</p>`;
+            }
+            detailsContent.innerHTML = content;
+        }
+
+        // --- EVENT HANDLERS ---
+        function handleSizeChange(size) {
+            currentState.size = size;
+            const newSizeProfile = productData.plantSizeProfile.find(p => p.plantSize === size);
+            currentState.colorId = newSizeProfile.PlantVariants[0].color.id; // Default to first color of new size
+            currentState.potVariantId = null; // Reset pot selection
+            render();
+        }
+
+        function handleColorChange(colorId) {
+            currentState.colorId = colorId;
+            render();
+        }
+
+        function handlePotChange(potId) {
+            currentState.potVariantId = potId;
+            render();
+        }
+
+        function handleTabChange(tab, event) {
+            event.preventDefault();
+            currentState.tab = tab;
+            render();
+        }
+
+        function handleSeasonChange(season) {
+            currentState.season = season;
+            render();
+        }
+
+        // --- INITIAL RENDER ---
+        document.addEventListener('DOMContentLoaded', render);
+    </script>
+
+</body>
+</html>

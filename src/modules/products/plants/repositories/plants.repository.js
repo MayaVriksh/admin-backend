@@ -6,11 +6,11 @@ class PlantRepository {
     static baseSelect(productCard) {
         return {
             // id: true,
-            plantId: true,
-            variantId: true,
+            // plantId: true,
+            // variantId: true,
 
-            currentStock: true,
-            trueCostPrice: true,
+            // currentStock: true,
+            // trueCostPrice: true,
 
             // Plant details
             plants: {
@@ -47,18 +47,18 @@ class PlantRepository {
                           }),
 
                     // Categories
-                    ...(productCard
-                        ? {}
-                        : {
-                              plantCategories: {
-                                  select: {
-                                      categoryId: true,
-                                      name: true,
-                                      description: true,
-                                      mediaUrl: true
-                                  }
-                              }
-                          }),
+                    // ...(productCard
+                    //     ? {}
+                    //     : {
+                    //           plantCategories: {
+                    //               select: {
+                    //                   categoryId: true,
+                    //                   name: true,
+                    //                   description: true,
+                    //                   mediaUrl: true
+                    //               }
+                    //           }
+                    //       }),
 
                     plantSizeProfile: {
                         select: {
