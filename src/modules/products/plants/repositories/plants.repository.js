@@ -10,7 +10,6 @@ class PlantRepository {
             // variantId: true,
 
             // currentStock: true,
-            // trueCostPrice: true,
 
             // Plant details
             plants: {
@@ -74,6 +73,7 @@ class PlantRepository {
                                                       hexCode: true
                                                   }
                                               },
+                                              mrp: true,
                                               plantVariantImages: {
                                                   where: { isPrimary: true },
                                                   select: {
