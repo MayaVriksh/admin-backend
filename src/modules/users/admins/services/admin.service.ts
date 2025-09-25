@@ -1147,7 +1147,86 @@ const createPurchaseOrderFromCart = async (payload) => {
     });
 };
 
+// A private helper function to transform the deeply nested DB object into a clean, flat response for the UI.
+const _transformCartItem = (item) => {
+    const isPlant = item.productType === 'PLANT';
+    const itemTotal = Number(item.unitsRequested) * Number(item.unitCostPrice);
+
+    let variantDetails = {
+        name: "Unknown Product",
+        sku: "N/A",
+        size: "N/A",
+        color: "N/A",
+        imageUrl: null
+    };
+
+    if (isPlant && item.plantVariant) {
+        variantDetails = {
+            name: item.plantVariant.plants?.name || "N/A",
+            sku: item.plantVariant.sku,
+            size: item.plantVariant.size?.plantSize || "N/A",
+            color: item.plantVariant.color?.name || "N/A",
+            imageUrl: item.plantVariant.plantVariantImages?.[0]?.mediaUrl || null
+        };
+    } else if (!isPlant && item.potVariant) {
+        variantDetails = {
+            name: item.potVariant.potName,
+            sku: item.potVariant.sku,
+            size: item.potVariant.sizeMaterialOption?.sizeProfile?.size || "N/A",
+            color: item.potVariant.color?.name || "N/A",
+            imageUrl: item.potVariant.images?.[0]?.mediaUrl || null
+        };
+    }
+
+    return {
+        cartItemId: item.cartItemId,
+        productType: item.productType,
+        unitsRequested: item.unitsRequested,
+        unitCostPrice: item.unitCostPrice,
+        itemTotalCost: itemTotal,
+        variantId: isPlant ? item.plantVariantId : item.potVariantId,
+        ...variantDetails
+    };
+};
+
+
+/**
+ * Retrieves all items for a checkout summary, transforms them, and calculates the total cost.
+ */
+const getCheckoutSummary = async (warehouseId, supplierId) => {
+    // 1. Fetch all trusted cart items from the repository.
+    const cartItems = await adminRepo.findCartItemsForCheckout(warehouseId, supplierId);
+
+    if (!cartItems || cartItems.length === 0) {
+        throw { code: 404, message: "No items found in the cart for this supplier to check out." };
+    }
+
+    // 2. Securely calculate the total cost and transform the data on the backend.
+    let totalCost = 0;
+    const supplierName = cartItems[0].supplier.nurseryName; // Get supplier name from the first item
+
+    // Use the new, more detailed transformation function
+    const transformedItems = cartItems.map(item => {
+        const transformed = _transformCartItem(item);
+        totalCost += transformed.itemTotalCost;
+        return transformed;
+    });
+
+    // 3. Return the final, structured response for the checkout summary page.
+    return {
+        success: true,
+        code: 200,
+        message: "Checkout summary retrieved successfully.",
+        data: {
+            supplierName: supplierName,
+            items: transformedItems,
+            totalCost: totalCost
+        }
+    };
+};
+
 export {
-    addItemToWarehouseCart, createPurchaseOrderFromCart, getOrderRequestByOrderId, getSupplierOrderHistory, getWarehouseCart, listSupplierOrders, recordPaymentForOrder, restockInventory, showAdminProfile, uploadQcMediaForOrder
+    addItemToWarehouseCart, createPurchaseOrderFromCart, getOrderRequestByOrderId, getSupplierOrderHistory, getWarehouseCart, listSupplierOrders,
+    recordPaymentForOrder, restockInventory, showAdminProfile, uploadQcMediaForOrder, getCheckoutSummary
 };
 

@@ -766,9 +766,71 @@ const createOrderAndItems = async (orderData, itemsData, tx) => {
 
     return purchaseOrder;
 };
-
+/**
+ * Fetches all cart items for a specific warehouse and supplier, including product details.
+ */
+const findCartItemsForCheckout = async (warehouseId, supplierId) => {
+    return await prisma.warehouseCartItem.findMany({
+        where: {
+            warehouseId: warehouseId,
+            supplierId: supplierId
+        },
+        select: {
+            cartItemId: true,
+            productType: true,
+            unitsRequested: true,
+            unitCostPrice: true,
+            plantId: true,
+            plantVariantId: true,
+            potCategoryId: true,
+            potVariantId: true,
+            supplier: { // Include supplier name for the summary header
+                select: {
+                    supplierId: true,
+                    nurseryName: true
+                }
+            },
+            plantVariant: {
+                select: {
+                    sku: true,
+                    plants: { select: { name: true } },
+                    size: { select: { plantSize: true } },
+                    color: { select: { name: true } },
+                    plantVariantImages: {
+                        where: { isPrimary: true },
+                        select: { mediaUrl: true }
+                    }
+                }
+            },
+            potVariant: {
+                select: {
+                    potVariantId: true,
+                    sku: true,
+                    potName: true,
+                    sizeMaterialOption: {
+                        select: {
+                            sizeProfile: { select: { size: true } },
+                            material: { select: { name: true } }
+                        }
+                    },
+                    color: { // Color is still a direct relation
+                        select: {
+                            name: true,
+                            hexCode: true
+                        }
+                    },
+                    images: { // Images are still a direct relation
+                        where: { isPrimary: true },
+                        take: 1,
+                        select: { mediaUrl: true }
+                    },
+                }
+            }
+        }
+    });
+};
 export {
     addMediaToPurchaseOrder, checkPurchaseOrderExist, createDamageLog, createOrderAndItems, createPaymentAndUpdateOrder, createPlantRestockLog, createRestockLog, findAdminByUserId, findCartItemsByWarehouseId, findHistoricalPurchaseOrders, findPurchaseOrdersByAdmin, updateOrderStatus, updateWarehouseInventory,
-    upsertCartItem
+    upsertCartItem, findCartItemsForCheckout
 };
 

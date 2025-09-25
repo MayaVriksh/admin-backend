@@ -392,5 +392,23 @@ export default [
                 }
             }
         }
+    },
+    {
+        method: "GET",
+        path: "/admin/checkout-summary",
+        options: {
+            tags: ["api", "Warehouse Inventory"],
+            description: "Get the checkout summary for a specific supplier's items in a warehouse cart.",
+            notes: "Fetches all necessary data (item names, units, prices, totals) from the database to populate the checkout summary page. All calculations are performed securely on the backend.",
+            pre: [
+                verifyAccessTokenMiddleware,
+                requireRole([ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.WAREHOUSE_MANAGER])
+            ],
+            validate: {
+                ...AdminValidator.getCheckoutSummaryValidation,
+                failAction: handleValidationFailure,
+            },
+            handler: AdminController.getCheckoutSummary,
+        }
     }
 ];

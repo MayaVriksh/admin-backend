@@ -403,9 +403,15 @@ const createPurchaseOrderFromCartValidation = {
         deliveryCharges: Joi.number().min(0).optional().default(0).description("Optional delivery charges for the order.")
     })
 };
+const getCheckoutSummaryValidation = {
+    query: Joi.object({
+        warehouseId: Joi.string().required().description("The ID of the warehouse for the cart."),
+        supplierId: Joi.string().required().description("The ID of the supplier for the checkout.")
+    })
+};
 
 export {
     addToWarehouseCartValidation, createPurchaseOrderFromCartValidation, getOrderByIdResponseSchema, getWarehouseCartValidation, listHistoryValidation,
-    listOrdersResponseSchema, orderIdParamValidation, orderRequestValidation, qcMediaUploadValidation, recordPaymentValidation, restockOrderValidation
+    listOrdersResponseSchema, orderIdParamValidation, orderRequestValidation, qcMediaUploadValidation, recordPaymentValidation, restockOrderValidation, getCheckoutSummaryValidation
 };
 

@@ -302,9 +302,21 @@ const createPurchaseOrderFromCart = async (req, h) => {
         }).code(error.code || 500);
     }
 };
+const getCheckoutSummary = async (req, h) => {
+    try {
+        const { warehouseId, supplierId } = req.query;
+        const result = await AdminService.getCheckoutSummary(warehouseId, supplierId);
+        return h.response(result).code(result.code);
+    } catch (error) {
+        console.error("Get Checkout Summary Controller Error:", error);
+        return h.response({
+            success: false, message: error.message
+        }).code(error.code || 500);
+    }
+};
 
 export {
     addItemToWarehouseCart, createPurchaseOrderFromCart, getOrderRequestByOrderId,
-    getSupplierOrderHistory, getWarehouseCart, listSupplierOrders, recordPayment, restockInventory, showAdminProfile, uploadQcMedia
+    getSupplierOrderHistory, getWarehouseCart, listSupplierOrders, recordPayment, restockInventory, showAdminProfile, uploadQcMedia, getCheckoutSummary
 };
 
