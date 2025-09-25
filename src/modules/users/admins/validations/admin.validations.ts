@@ -409,9 +409,15 @@ const getCheckoutSummaryValidation = {
         supplierId: Joi.string().required().description("The ID of the supplier for the checkout.")
     })
 };
+const removeCartItemValidation = {
+    params: Joi.object({
+        cartItemId: Joi.string().required().description("The unique ID of the warehouse cart item to be deleted.")
+    })
+};
+
 
 export {
     addToWarehouseCartValidation, createPurchaseOrderFromCartValidation, getOrderByIdResponseSchema, getWarehouseCartValidation, listHistoryValidation,
-    listOrdersResponseSchema, orderIdParamValidation, orderRequestValidation, qcMediaUploadValidation, recordPaymentValidation, restockOrderValidation, getCheckoutSummaryValidation
+    listOrdersResponseSchema, orderIdParamValidation, orderRequestValidation, qcMediaUploadValidation, recordPaymentValidation, restockOrderValidation, getCheckoutSummaryValidation, removeCartItemValidation
 };
 

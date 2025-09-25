@@ -1225,8 +1225,37 @@ const getCheckoutSummary = async (warehouseId, supplierId) => {
     };
 };
 
+/**
+ * Handles the business logic for removing an item from the warehouse cart.
+ * Includes security checks to ensure the item exists.
+ */
+const removeCartItem = async (cartItemId, userId) => {
+    // --- Step 1: Edge Case Handling & Security Check ---
+    // First, verify that the cart item actually exists in the database.
+    const cartItem = await adminRepo.findCartItemById(cartItemId);
+
+    if (!cartItem) {
+        throw { code: 404, message: `Action failed: Cart item with ID '${cartItemId}' was not found. It may have already been removed.` };
+    }
+
+    // --- (Optional but Recommended Security Enhancement) ---
+    // Here, you could add logic to verify that the `userId` has permission
+    // for the `cartItem.warehouseId` to prevent an admin from one warehouse
+    // from deleting items in another's cart.
+
+    // --- Step 2: Proceed with the Deletion ---
+    // If the item exists, call the repository to execute the delete command.
+    await adminRepo.deleteCartItem(cartItemId);
+
+    return {
+        success: true,
+        code: 200,
+        message: "Item was successfully removed from the cart."
+    };
+};
+
 export {
     addItemToWarehouseCart, createPurchaseOrderFromCart, getOrderRequestByOrderId, getSupplierOrderHistory, getWarehouseCart, listSupplierOrders,
-    recordPaymentForOrder, restockInventory, showAdminProfile, uploadQcMediaForOrder, getCheckoutSummary
+    recordPaymentForOrder, restockInventory, showAdminProfile, uploadQcMediaForOrder, getCheckoutSummary, removeCartItem
 };
 

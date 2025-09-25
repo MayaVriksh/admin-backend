@@ -410,5 +410,23 @@ export default [
             },
             handler: AdminController.getCheckoutSummary,
         }
+    },
+    {
+        method: "DELETE",
+        path: "/admin/warehouse-cart/items/{cartItemId}",
+        options: {
+            tags: ["api", "Warehouse Inventory"],
+            description: "Remove a single item from the warehouse purchase order cart.",
+            notes: "Deletes the specified item from the cart. Includes a security check to ensure the item exists before deletion.",
+            pre: [
+                verifyAccessTokenMiddleware,
+                requireRole([ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.WAREHOUSE_MANAGER])
+            ],
+            validate: {
+                ...AdminValidator.removeCartItemValidation,
+                failAction: handleValidationFailure,
+            },
+            handler: AdminController.removeCartItem,
+        }
     }
 ];

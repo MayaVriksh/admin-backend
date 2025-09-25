@@ -829,6 +829,28 @@ const findCartItemsForCheckout = async (warehouseId, supplierId) => {
         }
     });
 };
+
+
+/**
+ * Finds a single cart item by its unique ID.
+ * @param {string} cartItemId - The unique ID of the cart item.
+ */
+export const findCartItemById = async (cartItemId) => {
+    return await prisma.warehouseCartItem.findUnique({
+        where: { cartItemId }
+    });
+};
+
+/**
+ * Deletes a single cart item from the database by its unique ID.
+ * @param {string} cartItemId - The unique ID of the cart item to delete.
+ */
+export const deleteCartItem = async (cartItemId) => {
+    return await prisma.warehouseCartItem.delete({
+        where: { cartItemId }
+    });
+};
+
 export {
     addMediaToPurchaseOrder, checkPurchaseOrderExist, createDamageLog, createOrderAndItems, createPaymentAndUpdateOrder, createPlantRestockLog, createRestockLog, findAdminByUserId, findCartItemsByWarehouseId, findHistoricalPurchaseOrders, findPurchaseOrdersByAdmin, updateOrderStatus, updateWarehouseInventory,
     upsertCartItem, findCartItemsForCheckout
