@@ -1082,18 +1082,18 @@ const getWarehouseCart = async (warehouseId) => {
 
 const createPurchaseOrderFromCart = async (payload) => {
     // The payload from the client is simple and secure
-    const { warehouseId, supplierId, expectedDateOfArrival, deliveryCharges } = payload;
+    const { warehouseId, supplierId, expectedDateOfArrival, cartItemIds, deliveryCharges } = payload;
 
     return await prisma.$transaction(async (tx) => {
         // Step 1: Fetch the trusted cart items for this specific warehouse AND supplier.
         const trustedCartItems = await tx.warehouseCartItem.findMany({
             where: {
                 warehouseId: warehouseId,
-                supplierId: supplierId // The crucial filter
+                supplierId: supplierId, // The crucial filter
+                cartItemId: { in: cartItemIds }
             }
         });
         console.log("trustedCartItems",trustedCartItems);
-        
         // --- Edge Case Handling ---
         if (trustedCartItems.length === 0) {
             throw { code: 400, message: `The cart for this warehouse has no items for the selected supplier.` };
@@ -1107,7 +1107,6 @@ const createPurchaseOrderFromCart = async (payload) => {
             return { ...item, totalCost: totalItemCost };
         });
 
-        console.log("processedItems",processedItems);
         const finalTotalCost = itemsTotalCost + (deliveryCharges || 0);
 
         // Step 3: Prepare the data for the main PurchaseOrder.

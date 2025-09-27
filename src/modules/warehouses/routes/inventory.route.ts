@@ -7,7 +7,7 @@ import { handleValidationFailure } from "../../../utils/failActionValidation.js"
 const inventoryRoutes = [
     {
         method: "GET",
-        path: "/admin/warehouses/{warehouseId}/inventory",
+        path: "/admin/warehouse/{warehouseId}/inventory",
         options: {
             tags: ["api", "Warehouse Inventory"],
             description: "Get a paginated and filterable list of all plant inventory for a specific warehouse.",

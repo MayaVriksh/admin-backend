@@ -397,12 +397,21 @@ const getWarehouseCartValidation = {
 
 const createPurchaseOrderFromCartValidation = {
     payload: Joi.object({
-        warehouseId: Joi.string().required().description("The ID of the warehouse whose cart is being converted to an order."),
+        warehouseId: Joi.string().required().description("The ID of the warehouse for the cart."),
         supplierId: Joi.string().required().description("The ID of the supplier for this order."),
+        // --- THIS IS THE FIX ---
+        // The expected arrival date is now a required field.
         expectedDateOfArrival: Joi.date().iso().required().description("The expected delivery date in ISO format."),
-        deliveryCharges: Joi.number().min(0).optional().default(0).description("Optional delivery charges for the order.")
+        
+        deliveryCharges: Joi.number().min(0).optional().default(0).description("Optional delivery charges."),
+        
+        // The frontend must send the list of cart item IDs it is checking out.
+        // This is more secure than fetching all items for a supplier.
+        cartItemIds: Joi.array().items(Joi.string()).min(1).required().description("An array of WarehouseCartItem IDs to be ordered.")
     })
 };
+
+
 const getCheckoutSummaryValidation = {
     query: Joi.object({
         warehouseId: Joi.string().required().description("The ID of the warehouse for the cart."),

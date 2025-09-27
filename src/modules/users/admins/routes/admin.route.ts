@@ -326,7 +326,7 @@ export default [
     },
     {
         method: "POST",
-        path: "/admin/warehouse-cart/add",
+        path: "/admin/warehouse-cart/items",
         options: {
             tags: ["api", "Warehouse Inventory"],
             description: "Add or update an item in the warehouse purchase order cart.",
@@ -349,7 +349,7 @@ export default [
     },
     {
         method: "GET",
-        path: "/admin/warehouse-cart/{warehouseId}",
+        path: "/admin/warehouse-cart/{warehouseId}/view-cart",
         options: {
             tags: ["api", "Warehouse Inventory"],
             description: "Get all items for a warehouse's cart, grouped by supplier, with calculated totals.",
@@ -372,7 +372,7 @@ export default [
     },
     {
         method: "POST",
-        path: "/admin/purchase-orders/checkout-from-cart",
+        path: "/admin/purchase-orders/create-purchase-order",
         options: {
             tags: ["api", "Warehouse Inventory"],
             description: "Create a new Purchase Order from all items in a warehouse's cart.",
