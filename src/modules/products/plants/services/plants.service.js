@@ -322,7 +322,7 @@ class PlantService {
         const potTypeOrder = [
             "General",
             "Basic",
-            "EcoFriendly",
+            "Eco Friendly",
             "Standard",
             "Premium",
             "Exclusive"
