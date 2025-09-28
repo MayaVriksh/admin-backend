@@ -61,12 +61,18 @@ const getAllPlantVariantsValidation = {
             .description("Number of records to skip (alternative to page)"),
 
         size: Joi.array().items(
-            Joi.string().valid("EXTRA_SMALL", "SMALL", "MEDIUM", "LARGE", "EXTRA_LARGE")
-        ).optional().description("Filter by one or more sizes."),
+            Joi.string().trim().valid("EXTRA_SMALL", "SMALL", "MEDIUM", "LARGE", "EXTRA_LARGE")
+        ).single() // This will convert a single string like "SMALL" into ["SMALL"]
+         .optional()
+         .label("Plant Size")
+         .description("Filter variants by one or more sizes (comma-separated for multiple)"),
 
-        // --- MODIFIED: Validates an array of strings ---
-        color: Joi.array().items(Joi.string()).optional()
-            .description("Filter by one or more color names."),
+
+        color: Joi.array().items(Joi.string().trim())
+             .single() // Also apply the fix here for consistency
+             .optional()
+             .label("Plant Color")
+             .description("Filter variants by one or more colors (comma-separated for multiple)"),
 
         minPrice: Joi.number()
             .min(0)
