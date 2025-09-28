@@ -334,17 +334,20 @@ class PlantService {
                 const compatiblePotsForSize =
                     allCompatiblePots[sizeProfile.plantSize];
 
-                const sortedPotTypes = compatiblePotsForSize
-                    ? compatiblePotsForSize.potTypes.sort(
-                          (a, b) =>
-                              potTypeOrder.indexOf(a.potTypeName) -
-                              potTypeOrder.indexOf(b.potTypeName)
-                      )
-                    : [];
+                const compatiblePots = compatiblePotsForSize
+                    ? {
+                          size: compatiblePotsForSize.size,
+                          potTypes: compatiblePotsForSize.potTypes.sort(
+                              (a, b) =>
+                                  potTypeOrder.indexOf(a.potTypeName) -
+                                  potTypeOrder.indexOf(b.potTypeName)
+                          )
+                      }
+                    : { size: sizeProfile.plantSize, potTypes: [] };
 
                 return {
                     ...sizeProfile,
-                    compatiblePots: sortedPotTypes
+                    compatiblePots
                 };
             })
             .sort(
