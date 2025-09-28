@@ -54,7 +54,7 @@ class PlantController {
                 maxPrice,
                 plantCategory
             });
-
+            console.log(result.data);
             return h
                 .response({
                     success: result.success || RESPONSE_FLAGS.SUCCESS,

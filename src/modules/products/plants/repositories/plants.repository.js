@@ -465,7 +465,7 @@ class PlantRepository {
                               {
                                   plantVariant: {
                                       size: {
-                                          plantSize: { equals: size }
+                                          plantSize: { in: size }
                                       }
                                   }
                               }
@@ -477,7 +477,7 @@ class PlantRepository {
                                   plantVariant: {
                                       color: {
                                           name: {
-                                              contains: color,
+                                              in: color,
                                               mode: "insensitive"
                                           }
                                       }
@@ -541,7 +541,7 @@ class PlantRepository {
                               {
                                   plantVariant: {
                                       size: {
-                                          plantSize: { equals: size }
+                                          plantSize: { in: size }
                                       }
                                   }
                               }
@@ -553,7 +553,7 @@ class PlantRepository {
                                   plantVariant: {
                                       color: {
                                           name: {
-                                              contains: color,
+                                              in: color,
                                               mode: "insensitive"
                                           }
                                       }

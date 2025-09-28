@@ -60,20 +60,13 @@ const getAllPlantVariantsValidation = {
             .label("Skip Count")
             .description("Number of records to skip (alternative to page)"),
 
-        size: Joi.string()
-            .trim()
-            .valid("EXTRA_SMALL", "SMALL", "MEDIUM", "LARGE", "EXTRA_LARGE")
-            .optional()
-            .label("Plant Size")
-            .description("Filter variants by size"),
+        size: Joi.array().items(
+            Joi.string().valid("EXTRA_SMALL", "SMALL", "MEDIUM", "LARGE", "EXTRA_LARGE")
+        ).optional().description("Filter by one or more sizes."),
 
-        color: Joi.string()
-            .trim()
-            .min(2)
-            .max(30)
-            .optional()
-            .label("Plant Color")
-            .description("Filter variants by color"),
+        // --- MODIFIED: Validates an array of strings ---
+        color: Joi.array().items(Joi.string()).optional()
+            .description("Filter by one or more color names."),
 
         minPrice: Joi.number()
             .min(0)
