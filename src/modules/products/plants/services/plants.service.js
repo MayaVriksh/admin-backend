@@ -328,22 +328,30 @@ class PlantService {
             "Exclusive"
         ];
 
-        // Map over the size profiles fetched from the DB, sort potTypes by custom order
+        // Map over the size profiles fetched from the DB, find matching potData by size, sort potTypes
         const augmentedSizeProfiles = plantFromDb.plants.plantSizeProfile
             .map((sizeProfile) => {
-                const compatiblePotsForSize =
-                    allCompatiblePots[sizeProfile.plantSize];
+                const compatiblePotsForSize = allCompatiblePots.find(
+                    (p) => p.size === sizeProfile.plantSize
+                );
 
                 const compatiblePots = compatiblePotsForSize
-                    ? {
-                          size: compatiblePotsForSize.size,
-                          potTypes: compatiblePotsForSize.potTypes.sort(
-                              (a, b) =>
-                                  potTypeOrder.indexOf(a.potTypeName) -
-                                  potTypeOrder.indexOf(b.potTypeName)
-                          )
-                      }
-                    : { size: sizeProfile.plantSize, potTypes: [] };
+                    ? [
+                          {
+                              size: compatiblePotsForSize.size,
+                              potTypes: compatiblePotsForSize.potTypes.sort(
+                                  (a, b) =>
+                                      potTypeOrder.indexOf(a.potTypeName) -
+                                      potTypeOrder.indexOf(b.potTypeName)
+                              )
+                          }
+                      ]
+                    : [
+                          {
+                              size: sizeProfile.plantSize,
+                              potTypes: []
+                          }
+                      ];
 
                 return {
                     ...sizeProfile,

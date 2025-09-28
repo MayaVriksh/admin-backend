@@ -619,6 +619,6 @@ const potData = {
     }
 };
 
-const getPot = () => potData;
+const getPot = () => Object.values(potData);
 
 module.exports = getPot;
