@@ -6,7 +6,8 @@ const {
 } = require("../../../../constants/responseCodes.constant");
 const getPotData = require("../../../../constants/pots.constants");
 const potData = require("../../../../constants/pot.constant");
-// Helper function to transfprm the response
+
+// Helper function to transform plants for cards
 const transformPlantsForCards = (servicePlants) => {
     const sizeOrder = [
         "EXTRA_SMALL",
@@ -18,7 +19,6 @@ const transformPlantsForCards = (servicePlants) => {
 
     return servicePlants.map((item) => {
         const plant = item.plants;
-
         const allMrps = plant.plantSizeProfile.flatMap((size) =>
             size.PlantVariants.map((variant) =>
                 variant.mrp
@@ -96,11 +96,12 @@ const transformPlantsForCards = (servicePlants) => {
             availableColors,
             images,
             rating: 4.6,
-            totalratings: 46
+            totalRatings: 46
         };
     });
 };
 
+// Transform plant variants
 const transformPlantVariants = (serviceVariants) => {
     return serviceVariants.map((item) => {
         const variant = item.plantVariant;
@@ -221,20 +222,27 @@ class PlantService {
         };
     }
 
-    // Get all plant variants with pagination & filtering
+    // Get all plant variants (with optional orderByPrice)
     static async getAllPlantVariants({
         page = 1,
         limit = 10,
         skip,
-        sortBy = "createdAt",
-        order = "asc",
         size,
         color,
         minPrice,
         maxPrice,
-        plantCategory
+        plantCategory,
+        orderByPrice
     }) {
         const offset = skip !== undefined ? skip : (page - 1) * limit;
+
+        // Determine sorting
+        let sortBy = "createdAt";
+        let order = "asc";
+        if (orderByPrice) {
+            sortBy = "mrp"; // or sellingPrice depending on your DB
+            order = orderByPrice;
+        }
 
         const [variants, total] = await Promise.all([
             PlantRepository.findAllVariants({
@@ -286,34 +294,64 @@ class PlantService {
     }
 
     // Get plant by ID
-    // Get plant by ID - THIS IS THE MODIFIED FUNCTION
     static async getPlantById(id) {
         // Step 1: Fetch the core plant data from the database via the repository.
         const plantFromDb = await PlantRepository.findById(id);
-        console.log("plantFromDb",plantFromDb);
+
+        // console.log("plantFromDb",plantFromDb);
+
         if (!plantFromDb) {
             throw {
                 success: RESPONSE_FLAGS.FAILURE,
                 code: RESPONSE_CODES.NOT_FOUND,
-                message: ERROR_MESSAGES.PLANTS?.NOT_FOUND || "Plant not found"
+                message: ERROR_MESSAGES.PLANTS?.NOT_FOUND || "Plant not found."
             };
         }
 
-        // --- THIS IS THE NEW LOGIC ---
         // Step 2: Augment the database response with the static compatible pots data.
         const allCompatiblePots = potData();
 
-        // Map over the size profiles fetched from the DB
-        const augmentedSizeProfiles = plantFromDb.plants.plantSizeProfile.map(sizeProfile => {
-            // For each size (e.g., "SMALL"), find the matching pot data from our constant
-            const compatiblePotsForSize = allCompatiblePots[sizeProfile.plantSize];
-            
-            return {
-                ...sizeProfile,
-                // Add the new `compatiblePots` key to the response object for this size
-                compatiblePots: compatiblePotsForSize ? [compatiblePotsForSize] : [] 
-            };
-        });
+        const sizeOrder = [
+            "EXTRA_SMALL",
+            "SMALL",
+            "MEDIUM",
+            "LARGE",
+            "EXTRA_LARGE"
+        ];
+
+        const potTypeOrder = [
+            "General",
+            "Basic",
+            "EcoFriendly",
+            "Standard",
+            "Premium",
+            "Exclusive"
+        ];
+
+        // Map over the size profiles fetched from the DB, sort potTypes by custom order
+        const augmentedSizeProfiles = plantFromDb.plants.plantSizeProfile
+            .map((sizeProfile) => {
+                const compatiblePotsForSize =
+                    allCompatiblePots[sizeProfile.plantSize];
+
+                const sortedPotTypes = compatiblePotsForSize
+                    ? compatiblePotsForSize.potTypes.sort(
+                          (a, b) =>
+                              potTypeOrder.indexOf(a.potTypeName) -
+                              potTypeOrder.indexOf(b.potTypeName)
+                      )
+                    : [];
+
+                return {
+                    ...sizeProfile,
+                    compatiblePots: sortedPotTypes
+                };
+            })
+            .sort(
+                (a, b) =>
+                    sizeOrder.indexOf(a.plantSize) -
+                    sizeOrder.indexOf(b.plantSize)
+            );
 
         // Step 3: Construct the final response object with the augmented data.
         const finalPlantData = {
@@ -323,12 +361,11 @@ class PlantService {
                 plantSizeProfile: augmentedSizeProfiles
             }
         };
-        // --- END OF NEW LOGIC ---
 
         return {
             success: RESPONSE_FLAGS.SUCCESS,
             code: RESPONSE_CODES.SUCCESS,
-            data: finalPlantData // Return the final, merged data
+            data: finalPlantData
         };
     }
 
@@ -369,20 +406,13 @@ class PlantService {
         return {
             success: RESPONSE_FLAGS.SUCCESS,
             code: RESPONSE_CODES.SUCCESS,
-            data: {
-                total,
-                page,
-                limit,
-                skip: offset,
-                plants
-            }
+            data: { total, page, limit, skip: offset, plants }
         };
     }
 
     // Get all compatible pots
     static async getAllCompatiblePots() {
         const potsData = getPotData();
-
         return {
             success: RESPONSE_FLAGS.SUCCESS,
             code: RESPONSE_CODES.SUCCESS,

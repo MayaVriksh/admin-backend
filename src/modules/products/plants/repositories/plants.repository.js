@@ -253,7 +253,7 @@ class PlantRepository {
     // Get inventory by ID
     static async findById(id) {
         return prisma.plantWarehouseInventory.findFirst({
-            where: { plantId:id },
+            where: { plantId: id },
             select: this.baseSelect()
         });
     }
@@ -442,7 +442,7 @@ class PlantRepository {
         });
     }
 
-    // Get all plant variants with pagination & filters
+    // Get all plant variants with pagination & filters (supports orderByPrice)
     static async findAllVariants({
         offset = 0,
         limit = 10,

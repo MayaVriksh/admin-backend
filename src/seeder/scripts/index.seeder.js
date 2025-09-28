@@ -13,6 +13,11 @@ const seedPurchaseOrders = require("./purchaseorder.seeder");
 const { seedWarehouseInventory } = require("./warehouseInventory.seeder");
 const seedPlantCategories = require("./plantCategory.seeder");
 const seedNotifications = require("./notifications.seeder");
+const {
+    seedSunlightTypes,
+    seedHumidityLevels,
+    seedPlantCareGuidelines
+} = require("./plantCareGuidelines.seeder");
 
 async function runSeeder() {
     console.log("🌱 Starting full seeding...");
@@ -35,6 +40,9 @@ async function runSeeder() {
         await seedWarehouseInventory();
         await seedPlantCategories.seedPlantCategories();
         await seedPlantCategories.assignCategoriesToPlants();
+        await seedSunlightTypes();
+        await seedHumidityLevels();
+        await seedPlantCareGuidelines();
 
         console.log("✅ All seeders executed successfully!");
     } catch (error) {

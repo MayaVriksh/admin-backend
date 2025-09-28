@@ -3,7 +3,7 @@ const {
     RESPONSE_CODES
 } = require("../../../../constants/responseCodes.constant");
 const SUCCESS_MESSAGES = require("../../../../constants/successMessages.constant.js");
-const PlantService = require("..//services/plants.service.js");
+const PlantService = require("../services/plants.service.js");
 const ResponseHandler = require("../../../../utils/responseHandler.utils.js");
 
 class PlantController {
@@ -11,6 +11,7 @@ class PlantController {
     static async getAllPlants(req, h) {
         try {
             const { page, limit, skip, plantCategory } = req.query;
+
             const result = await PlantService.getAllPlants({
                 page,
                 limit,
@@ -41,7 +42,8 @@ class PlantController {
                 color,
                 minPrice,
                 maxPrice,
-                plantCategory
+                plantCategory,
+                orderByPrice
             } = req.query;
 
             const result = await PlantService.getAllPlantVariants({
@@ -52,9 +54,11 @@ class PlantController {
                 color,
                 minPrice,
                 maxPrice,
-                plantCategory
+                plantCategory,
+                orderByPrice
             });
-            console.log(result.data);
+            // console.log("getAllPlantVariants: ", result.data);
+
             return h
                 .response({
                     success: result.success || RESPONSE_FLAGS.SUCCESS,

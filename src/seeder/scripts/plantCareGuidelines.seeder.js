@@ -71,6 +71,8 @@ async function seedPlantCareGuidelines() {
         const sunlightTypes = await prisma.sunlightTypes.findMany();
         const humidityLevels = await prisma.humidityLevel.findMany();
 
+        // await prisma.plantCareGuidelines.deleteMany();
+
         if (
             !plantSizes.length ||
             !sunlightTypes.length ||
@@ -112,11 +114,11 @@ async function seedPlantCareGuidelines() {
                             }
                         });
                         console.log(
-                            `✅ PlantCareGuidelines for size '${size.name}', sunlight '${sun.typeName}' & humidity '${hum.level}' created`
+                            `✅ PlantCareGuidelines for size '${size.plantSize}', sunlight '${sun.typeName}' & humidity '${hum.level}' created`
                         );
                     } else {
                         console.log(
-                            `⚠️ PlantCareGuidelines for size '${size.name}' already exists`
+                            `⚠️ PlantCareGuidelines for size '${size.plantSize}' already exists`
                         );
                     }
                 }
