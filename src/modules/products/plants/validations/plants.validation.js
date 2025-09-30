@@ -20,7 +20,11 @@ const getAllPlantsValidation = {
             .min(1)
             .default(1)
             .label("Page Number")
-            .description("Page number for pagination (starts from 1)"),
+            .description("Page number for pagination (starts from 1)")
+            .messages({
+                "number.base": "Page number must be a number",
+                "number.min": "Page number must be at least 1"
+            }),
 
         limit: Joi.number()
             .integer()
@@ -28,21 +32,34 @@ const getAllPlantsValidation = {
             .max(100)
             .default(10)
             .label("Page Limit")
-            .description("Number of records per page"),
+            .description("Number of records per page")
+            .messages({
+                "number.base": "Limit must be a number",
+                "number.min": "Limit must be at least 1",
+                "number.max": "Limit cannot exceed 100"
+            }),
 
         skip: Joi.number()
             .integer()
             .min(0)
             .optional()
             .label("Skip Count")
-            .description("Number of records to skip (alternative to page)"),
+            .description("Number of records to skip (alternative to page)")
+            .messages({
+                "number.base": "Skip must be a number",
+                "number.min": "Skip cannot be negative"
+            }),
 
         plantCategory: Joi.string()
+            .trim()
             .valid(...categoryKeys)
             .optional()
             .label("Plant Category")
             .description("Filter plants by category key")
-    })
+            .messages({
+                "any.only": "Invalid plant category"
+            })
+    }).oxor("page", "skip")
 };
 
 //
@@ -73,14 +90,31 @@ const getAllPlantVariantsValidation = {
             .description("Number of records to skip (alternative to page)"),
 
         size: Joi.array()
-            .items(Joi.string().valid(...sizeKeys))
+            .items(
+                Joi.string()
+                    .trim()
+                    .valid(...sizeKeys)
+                    .label("Plant Size")
+                    .description("Valid plant size")
+            )
             .single()
+            .unique()
             .optional()
+            .label("Plant Sizes")
             .description("Filter by one or more plant size keys."),
 
         color: Joi.array()
-            .items(Joi.string().valid(...colorKeys))
+            .items(
+                Joi.string()
+                    .trim()
+                    .valid(...colorKeys)
+                    .label("Color")
+                    .description("Valid color")
+            )
+            .single()
+            .unique()
             .optional()
+            .label("Colors")
             .description("Filter by one or more color keys."),
 
         minPrice: Joi.number()
@@ -100,17 +134,31 @@ const getAllPlantVariantsValidation = {
             ),
 
         plantCategory: Joi.string()
+            .trim()
             .valid(...categoryKeys)
             .optional()
             .label("Plant Category")
             .description("Filter variants by plant category key"),
 
         orderByPrice: Joi.string()
+            .trim()
             .valid("asc", "desc")
             .optional()
             .label("Order By Price")
             .description("Sort variants by price (ascending or descending)")
     })
+        .custom((obj, helpers) => {
+            if (obj.minPrice !== undefined && obj.maxPrice !== undefined) {
+                if (obj.maxPrice < obj.minPrice) {
+                    return helpers.error("any.invalid", {
+                        message:
+                            "Maximum price cannot be less than minimum price"
+                    });
+                }
+            }
+            return obj;
+        }, "Price Validation")
+        .oxor("page", "skip")
 };
 
 //
@@ -119,6 +167,7 @@ const getAllPlantVariantsValidation = {
 const getPlantByIdValidation = {
     params: Joi.object({
         id: Joi.string()
+            .trim()
             .required()
             .label("Plant ID")
             .description("Unique identifier of the plant")
