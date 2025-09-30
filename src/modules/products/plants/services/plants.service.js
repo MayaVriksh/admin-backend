@@ -6,6 +6,7 @@ const {
 } = require("../../../../constants/responseCodes.constant");
 const getPotData = require("../../../../constants/pots.constants");
 const potData = require("../../../../constants/pot.constant");
+const { COLORS } = require("../../../../constants/colors.constants");
 
 // Helper function to transform plants for cards
 const transformPlantsForCards = (servicePlants) => {
@@ -236,6 +237,11 @@ class PlantService {
     }) {
         const offset = skip !== undefined ? skip : (page - 1) * limit;
 
+        let mappedColors;
+        if (Array.isArray(color)) {
+            mappedColors = color.map((c) => COLORS[c]).filter(Boolean);
+        }
+
         // Determine sorting
         let sortBy = "createdAt";
         let order = "asc";
@@ -251,14 +257,14 @@ class PlantService {
                 sortBy,
                 order,
                 size,
-                color,
+                color: mappedColors,
                 minPrice,
                 maxPrice,
                 plantCategory
             }),
             PlantRepository.countAllVariants({
                 size,
-                color,
+                color: mappedColors,
                 minPrice,
                 maxPrice,
                 plantCategory
