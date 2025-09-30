@@ -454,10 +454,28 @@ class PlantRepository {
         maxPrice,
         plantCategory
     }) {
+        const SORTABLE_FIELDS = {
+            warehouse: ["stock", "createdAt"], // fields in plantWarehouseInventory
+            variant: ["mrp", "sellingPrice", "updatedAt"] // fields in plantVariant
+        };
+
+        let orderByClause;
+
+        if (SORTABLE_FIELDS.variant.includes(sortBy)) {
+            // Sort inside plantVariant relation
+            orderByClause = { plantVariant: { [sortBy]: order } };
+        } else if (SORTABLE_FIELDS.warehouse.includes(sortBy)) {
+            // Sort on warehouse table itself
+            orderByClause = { [sortBy]: order };
+        } else {
+            // Fallback: default sort
+            orderByClause = { createdAt: "asc" };
+        }
+
         return prisma.plantWarehouseInventory.findMany({
             skip: offset,
             take: limit,
-            orderBy: { [sortBy]: order },
+            orderBy: orderByClause,
             where: {
                 AND: [
                     ...(size
