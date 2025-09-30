@@ -75,7 +75,6 @@ const getAllPlantVariantsValidation = {
         size: Joi.array()
             .items(Joi.string().valid(...sizeKeys))
             .single()
-            .default([])
             .optional()
             .description("Filter by one or more plant size keys."),
 
