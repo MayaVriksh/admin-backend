@@ -835,7 +835,7 @@ const findCartItemsForCheckout = async (warehouseId, supplierId) => {
  * Finds a single cart item by its unique ID.
  * @param {string} cartItemId - The unique ID of the cart item.
  */
-export const findCartItemById = async (cartItemId) => {
+const findCartItemById = async (cartItemId) => {
     return await prisma.warehouseCartItem.findUnique({
         where: { cartItemId }
     });
@@ -845,14 +845,43 @@ export const findCartItemById = async (cartItemId) => {
  * Deletes a single cart item from the database by its unique ID.
  * @param {string} cartItemId - The unique ID of the cart item to delete.
  */
-export const deleteCartItem = async (cartItemId) => {
+const deleteCartItem = async (cartItemId) => {
     return await prisma.warehouseCartItem.delete({
         where: { cartItemId }
     });
 };
 
+/**
+ * Updates a specific warehouse cart item by its ID.
+ * @param {string} warehouseCartItemId - The ID of the cart item to update.
+ *- The new data for the item (units and costPrice).
+ * @returns {Promise<object|null>} A promise that resolves to the updated cart item or null if not found.
+ */
+const updateById = async (warehouseCartItemId, { unitsRequested, unitCostPrice }) => {
+  try {
+    const item = await prisma.warehouseCartItem.findUnique({
+      where: { cartItemId: warehouseCartItemId },
+    });
+
+    if (!item) {
+      return null; // Item not found
+    }
+
+    return await prisma.warehouseCartItem.update({
+      where: { cartItemId: warehouseCartItemId },
+      data: {
+        unitsRequested,
+        unitCostPrice,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating warehouse cart item:", error);
+    throw new Error("Database operation failed.");
+  }
+};
+
 export {
     addMediaToPurchaseOrder, checkPurchaseOrderExist, createDamageLog, createOrderAndItems, createPaymentAndUpdateOrder, createPlantRestockLog, createRestockLog, findAdminByUserId, findCartItemsByWarehouseId, findHistoricalPurchaseOrders, findPurchaseOrdersByAdmin, updateOrderStatus, updateWarehouseInventory,
-    upsertCartItem, findCartItemsForCheckout
+    upsertCartItem, findCartItemsForCheckout, findCartItemById, deleteCartItem, updateById
 };
 

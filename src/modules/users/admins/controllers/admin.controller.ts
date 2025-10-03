@@ -328,9 +328,35 @@ const removeCartItem = async (req, h) => {
         }).code(error.code || 500);
     }
 };
+
+const updateCartItemHandler = async (req, h) => {
+  try {
+    const { warehouseCartItemId } = req.params;
+    const updateData = req.payload;
+
+    const updatedItem = await AdminService.updateCartItemService(
+      warehouseCartItemId,
+      updateData
+    );
+
+    return h
+      .response({
+        success: RESPONSE_FLAGS.SUCCESS,
+        message: "Cart Item has been successfully Updated",
+        data: updatedItem,
+      })
+      .code(RESPONSE_CODES.SUCCESS);
+  } catch (error) {
+    console.error("Remove Cart Item Controller Error:", error);
+        return h.response({
+            success: false, message: error.message
+        }).code(error.code || 500);
+    }
+};
+
 export {
     addItemToWarehouseCart, createPurchaseOrderFromCart, getOrderRequestByOrderId,
     getSupplierOrderHistory, getWarehouseCart, listSupplierOrders, recordPayment,
-    restockInventory, showAdminProfile, uploadQcMedia, getCheckoutSummary, removeCartItem
+    restockInventory, showAdminProfile, uploadQcMedia, getCheckoutSummary, removeCartItem, updateCartItemHandler
 };
 

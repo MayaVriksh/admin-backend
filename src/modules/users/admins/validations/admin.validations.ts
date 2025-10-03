@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import * as ORDER_STATUSES from '../../../../constants/orderStatus.constant';
+import { handleValidationFailure } from '../../../../utils/failActionValidation';
 
 // A single, powerful validation schema for the order list endpoint
 const orderRequestValidation = {
@@ -424,9 +425,31 @@ const removeCartItemValidation = {
     })
 };
 
+const updateCartItemValidation = {
+  params: Joi.object({
+    warehouseCartItemId: Joi.string().trim().required().messages({
+      "any.required": "Warehouse Cart Item ID is required in the URL.",
+      "string.empty": "Warehouse Cart Item ID cannot be empty.",
+    }),
+  }),
+  payload: Joi.object({
+    unitsRequested: Joi.number().integer().min(1).required().messages({
+      "any.required": "Units are required.",
+      "number.base": "Units must be a number.",
+      "number.integer": "Units must be a whole number.",
+      "number.min": "Units must be at least 1.",
+    }),
+    unitCostPrice: Joi.number().min(0).required().messages({
+      "any.required": "Cost Price is required.",
+      "number.base": "Cost Price must be a number.",
+      "number.min": "Cost Price cannot be negative.",
+    }),
+  }),
+};
 
 export {
     addToWarehouseCartValidation, createPurchaseOrderFromCartValidation, getOrderByIdResponseSchema, getWarehouseCartValidation, listHistoryValidation,
-    listOrdersResponseSchema, orderIdParamValidation, orderRequestValidation, qcMediaUploadValidation, recordPaymentValidation, restockOrderValidation, getCheckoutSummaryValidation, removeCartItemValidation
+    listOrdersResponseSchema, orderIdParamValidation, orderRequestValidation, qcMediaUploadValidation, recordPaymentValidation, restockOrderValidation,
+    getCheckoutSummaryValidation, removeCartItemValidation, updateCartItemValidation
 };
 

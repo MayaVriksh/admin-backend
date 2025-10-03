@@ -1254,8 +1254,31 @@ const removeCartItem = async (cartItemId, userId) => {
     };
 };
 
+/**
+ * Service to update a warehouse cart item.
+ * @param {string} warehouseCartItemId - The ID of the cart item.
+ * @param {object} updateData - The data to update (units, costPrice).
+ * @returns {Promise<object>} A promise that resolves to the updated cart item.
+ */
+const updateCartItemService = async (warehouseCartItemId, updateData) => {
+  const updatedItem = await adminRepo.updateById(
+    warehouseCartItemId,
+    updateData
+  );
+
+  if (!updatedItem) {
+    throw {
+      success: RESPONSE_FLAGS.FAILURE,
+      code: RESPONSE_CODES.NOT_FOUND,
+      message: ERROR_MESSAGES.CART.ITEM_NOT_FOUND,
+    };
+  }
+
+  return updatedItem;
+};
+
 export {
     addItemToWarehouseCart, createPurchaseOrderFromCart, getOrderRequestByOrderId, getSupplierOrderHistory, getWarehouseCart, listSupplierOrders,
-    recordPaymentForOrder, restockInventory, showAdminProfile, uploadQcMediaForOrder, getCheckoutSummary, removeCartItem
+    recordPaymentForOrder, restockInventory, showAdminProfile, uploadQcMediaForOrder, getCheckoutSummary, removeCartItem, updateCartItemService
 };
 

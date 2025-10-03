@@ -328,7 +328,7 @@ export default [
         method: "POST",
         path: "/admin/warehouse-cart/items",
         options: {
-            tags: ["api", "Warehouse Inventory"],
+            tags: ["api", "Warehouse Cart"],
             description: "Add or update an item in the warehouse purchase order cart.",
             notes: "This endpoint performs several crucial checks: 1. Verifies that the product variant exists. 2. Ensures the product is active and available for ordering. 3. Uses a database 'upsert' to atomically add the item or update its quantity if it's already in the cart.",
             pre: [
@@ -351,7 +351,7 @@ export default [
         method: "GET",
         path: "/admin/warehouse-cart/{warehouseId}/view-cart",
         options: {
-            tags: ["api", "Warehouse Inventory"],
+            tags: ["api", "Warehouse Cart"],
             description: "Get all items for a warehouse's cart, grouped by supplier, with calculated totals.",
             notes: "This endpoint fetches all cart items for a given warehouse, performs server-side grouping by supplier, and calculates subtotals and a grand total. The response is structured and ready for direct rendering in the UI.",
             pre: [
@@ -397,7 +397,7 @@ export default [
         method: "GET",
         path: "/admin/checkout-summary",
         options: {
-            tags: ["api", "Warehouse Inventory"],
+            tags: ["api", "Warehouse Cart"],
             description: "Get the checkout summary for a specific supplier's items in a warehouse cart.",
             notes: "Fetches all necessary data (item names, units, prices, totals) from the database to populate the checkout summary page. All calculations are performed securely on the backend.",
             pre: [
@@ -415,7 +415,7 @@ export default [
         method: "DELETE",
         path: "/admin/warehouse-cart/items/{cartItemId}",
         options: {
-            tags: ["api", "Warehouse Inventory"],
+            tags: ["api", "Warehouse Cart"],
             description: "Remove a single item from the warehouse purchase order cart.",
             notes: "Deletes the specified item from the cart. Includes a security check to ensure the item exists before deletion.",
             pre: [
@@ -428,5 +428,41 @@ export default [
             },
             handler: AdminController.removeCartItem,
         }
-    }
+    },
+    {
+    method: "PUT",
+    path: "/admin/warehouse-cart/{warehouseCartItemId}",
+    options: {
+      description: "Update units and cost price of a specific item in the warehouse cart.",
+      notes: "Updates a single item in the warehouse cart. Used for editing quantities and prices before creating a purchase order.",
+      tags: ["api", "Warehouse Cart"],
+        pre: [
+            verifyAccessTokenMiddleware,
+            requireRole([ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.WAREHOUSE_MANAGER])
+        ],
+        validate: {
+            ...AdminValidator.updateCartItemValidation,
+            failAction: handleValidationFailure,
+        },
+        handler: AdminController.updateCartItemHandler,
+        plugins: {
+            "hapi-swagger": {
+                responses: {
+                    200: {
+                        description: "Cart item updated successfully.",
+                    },
+                    400: {
+                        description: "Validation error: Invalid input data.",
+                    },
+                    404: {
+                        description: "Cart item not found.",
+                    },
+                    500: {
+                        description: "Internal server error.",
+                    },
+                },
+            },
+        },
+    },
+  },
 ];
