@@ -1,5 +1,5 @@
-// src/api/reels/repository/reels.repository.js
-const {prisma} = require("../../../../config/prisma.config");
+const { prisma } = require("../../../../config/prisma.config");
+const { v4: uuidv4 } = require("uuid");
 
 /**
  * The set of fields to select when fetching reels for public display.
@@ -15,10 +15,10 @@ const selectFields = {
     reelType: true,
     formatType: true,
     plant: {
-      select: {
-        plantId: true,
-        name: true,
-      }
+        select: {
+            plantId: true,
+            name: true
+        }
     }
 };
 
@@ -27,31 +27,34 @@ const selectFields = {
  * @returns {Promise<Array>} A promise that resolves to an array of active reels.
  */
 const findAllActive = async () => {
-  return await prisma.plantReel.findMany({
-    where: {
-      isActive: true,
-      deletedAt: null,
-    },
-    select: selectFields,
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+    return await prisma.plantReel.findMany({
+        where: {
+            isActive: true,
+            deletedAt: null
+        },
+        select: selectFields,
+        orderBy: {
+            createdAt: "desc"
+        }
+    });
 };
 
 /**
  * Creates a new plant reel in the database.
  * @param {object} reelData - The data for the new reel.
- * @returns {Promise<object>} A promise that resolves to the newly created reel.
+ * @returns {Promise<object>} A promise that resolves to the newly create reel.
  */
-const created = async (reelData) => {
-  console.log(reelData);
-  return await prisma.plantReel.create({
-    data: reelData,
-  });
+const create = async (reelData) => {
+    console.log(reelData);
+    return await prisma.plantReel.create({
+        data: {
+            id: uuidv4(),
+            ...reelData
+        }
+    });
 };
 
 module.exports = {
-  findAllActive,
-  created,
+    findAllActive,
+    create
 };

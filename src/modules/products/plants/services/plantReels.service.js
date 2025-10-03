@@ -23,7 +23,7 @@ const getAllActiveReelsService = async () => {
  * @returns {Promise<object>} A promise that resolves to the created reel.
  */
 const createReelService = async (payload) => {
-console.log(payload)
+// console.log(payload)
   const newReel = await reelsRepository.created(payload);
   if (!newReel) {
     throw {

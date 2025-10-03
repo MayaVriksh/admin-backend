@@ -35,7 +35,7 @@ const createReelHandler = async (req, h) => {
     const newReel = await reelsService.createReelService(req.payload);
     return h.response({
         success: RESPONSE_FLAGS.SUCCESS,
-        message: SUCCESS_MESSAGES.REELS.CREATED,
+        message: SUCCESS_MESSAGES?.REELS?.CREATED || "Plant Reel created successfully.",
         data: newReel,
       }).code(RESPONSE_CODES.CREATED);
   } catch (error) {
