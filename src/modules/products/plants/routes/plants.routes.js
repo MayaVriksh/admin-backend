@@ -36,7 +36,7 @@ module.exports = [
         }
     },
 
-    // Plant: Get all plants' variants
+    // Plant: Get all plants' variants for All Plants Page 
     {
         method: "GET",
         path: "/plant-variants",
@@ -69,7 +69,7 @@ module.exports = [
         }
     },
 
-    // Plant: Get plant by ID
+    // Plant: Get plant by ID Product Details Page
     {
         method: "GET",
         path: "/plants/{id}",

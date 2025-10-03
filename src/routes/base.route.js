@@ -5,13 +5,14 @@ const supplierRoutes = require("../modules/users/suppliers/routes/index.route");
 const adminRoutes = require("../modules/users/admins/routes/index.route");
 const plantRoutes = require("../modules/products/plants/routes/plants.routes");
 const customerRoutes = require("../modules/auth/routes/customer.auth.route");
-
+const plantReelsRoutes = require("../modules/products/plants/routes/plantReels.routes");
 module.exports = {
     name: "base-router-v1",
     register: async (server, _) => {
         server.route([
             ...testRoute,
-            ...plantRoutes
+            ...plantRoutes,
+            ...plantReelsRoutes,
             // ...customerRoutes
             // ...authRoutes,
             // ...notificationRoutes,
