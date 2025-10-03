@@ -1130,7 +1130,8 @@ const createPurchaseOrderFromCart = async (payload) => {
         await tx.warehouseCartItem.deleteMany({
             where: {
                 warehouseId: warehouseId,
-                supplierId: supplierId // The crucial new filter
+                supplierId: supplierId, // The crucial new filter
+                cartItemId: { in: cartItemIds }
             }
         });
 
