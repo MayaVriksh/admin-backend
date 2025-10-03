@@ -780,6 +780,7 @@ model Plants {
   plantCategories  PlantCategory[]    @relation(name: "ProductCategories")
   plantSizeProfile PlantSizeProfile[] @relation(name: "PlantsToPlantSizeProfile")
   variants         PlantVariants[]    @relation(name: "ProductToVariant")
+  PlantReel        PlantReel[]        @relation(name: "PlantReelToPlants")
 
   // --- Inventory & supply chain ---
   plantWarehouseInventory PlantWarehouseInventory[] @relation(name: "PlantToWarehouseInventory")
@@ -2116,4 +2117,58 @@ model Notification {
   @@index([userId, isRead])
   @@index([userId, createdAt])
   @@index([category])
+}
+
+model PlantReel {
+  id      String  @id
+  plantId String?
+
+  title         String
+  description   String?
+  videoDuration Int? // in seconds
+
+  // YouTube-specific field(s)
+  youtubeVideoUrl String? @unique
+
+  // Cloudinary-specific fields
+  cloudinaryVideoUrl     String? // Full playable Cloudinary URL
+  cloudinaryThumbnailUrl String? // Thumbnail
+  cloudinaryPublicId     String? // Cloudinary publicId (e.g., "plants/rose-video-123")
+  cloudinaryResourceType String? // "video" | "image" | "raw"
+  cloudinaryFormat       String? // e.g., "mp4", "webm"
+  cloudinaryBytes        Int? // file size
+
+  // Classification
+  reelType   VideoType   @default(GENERAL) // Plant-related category
+  formatType VideoFormat @default(REEL) // Short reel vs full-length video
+
+  // Status flags
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  plant Plants? @relation(name: "PlantReelToPlants", fields: [plantId], references: [plantId], onDelete: Cascade)
+
+  @@index([plantId])
+  @@index([isActive])
+  @@index([reelType])
+  @@index([formatType])
+}
+
+enum VideoType {
+  GENERAL
+  PLANT_CARE
+  FERTILIZER_GUIDE
+  PEST_CONTROL
+  PROPAGATION
+  REPOTTING
+  SEASONAL_TIPS
+}
+
+enum VideoFormat {
+  REEL // short-form video like YouTube Shorts or Cloudinary short clips
+  VIDEO // long-form tutorial or demonstration
 }
