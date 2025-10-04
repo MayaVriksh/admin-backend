@@ -1,51 +1,23 @@
 const { prisma } = require('../../../../config/prisma.config');
 
-// A reusable, optimized select clause for fetching only the data needed for a product card
-const _baseSelectForCard = {
-    plantId: true,
-    name: true,
-    // Fetch the lowest MRP among all variants to display as the starting price "₹..."
-    variants: {
-        orderBy: { mrp: 'asc' },
-        take: 1,
-        select: { mrp: true }
-    },
-    // Fetch the primary image of the first variant for the card's display image
-    plantSizeProfile: {
-        select: {
-            PlantVariants: {
-                select: {
-                    plantVariantImages: {
-                        where: { isPrimary: true },
-                        take: 1,
-                        select: { mediaUrl: true }
-                    }
-                }
-            }
-        }
-    }
-};
-
-
 /**
- * Fetches a paginated list of plants that have at least one variant
- * associated with a specific tag name.
+ * Fetches a paginated list of SPECIFIC PLANT VARIANTS that are
+ * associated with a given tag name.
+ *
+ * This is a variant-centric query, designed to return individual variants
+ * (e.g., "Small, Green Peace Lily") that have a specific tag.
  */
 const findPlantsByTagName = async ({ tagName, page, limit }) => {
     const where = {
-        deletedAt: null,
         isProductActive: true,
-        // This is the core logic: find plants that have 'some' variant
-        // that is linked to 'some' tag with the specified name.
-        variants: {
+        deletedAt: null,
+        // The core logic is now simpler: find variants that have
+        // 'some' tag with the specified name.
+        tags: {
             some: {
-                tags: {
-                    some: {
-                        tagName: {
-                            equals: tagName,
-                            mode: 'insensitive'
-                        }
-                    }
+                tagName: {
+                    equals: tagName,
+                    mode: 'insensitive'
                 }
             }
         }
@@ -53,20 +25,66 @@ const findPlantsByTagName = async ({ tagName, page, limit }) => {
 
     const skip = (page - 1) * limit;
 
-    const [plants, total] = await prisma.$transaction([
-        prisma.plants.findMany({
+    const [variants, total] = await prisma.$transaction([
+        prisma.plantVariants.findMany({
             where,
             skip,
             take: limit,
             orderBy: { createdAt: 'desc' },
-            select: _baseSelectForCard
+            // This select clause is now on the PlantVariants model
+            select: {
+                variantId: true,
+                sku: true,
+                mrp: true,
+                // Include details from related models
+                color: {
+                    select: {
+                        name: true
+                    }
+                },
+                size: {
+                    select: {
+                        // Assuming your PlantSizeProfile has these fields
+                        height: true,
+                        weight: true,
+                        plantSize: true // e.g., "Small", "Medium"
+                    }
+                },
+                plantVariantImages: {
+                    where: { isPrimary: true },
+                    take: 1,
+                    select: { mediaUrl: true }
+                },
+                // Include the parent plant's name
+                plants: {
+                    select: {
+                        plantId: true,
+                        name: true
+                    }
+                },
+                Review: {
+                    select: {
+                        rating: true // Fetches an array of all ratings for the variant
+                    }
+                },
+                _count: {
+                    select: {
+                        Review: true // Counts the total number of reviews for the variant
+                    }
+                }
+            }
         }),
-        prisma.plants.count({ where })
+        // The count is also now on the PlantVariants model
+        prisma.plantVariants.count({ where })
     ]);
 
-    return { plants, total };
+    // NOTE: The service layer will now receive an array of VARIANTS, not plants.
+    // It will need to be adjusted to handle this richer data.
+    // e.g., renaming the returned object property from 'plants' to 'variants'
+    return { plants: variants, total };
 };
 
 module.exports = {
     findPlantsByTagName,
 };
+

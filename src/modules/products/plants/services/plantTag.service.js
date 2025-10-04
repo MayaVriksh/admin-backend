@@ -16,7 +16,29 @@ const _transformPlantForCard = (plant) => {
         reviewCount: Math.floor(Math.random() * 100) + 20 // Dummy data
     };
 };
+// Example for your service layer (e.g., in plantTag.service.js)
 
+const _transformVariantForCard = (variant) => {
+    const reviewCount = variant._count.Review;
+    let averageRating = 0;
+    console.log("XX",variant.plants.name)
+    const primaryImage = variant.plantVariantImages[0]?.mediaUrl || null
+    if (reviewCount > 0) {
+        const totalRating = variant.Review.reduce((sum, review) => sum + review.rating, 0);
+        averageRating = parseFloat((totalRating / reviewCount).toFixed(1));
+    }
+
+    return {
+        variantId: variant.variantId,
+        plantName: variant.plants.name,
+        sizeName: variant.size.sizeName,
+        colorName: variant.color.name,
+        mrp: Number(variant.mrp),
+        imageUrl: primaryImage,
+        rating: averageRating,
+        reviewCount: reviewCount
+    };
+};
 /**
  * Retrieves a paginated list of plants filtered by a tag.
  */
@@ -24,7 +46,7 @@ const findPlantsByTag = async (filters) => {
     const { tagName, page, limit } = filters;
 
     const { plants, total } = await findPlantsByTagName({ tagName, page, limit });
-
+    console.log(plants)
     if (!plants || plants.length === 0) {
         return {
             success: true,
@@ -34,7 +56,7 @@ const findPlantsByTag = async (filters) => {
         };
     }
 
-    const transformedPlants = plants.map(_transformPlantForCard);
+    const transformedPlants = plants.map(_transformVariantForCard);
     const totalPages = Math.ceil(total / limit);
 
     return {
