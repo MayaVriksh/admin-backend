@@ -30,8 +30,7 @@
         "seed:warehouse_inventory": "bun run src/seeder/scripts/warehouseInventory.seeder.ts",
         "seed:plant_category": "bun run src/seeder/scripts/plantCategory.seeder.ts",
         "send_grid_email": "bun run src/utils/sendgrid.ts",
-        "nodemailer_email": "bun run src/utils/email.util.ts",
-        "postinstall": "prisma generate --no-engine"
+        "nodemailer_email": "bun run src/utils/email.util.ts"
     },
     "prisma": {
         "schema": "src/orm/prisma/schema.prisma"
