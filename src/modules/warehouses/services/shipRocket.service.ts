@@ -13,23 +13,9 @@ interface FetchCollectionsParams {
 
 const ShipRocketService = {
     /*
-     * Fetch all products (optionally filtered by collection) and format for ShipRocket
-     */
-    async fetchProducts({ page, limit }: FetchProductsParams) {
-        return this._formatProducts(
-            await ShipRocketRepository.fetchProducts({ page, limit })
-        );
-    },
-
-    /*
      * Fetch products filtered by collection/category and format for ShipRocket
      */
-    async fetchProductsByCollection({
-        collection_id,
-        page,
-        limit
-    }: FetchProductsParams) {
-        if (!collection_id) throw new Error("collection_id is required");
+    async fetchProducts({ collection_id, page, limit }: FetchProductsParams) {
         return this._formatProducts(
             await ShipRocketRepository.fetchProducts({
                 collection_id,
@@ -76,15 +62,15 @@ const ShipRocketService = {
             status: plant.isProductActive ? "active" : "inactive",
             variants: plant.variants.map((variant: any) => {
                 const weightInGram = Number(variant.size?.weight || 0) * 1000;
-                console.log("Weight in gram: ", weightInGram);
-                console.log(
-                    "Plant Warehosue inventory: ",
-                    variant.plantWarehouseInventory
-                );
-                console.log(
-                    "True cost price: ",
-                    variant.plantWarehouseInventory?.trueCostPrice.toString()
-                );
+                // console.log("Weight in gram: ", weightInGram);
+                // console.log(
+                //     "Plant Warehosue inventory: ",
+                //     variant.plantWarehouseInventory
+                // );
+                // console.log(
+                //     "True cost price: ",
+                //     variant.plantWarehouseInventory?.trueCostPrice.toString()
+                // );
 
                 return {
                     id: variant.variantId,
