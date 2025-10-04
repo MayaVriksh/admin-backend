@@ -2,12 +2,12 @@
  * Application initialization and configuration.
  */
 
-import Hapi from '@hapi/hapi';
+import Hapi from "@hapi/hapi";
 
-import Inert from '@hapi/inert';
-import Vision from '@hapi/vision';
-import HapiSwagger from 'hapi-swagger';
-import { baseRoutes } from './routes/base.route';
+import Inert from "@hapi/inert";
+import Vision from "@hapi/vision";
+import HapiSwagger from "hapi-swagger";
+import { baseRoutes } from "./routes/base.route";
 
 const createServer = async () => {
     const server = Hapi.server({
@@ -78,7 +78,10 @@ const createServer = async () => {
                     version: "1.0.0",
                     description: "API for Mayavriksh backend"
                 },
-                schemes: ["http", "https"],
+                schemes:
+                    process.env.NODE_ENV === "production"
+                        ? ["https"]
+                        : ["http", "https"],
                 grouping: "tags",
                 swaggerUI: true,
                 documentationPage: true,
