@@ -23,6 +23,8 @@ const ShipRocketController = {
             });
             return h.response(data).code(RESPONSE_CODES.SUCCESS);
         } catch (error: any) {
+            console.log("Error: ", error);
+
             return h
                 .response({ error: COMMON.INTERNAL_SERVER_ERROR })
                 .code(RESPONSE_CODES.INTERNAL_SERVER_ERROR);
@@ -42,6 +44,8 @@ const ShipRocketController = {
             });
             return h.response(data).code(RESPONSE_CODES.SUCCESS);
         } catch (error: any) {
+            console.log("Error: ", error);
+
             return h
                 .response({ error: COMMON.INTERNAL_SERVER_ERROR })
                 .code(RESPONSE_CODES.INTERNAL_SERVER_ERROR);
