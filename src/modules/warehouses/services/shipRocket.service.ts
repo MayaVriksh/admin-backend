@@ -78,6 +78,10 @@ const ShipRocketService = {
                 const weightInGram = Number(variant.size?.weight || 0) * 1000;
                 console.log("Weight in gram: ", weightInGram);
                 console.log(
+                    "Plant Warehosue inventory: ",
+                    variant.plantWarehouseInventory
+                );
+                console.log(
                     "True cost price: ",
                     variant.plantWarehouseInventory?.trueCostPrice.toString()
                 );
