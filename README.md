@@ -3,15 +3,19 @@
 A scalable and well-documented backend API for the Mayavriksh platform, built with **Hapi.js**, **Prisma ORM**, **Swagger for API documentation** and **MySQL** as the database.
 
 ---
+
 ## Cloning Instructions
 
 ### Clone repo with submodules
+
 git clone --recurse-submodules <repo-url>
 
 ### If you already cloned without submodules
+
 git submodule update --init --recursive
 
 ### Pull latest changes in submodules
+
 git submodule update --remote --merge
 
 ## 🛠 Tech Stack
@@ -74,11 +78,13 @@ Quick access to the official docs for all major technologies used in this projec
     For Windows:
     npm install -g bun
     ```
+
     ```
     For running Bun:
     bun i
     bun --watch src/server.ts
     ```
+
     > ℹ️ This will also automatically run `prisma generate` due to the `postinstall` script in `package.json`.
 
 5. **Set up your `.env` file**
@@ -130,14 +136,36 @@ http://localhost:5500/mayavriksh-docs
 
 ## 🧪 Available Scripts
 
-| Command                  | Description                                                            |
-| ------------------------ | ---------------------------------------------------------------------- |
-| `npm install`            | Installs all dependencies & runs `prisma generate`                     |
-| `npm run dev`            | Starts server using `nodemon`                                          |
-| `npm start`              | Starts server using Node                                               |
-| `npm run format`         | Formats code using Prettier                                            |
-| `npm run prisma`         | Shortcut to Prisma CLI                                                 |
-| `npx prisma migrate dev` | Run after making schema changes(Delete "generated" folder before-hand) |
+| Command                            | Description                                                             |
+| ---------------------------------- | ----------------------------------------------------------------------- |
+| `bun install`                      | Installs all dependencies & runs `prisma generate`                      |
+| `bun dev`                          | Starts server with Bun’s watch mode (`src/server.ts`)                   |
+| `bun start`                        | Starts server using Bun (`src/server.ts`)                               |
+| `bun lint`                         | Runs ESLint for `.js` and `.ts` files                                   |
+| `bun format`                       | Formats code using Prettier                                             |
+| `bun prisma`                       | Shortcut to Prisma CLI                                                  |
+| `bun run prisma:generate`          | Generates Prisma client without engines                                 |
+| `bun run prisma:migrate`           | Runs Prisma migrations (`migrate dev`)                                  |
+| `bun run prisma:studio`            | Opens Prisma Studio                                                     |
+| `bunx prisma migrate dev`          | Run after making schema changes (Delete "generated" folder before-hand) |
+| `bunx prisma studio`               | Opens Prisma Studio                                                     |
+| `bun run seed:all`                 | Seeds the database with all scripts                                     |
+| `bun run seed:serial_trackers`     | Seeds serial trackers                                                   |
+| `bun run seed:roles`               | Seeds roles                                                             |
+| `bun run seed:warehouses`          | Seeds warehouses                                                        |
+| `bun run seed:users`               | Seeds users                                                             |
+| `bun run seed:tags`                | Seeds tags                                                              |
+| `bun run seed:colors`              | Seeds colors                                                            |
+| `bun run seed:plants`              | Seeds plants                                                            |
+| `bun run seed:pot_materials`       | Seeds pot materials                                                     |
+| `bun run seed:pots`                | Seeds pots                                                              |
+| `bun run seed:fertilizers`         | Seeds fertilizers                                                       |
+| `bun run seed:purchase_order`      | Seeds purchase orders                                                   |
+| `bun run seed:warehouse_inventory` | Seeds warehouse inventory                                               |
+| `bun run seed:plant_category`      | Seeds plant categories                                                  |
+| `bun run send_grid_email`          | Test SendGrid email utility                                             |
+| `bun run nodemailer_email`         | Test Nodemailer email utility                                           |
+| `bun run postinstall`              | Runs `prisma generate --no-engine` after install                        |
 
 ---
 
