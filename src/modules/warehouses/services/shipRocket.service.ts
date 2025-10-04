@@ -83,16 +83,16 @@ const ShipRocketService = {
                 );
                 console.log(
                     "True cost price: ",
-                    variant.plantWarehouseInventory[0]?.trueCostPrice.toString()
+                    variant.plantWarehouseInventory?.trueCostPrice.toString()
                 );
 
                 return {
                     id: variant.variantId,
                     title: variant.color?.name || "Default",
-                    price: variant.plantWarehouseInventory[0]?.trueCostPrice.toString(),
+                    price: variant.plantWarehouseInventory?.trueCostPrice.toString(),
                     compare_at_price: variant.mrp.toString(),
                     sku: variant.sku,
-                    quantity: variant.plantWarehouseInventory[0]?.currentStock,
+                    quantity: variant.plantWarehouseInventory?.currentStock,
                     created_at: variant.createdAt,
                     updated_at: variant.updatedAt,
                     taxable: true,
